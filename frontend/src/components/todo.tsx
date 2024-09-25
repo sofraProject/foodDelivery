@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
+import { addTodo, removeTodo } from "../../libs/redux/actions/todo.action";
 import { useAppDispatch, useAppSelector } from "../../libs/redux/hooks";
-import { addTodo, removeTodo } from "../../libs/redux/slices/todos";
 
 const TodoComponent = () => {
   const todos = useAppSelector((state) => state.todos.todos); // Sélectionner les todos depuis le store

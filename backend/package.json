@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server.js",
-    "prisma": "prisma migrate deploy && prisma generate"
+    "prisma": " prisma generate"
   },
   "author": "",
   "license": "ISC",

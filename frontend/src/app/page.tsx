@@ -1,4 +1,8 @@
 import TodoComponent from "../components/todo";
 export default function Home() {
-  return <TodoComponent />;
+  return (
+    <>
+      <h1>newTitle</h1>
+    </>
+  );
 }

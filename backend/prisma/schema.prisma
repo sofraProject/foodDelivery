@@ -16,6 +16,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+//azyz model user
+
 model Sample {
   id        Int      @id @default(autoincrement())
   name      String
