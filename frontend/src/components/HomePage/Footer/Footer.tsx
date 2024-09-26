@@ -1,3 +1,4 @@
+"use client";
 import React from "react";
 import BottomFooter from "./BottomFooter";
 import MainFooter from "./MainFooter";

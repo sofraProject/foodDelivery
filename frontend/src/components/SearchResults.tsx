@@ -1,9 +1,11 @@
+"use client";
+
+import axios from "axios";
+import Link from "next/link";
 import React, { useEffect, useState } from "react";
+import { FaStore, FaUtensils } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
-import { Link } from "react-router-dom";
-import { FaUtensils, FaStore } from "react-icons/fa";
-import axios from "axios";
 
 const SearchResults: React.FC = () => {
   const { results, loading, error } = useSelector(
@@ -33,13 +35,11 @@ const SearchResults: React.FC = () => {
       });
     }
   }, [results.restaurants]);
-
+  const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
   const getAddressFromCoordinates = async (lng: number, lat: number) => {
     try {
       const response = await axios.get(
-        `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${
-          import.meta.env.VITE_MAPBOX_TOKEN
-        }`
+        `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${mapboxToken}`
       );
       return response.data.features[0].place_name;
     } catch (error) {
@@ -89,7 +89,7 @@ const SearchResults: React.FC = () => {
                   className="border-b border-gray-200 pb-4 last:border-b-0"
                 >
                   <Link
-                    to={`/OneItemdetail/${item.id}`}
+                    href={`/OneItemdetail/${item.id}`}
                     className="flex items-center hover:bg-orange-50 transition duration-300 rounded-lg p-2"
                   >
                     <img
