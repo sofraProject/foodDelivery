@@ -1,3 +1,8 @@
+<<<<<<< HEAD
+node_modules
+# Keep environment variables out of version control
+.env
+=======
 # Node.js specific
 node_modules/
 node_modules
@@ -120,3 +125,4 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+>>>>>>> 2044e4f9fd77185218f87b7963958675452400e6
