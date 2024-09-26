@@ -8,4 +8,4 @@ router.post(
   authenticate,
   paymentController.generatePayment
 );
-module.exports = Router;
+module.exports = router;
