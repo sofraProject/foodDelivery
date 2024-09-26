@@ -17,6 +17,12 @@ app.use(morgan("dev")); // Log HTTP requests
 const userRoute= require("./routes/User.route")
 app.use("/api/user" , userRoute)
 
+
+const searchRoute =require("./routes/Search.route")
+app.use("/api/search" , searchRoute)
+
+
+
 // Start the server
 const PORT = process.env.SERVER_PORT || 3306; // Provide a default port
 app.listen(PORT, async () => {
