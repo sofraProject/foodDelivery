@@ -6,7 +6,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server.js",
-    "prisma": " prisma generate",
+    "migrateAndGenerate": "npx prisma migrate dev --name init && npx prisma generate",
     "seed": "node seedsUsers.js",
     "seedCategory": "node seedsCategory.js",
     "seedMenuItem": "node seedsMenuItem.js"
