@@ -1,8 +1,9 @@
-'use client'
-
+"use client";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import React, { useState, FormEvent } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate, Link } from "react-router-dom";
+// import { useNavigate, Link } from "react-router-dom";
 import { signUpUser } from "../../redux/features/authSlice";
 import { AppDispatch } from "../../redux/store";
 import Brand from "../../components/Form/Brand";
@@ -10,6 +11,7 @@ import Button from "../../components/Form/Button";
 import TextField from "../../components/Form/TextField";
 
 const SignUp: React.FC = () => {
+  const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -17,7 +19,6 @@ const SignUp: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   // const [location, setLocation] = useState<[number, number] | null>(null);
   const dispatch: AppDispatch = useDispatch();
-  const navigate = useNavigate();
 
   // const getLocation = () => {
   //   if ("geolocation" in navigator) {
@@ -51,7 +52,7 @@ const SignUp: React.FC = () => {
           role,
         })
       );
-      navigate("/signin");
+      router.push("/signin");
     } catch (error) {
       console.error("Error signing up:", error);
       setError("Sign up failed");
@@ -92,7 +93,6 @@ const SignUp: React.FC = () => {
               title="Role"
               value={role}
               name="role"
-
               onChange={(e) => setRole(e.target.value)}
               className="p-2 border rounded-md"
             >
@@ -102,7 +102,7 @@ const SignUp: React.FC = () => {
             </select>
           </div>
           <Button text="Sign Up" />
-          <Link to="/signin">
+          <Link href="/signin">
             <p className="text-base text-primary text-center my-6 hover:underline">
               Already have an account?
             </p>

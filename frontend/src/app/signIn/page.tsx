@@ -1,22 +1,25 @@
-'use client'
+"use client";
 
-import React, { useState, FormEvent } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import React, { FormEvent, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, Link } from "react-router-dom";
-import { loginUser } from "../../redux/features/authSlice";
-import { RootState, AppDispatch } from "../../redux/store";
+// import { useNavigate, Link } from "react-router-dom";
 import { unwrapResult } from "@reduxjs/toolkit";
 import Brand from "../../components/Form/Brand";
 import Button from "../../components/Form/Button";
 import TextField from "../../components/Form/TextField";
+import { loginUser } from "../../redux/features/authSlice";
+import { AppDispatch, RootState } from "../../redux/store";
 import "../../styles/index.css";
 import "../../styles/tailwind.css";
 
 const SignIn: React.FC = () => {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const dispatch: AppDispatch = useDispatch();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const { status, error } = useSelector((state: RootState) => state.users);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -31,9 +34,9 @@ const SignIn: React.FC = () => {
 
       localStorage.setItem("token", user.token);
       if (user.role === "restaurant_owner") {
-        navigate("/dashboard");
+        router.push("/dashboard");
       } else {
-        navigate("/");
+        router.push("/");
       }
     } catch (error) {
       console.error("Error signing in:", error);
@@ -68,7 +71,7 @@ const SignIn: React.FC = () => {
           {status === "failed" && (
             <p className="text-red-500 text-center mt-2">{error}</p>
           )}
-          <Link to="/signup">
+          <Link href="/signup">
             <p className="text-base text-primary text-center my-6 hover:underline">
               Need an account?
             </p>

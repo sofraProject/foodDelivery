@@ -1,10 +1,10 @@
+import Image from "next/image";
 import logo from "../../assets/logo2.png";
-import "../../../styles/tailwind.css";
-
+import "../../styles/tailwind.css";
 const Brand: React.FC = () => {
   return (
     <div>
-      <img className="w-52" src={logo} alt="logo" />
+      <Image className="w-52" src={logo} alt="logo" />
     </div>
   );
 };
