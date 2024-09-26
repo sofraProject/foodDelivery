@@ -1,15 +1,15 @@
-'use client'
+"use client";
 
 import React from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
 import Banner from "../../components/HomePage/Banner";
 import Foods from "../../components/HomePage/Foods";
 import Footer from "../../components/HomePage/Footer/Footer";
-import RestaurantList from "../../components/RestaurantList";
 import HowItWorks from "../../components/HomePage/HowItWorks";
 import Testimonials from "../../components/HomePage/Testimonials";
+import RestaurantList from "../../components/RestaurantList";
 import SearchResults from "../../components/SearchResults";
+import { RootState } from "../../redux/store";
 
 export const HomePage: React.FC = () => {
   const { results } = useSelector((state: RootState) => state.search);

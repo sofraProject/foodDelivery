@@ -1,5 +1,6 @@
+"use client";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 interface FoodItem {
@@ -14,23 +15,24 @@ interface MenuItem {
   imageUrl: string;
   price: number;
 }
+const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
 
 const Foods: React.FC = () => {
   const [categories, setCategories] = useState<FoodItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const navigate = useNavigate();
+  const router = useRouter();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/categories")
+    fetch(`${serverDomain}/api/categories`)
       .then((res) => res.json())
       .then((data) => setCategories(data));
   }, []);
 
   const handleCategoryClick = (id: number) => {
     setSelectedCategory(id);
-    fetch(`http://localhost:3000/api/menu-items/cat/${id}`)
+    fetch(`${serverDomain}/api/menu-items/cat/${id}`)
       .then((res) => res.json())
       .then((data) => {
         const formattedData = data.map((item: MenuItem) => ({
@@ -45,7 +47,7 @@ const Foods: React.FC = () => {
   };
 
   const handleItemClick = (itemId: number) => {
-    navigate(`/OneItemdetail/${itemId}`);
+    router.push(`/OneItemdetail/${itemId}`);
   };
 
   const scroll = (direction: "left" | "right") => {
@@ -60,21 +62,21 @@ const Foods: React.FC = () => {
   };
 
   return (
-    <section className="my-16 max-w-screen-xl mx-auto px-6">
-      <h2 className="text-3xl font-bold mb-8 text-gray-800">
+    <section className="max-w-screen-xl px-6 mx-auto my-16">
+      <h2 className="mb-8 text-3xl font-bold text-gray-800">
         Explore Our Menu
       </h2>
       <div className="relative">
         <button
           onClick={() => scroll("left")}
-          className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition duration-300"
+          className="absolute left-0 z-10 p-2 transition duration-300 transform -translate-y-1/2 bg-white rounded-full shadow-md top-1/2 hover:bg-gray-100"
         >
           <FaChevronLeft className="text-gray-600" />
         </button>
 
         <div
           ref={scrollRef}
-          className="flex overflow-x-scroll space-x-6 p-4 scroll-smooth hide-scrollbar"
+          className="flex p-4 space-x-6 overflow-x-scroll scroll-smooth hide-scrollbar"
         >
           {categories.map((category) => (
             <div
@@ -87,10 +89,10 @@ const Foods: React.FC = () => {
               <img
                 src={category.imageUrl}
                 alt={category.name}
-                className="w-full h-32 object-cover"
+                className="object-cover w-full h-32"
               />
               <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-800 mb-1 truncate">
+                <h3 className="mb-1 text-lg font-semibold text-gray-800 truncate">
                   {category.name}
                 </h3>
               </div>
@@ -100,7 +102,7 @@ const Foods: React.FC = () => {
 
         <button
           onClick={() => scroll("right")}
-          className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-white p-2 rounded-full shadow-md hover:bg-gray-100 transition duration-300"
+          className="absolute right-0 z-10 p-2 transition duration-300 transform -translate-y-1/2 bg-white rounded-full shadow-md top-1/2 hover:bg-gray-100"
         >
           <FaChevronRight className="text-gray-600" />
         </button>
@@ -108,23 +110,23 @@ const Foods: React.FC = () => {
 
       {selectedCategory && (
         <div className="mt-16">
-          <h2 className="text-2xl font-semibold mb-6 text-gray-800">
+          <h2 className="mb-6 text-2xl font-semibold text-gray-800">
             Menu Items
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {menuItems.map((item) => (
               <div
                 key={item.id}
                 onClick={() => handleItemClick(item.id)}
-                className="bg-white shadow-md rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer"
+                className="overflow-hidden transition-all duration-300 bg-white rounded-lg shadow-md cursor-pointer hover:shadow-lg hover:scale-105"
               >
                 <img
                   src={item.imageUrl}
                   alt={item.name}
-                  className="w-full h-48 object-cover"
+                  className="object-cover w-full h-48"
                 />
                 <div className="p-4">
-                  <h3 className="text-xl font-semibold text-gray-800 mb-2 truncate">
+                  <h3 className="mb-2 text-xl font-semibold text-gray-800 truncate">
                     {item.name}
                   </h3>
                   <p className="text-lg font-bold text-primary">

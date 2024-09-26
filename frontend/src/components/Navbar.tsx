@@ -1,15 +1,19 @@
-import React, { useState, useEffect } from "react";
-import { useNavigate, NavLink } from "react-router-dom";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState, AppDispatch } from "../redux/store";
-import { logoutUser } from "../redux/features/authSlice";
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import { BsCart2 } from "react-icons/bs";
 import { FiLogOut } from "react-icons/fi";
+import { useDispatch, useSelector } from "react-redux";
 import logo from "../../src/assets/logo2.png";
+import { logoutUser } from "../redux/features/authSlice";
+import { AppDispatch, RootState } from "../redux/store";
 
 const Navbar: React.FC = () => {
   const [changeHeader, setChangeHeader] = useState<boolean>(false);
-  const navigate = useNavigate();
+  const router = useRouter();
   const dispatch: AppDispatch = useDispatch();
   const { user } = useSelector((state: RootState) => state.users);
   const { items } = useSelector((state: RootState) => state.cart);
@@ -29,7 +33,7 @@ const Navbar: React.FC = () => {
 
   const handleLogout = () => {
     dispatch(logoutUser());
-    navigate("/signin");
+    router.push("/signin");
   };
 
   return (
@@ -40,55 +44,58 @@ const Navbar: React.FC = () => {
           : "bg-transparent fixed z-50 top-0 left-0 w-full transition duration-500"
       }
     >
-      <nav className="flex items-center max-w-screen-xl mx-auto px-6 py-3">
+      <nav className="flex items-center max-w-screen-xl px-6 py-3 mx-auto">
         {/* left */}
         <div className="flex flex-grow">
-          <img
-            className="w-36 cursor-pointer"
+          <Image
+            className="cursor-pointer w-36"
             src={logo}
             alt="logo"
-            onClick={() => navigate("/")}
+            onClick={() => router.push("/")}
           />
         </div>
         {/* right */}
         {user ? (
           <div className="flex items-center justify-end space-x-4">
             {user.role === "driver" && (
-              <NavLink to="/delivery-interface" className="text-gray-600">
-                Delivery Interface
-              </NavLink>
+              <Link href="/delivery-interface">
+                <a className="text-gray-600">Delivery Interface</a>
+              </Link>
             )}
             {user.role === "restaurant_owner" && (
-              <NavLink to="/dashboard" className="text-gray-600">
-                Dashboard
-              </NavLink>
+              <Link href="/dashboard">
+                <a className="text-gray-600">Dashboard</a>
+              </Link>
             )}
             <div
               className="relative flex cursor-pointer"
-              onClick={() => navigate("/cart")}
+              onClick={() => router.push("/cart")}
             >
-              <span className="bg-primary w-6 h-6 rounded-full flex items-center justify-center text-white poppins absolute -right-2 -top-2">
+              <span className="absolute flex items-center justify-center w-6 h-6 text-white rounded-full bg-primary poppins -right-2 -top-2">
                 {items.length}
               </span>
-              <BsCart2 className="cursor-pointer w-6 h-6 text-gray-700" />
+              <BsCart2 className="w-6 h-6 text-gray-700 cursor-pointer" />
             </div>
 
-            <p className="text-gray-700 poppins hidden md:block lg:block">
+            <p className="hidden text-gray-700 poppins md:block lg:block">
               {user.name}
             </p>
             <FiLogOut
-              className="cursor-pointer w-6 h-6 text-gray-700"
+              className="w-6 h-6 text-gray-700 cursor-pointer"
               onClick={handleLogout}
             />
           </div>
         ) : (
           <div className="flex items-center justify-end space-x-6">
-            <button className="poppins" onClick={() => navigate("/signin")}>
+            <button
+              className="px-6 py-3 transition transform bg-white rounded-full d uration-700 text-primary poppins ring-red-300 focus:outline-none focus:ring-4 hover:scale-105"
+              onClick={() => router.push("/signin")}
+            >
               Sign In
             </button>
             <button
-              className="bg-primary px-6 py-3 text-white poppins rounded-full ring-red-300 focus:outline-none focus:ring-4 transform transition duration-700 hover:scale-105"
-              onClick={() => navigate("/signup")}
+              className="px-6 py-3 text-white transition duration-700 transform rounded-full bg-primary poppins ring-red-300 focus:outline-none focus:ring-4 hover:scale-105"
+              onClick={() => router.push("/signup")}
             >
               Sign Up
             </button>
