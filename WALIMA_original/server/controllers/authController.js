@@ -91,7 +91,6 @@ module.exports = {
         },
       });
     } catch (error) {
-      
       console.error("Error signing in user:", error);
       res
         .status(500)
