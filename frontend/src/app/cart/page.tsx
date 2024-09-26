@@ -37,7 +37,7 @@ const Cart: React.FC = () => {
   const handlePlaceOrder = async () => {
     try {
       const orderResponse = await axios.post(
-        "http://localhost:3000/api/orders/create",
+        "http://localhost:4000/api/orders/create",
         {
           items: cartItems,
         },
