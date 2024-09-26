@@ -1,10 +1,12 @@
-import React, { useEffect, useRef, useState } from "react";
+"use client";
+
+import axios from "axios";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
-import axios from "axios";
+import React, { useEffect, useRef, useState } from "react";
 import useSocket from "../hooks/useSocket";
 
-mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN as string;
+// mapboxgl.accessToken = import.meta.env.VITE_MAPBOX_TOKEN as string;
 
 mapboxgl.setRTLTextPlugin(
   "https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-rtl-text/v0.3.0/mapbox-gl-rtl-text.js",

@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
-import { RootState, AppDispatch } from "../../redux/store";
+"use client";
 
-import LocationPrompt from "../LocationPrompt";
+import React, { useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
+import { useDispatch, useSelector } from "react-redux";
 import { searchProductsAndRestaurants } from "../../redux/features/searchSlice";
+import { AppDispatch, RootState } from "../../redux/store";
+import LocationPrompt from "../LocationPrompt";
+
 const Banner: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [showSearch, setShowSearch] = useState<boolean>(false);

@@ -1,7 +1,8 @@
+"use client";
+import Link from "next/link";
 import React from "react";
 import { FaFacebookF, FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
 import Brand from "../../Form/Brand";
-import { Link } from "react-router-dom";
 
 interface FooterLink {
   id: number;
@@ -34,7 +35,7 @@ const MainFooter: React.FC = () => {
         {FooterLinks.map((item) =>
           item.path ? (
             <Link
-              to={item.path}
+              href={item.path}
               key={item.id}
               className="text-white text-xs hover:text-gray-400 transition-colors cursor-pointer"
             >

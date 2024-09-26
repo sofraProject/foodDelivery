@@ -5,7 +5,7 @@ exports.getAllCarts = async (req, res) => {
     const carts = await prismaConnection.cart.findMany();
     res.status(200).json(carts);
   } catch (error) {
-    res.status(500).json({ message: "Error retrieving carts", error });
+    res.status(500).json({ message: "Error retrieving carts", error: error.message });
   }
 };
 
@@ -20,7 +20,7 @@ exports.getCartById = async (req, res) => {
             name: true,
             price: true,
             imageUrl: true,
-            availble: true,
+            available: true,
             likes: true,
           },
         },
@@ -30,10 +30,10 @@ exports.getCartById = async (req, res) => {
     if (carts.length > 0) {
       const cartsWithNumberPrice = carts.map((cart) => ({
         ...cart,
-        menuItem: {
-          ...cart.menuItem,
-          price: parseFloat(cart.menuItem.price),
-        },
+        menuItem: cart.menuItem.map(item => ({
+          ...item,
+          price: parseFloat(item.price),
+        })),
       }));
       res.status(200).json(cartsWithNumberPrice);
     } else {
@@ -82,11 +82,21 @@ exports.createCart = async (req, res) => {
 
     if (existingCartItem) {
       existingCartItem.quantity += quantity;
-      await prismaConnection.cart.update({
+      const updatedCartItem = await prismaConnection.cart.update({
         where: { id: existingCartItem.id },
         data: { quantity: existingCartItem.quantity },
+        include: {
+          menuItem: {
+            select: {
+              id: true,
+              name: true,
+              price: true,
+              imageUrl: true,
+            },
+          },
+        },
       });
-      res.status(200).json(existingCartItem);
+      res.status(200).json(updatedCartItem);
     } else {
       const newCart = await prismaConnection.cart.create({
         data: {
@@ -109,7 +119,7 @@ exports.createCart = async (req, res) => {
       res.status(201).json(newCart);
     }
   } catch (error) {
-    console.error(error);
+    console.error("Error creating cart:", error);
     res.status(500).json({ message: "Error creating cart", error: error.message });
   }
 };
@@ -132,7 +142,8 @@ exports.updateCart = async (req, res) => {
     });
     res.status(200).json(updatedCart);
   } catch (error) {
-    res.status(500).json({ message: "Error updating cart", error });
+    console.error("Error updating cart:", error);
+    res.status(500).json({ message: "Error updating cart", error: error.message });
   }
 };
 
@@ -143,7 +154,8 @@ exports.deleteCart = async (req, res) => {
     });
     res.status(204).json({ message: "Cart deleted" });
   } catch (error) {
-    res.status(500).json({ message: "Error deleting cart", error });
+    console.error("Error deleting cart:", error);
+    res.status(500).json({ message: "Error deleting cart", error: error.message });
   }
 };
 
@@ -158,7 +170,8 @@ exports.getCartByCustomerId = async (req, res) => {
       res.status(404).json({ message: "No carts found for this customer" });
     }
   } catch (error) {
-    res.status(500).json({ message: "Error retrieving carts by customer", error });
+    console.error("Error retrieving carts by customer:", error);
+    res.status(500).json({ message: "Error retrieving carts by customer", error: error.message });
   }
 };
 
@@ -173,7 +186,8 @@ exports.getCartByMenuItemId = async (req, res) => {
       res.status(404).json({ message: "No carts found for this menu item" });
     }
   } catch (error) {
-    res.status(500).json({ message: "Error retrieving carts by menu item", error });
+    console.error("Error retrieving carts by menu item:", error);
+    res.status(500).json({ message: "Error retrieving carts by menu item", error: error.message });
   }
 };
 
@@ -188,7 +202,8 @@ exports.getCartByRestaurantOwnerId = async (req, res) => {
       res.status(404).json({ message: "No carts found for this restaurant owner" });
     }
   } catch (error) {
-    res.status(500).json({ message: "Error retrieving carts by restaurant owner", error });
+    console.error("Error retrieving carts by restaurant owner:", error);
+    res.status(500).json({ message: "Error retrieving carts by restaurant owner", error: error.message });
   }
 };
 
@@ -200,6 +215,7 @@ exports.clearCart = async (req, res) => {
     });
     res.status(200).json({ message: "Cart cleared successfully" });
   } catch (error) {
-    res.status(500).json({ message: "Error clearing cart", error });
+    console.error("Error clearing cart:", error);
+    res.status(500).json({ message: "Error clearing cart", error: error.message });
   }
 };

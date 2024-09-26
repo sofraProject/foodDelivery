@@ -1,5 +1,6 @@
+"use client";
 import React from "react";
-import { FaSearch, FaUtensils, FaTruck } from "react-icons/fa";
+import { FaSearch, FaTruck, FaUtensils } from "react-icons/fa";
 
 const steps = [
   {
