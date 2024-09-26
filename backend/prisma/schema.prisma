@@ -14,8 +14,7 @@ model User {
   password                  String                  @db.VarChar(255)
   imagesUrl                 String?                 @db.VarChar(255)
   balance                   Decimal?                @db.Decimal(7, 3)
-  latitude                  Float?                  @db.Float
-  longitude                 Float?                  @db.Float
+ location                  Json?                   // Using Json to represent location data
   role                      UserRole                @default(customer)
 
   
