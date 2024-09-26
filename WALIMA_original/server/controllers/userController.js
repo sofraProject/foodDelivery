@@ -5,6 +5,9 @@ exports.getAllUsers = async (req, res) => {
     const users = await db.User.findAll();
     res.status(200).json(users);
   } catch (error) {
+
+//+
+// {"conversationId":"6ca62089-fcb7-47e9-a4e8-e7093a84913a","source":"instruct"}
     res.status(500).json({ error: error.message });
   }
 };

@@ -1,3 +1,4 @@
+
 const { Sequelize, DataTypes } = require("sequelize");
 const connection = require("../config/database");
 const User = require("./User");
