@@ -21,7 +21,7 @@ db.Category = Category;
 db.Cart = Cart;
 db.Delivery = Delivery;
 db.OrderItem = OrderItem;
-// connection
+connection
 //   .sync({ force: true })
 //   .then(() => {
 //     console.log("Database synced");
