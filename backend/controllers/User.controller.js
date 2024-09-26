@@ -1,4 +1,5 @@
 // userController.js
+
 const { prismaConnection } = require("../prisma/prisma");
 
 exports.getAllUsers = async (req, res) => {
@@ -7,7 +8,6 @@ exports.getAllUsers = async (req, res) => {
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ error: error.message });
-    a;
   }
 };
 
