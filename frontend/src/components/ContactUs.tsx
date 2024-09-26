@@ -1,3 +1,5 @@
+"use client";
+
 import emailjs from "emailjs-com";
 import React, { useState } from "react";
 import swal from "sweetalert";
@@ -37,14 +39,14 @@ const ContactUs: React.FC = () => {
       className="flex flex-col min-h-screen"
       style={{ backgroundColor: "#fed7aa" }}
     >
-      <main className="flex-grow flex items-center justify-center py-20 px-4 sm:px-6 lg:px-8">
-        <div className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl overflow-hidden">
+      <main className="flex items-center justify-center flex-grow px-4 py-20 sm:px-6 lg:px-8">
+        <div className="w-full max-w-4xl overflow-hidden bg-white shadow-2xl rounded-3xl">
           <div className="p-8 md:flex">
             <div className="md:w-full">
-              <h2 className="text-4xl font-extrabold text-gray-900 mb-4 text-center">
+              <h2 className="mb-4 text-4xl font-extrabold text-center text-gray-900">
                 Get in Touch with Us!
               </h2>
-              <p className="text-gray-600 mb-8 text-lg text-center">
+              <p className="mb-8 text-lg text-center text-gray-600">
                 We'd love to hear from you. Fill out the form below, and we'll
                 get back to you as soon as possible.
               </p>
@@ -62,7 +64,7 @@ const ContactUs: React.FC = () => {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Your Name"
-                    className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
                     required
                   />
                 </div>
@@ -80,7 +82,7 @@ const ContactUs: React.FC = () => {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Your Email"
-                    className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
                     required
                   />
                 </div>
@@ -97,7 +99,7 @@ const ContactUs: React.FC = () => {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="Your Message"
-                    className="w-full border border-gray-300 px-4 py-2 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:outline-none"
                     required
                   ></textarea>
                 </div>

@@ -1,5 +1,6 @@
+"use client";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 interface FoodItem {
@@ -19,7 +20,7 @@ const Foods: React.FC = () => {
   const [categories, setCategories] = useState<FoodItem[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null);
   const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
-  const navigate = useNavigate();
+  const router = useRouter();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -45,7 +46,7 @@ const Foods: React.FC = () => {
   };
 
   const handleItemClick = (itemId: number) => {
-    navigate(`/OneItemdetail/${itemId}`);
+    router.push(`/OneItemdetail/${itemId}`);
   };
 
   const scroll = (direction: "left" | "right") => {

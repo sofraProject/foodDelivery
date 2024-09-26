@@ -1,11 +1,11 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import "leaflet/dist/leaflet.css";
+import React, { useCallback, useEffect, useState } from "react";
 import DeliveryMap from "../../components/DeliveryMap";
 import useSocket from "../../hooks/useSocket";
-import { QrReader } from "react-qr-reader";
+// import { QrReader } from "react-qr-reader";
 
 const DeliveryInterface: React.FC = () => {
   const [showQrScanner, setShowQrScanner] = useState<boolean>(false);
@@ -130,14 +130,14 @@ const DeliveryInterface: React.FC = () => {
   }, [fetchOrderDetails]);
 
   return (
-    <div className="pt-20 min-h-screen bg-gray-100">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
-          <div className="bg-primary text-white px-6 py-4">
+    <div className="min-h-screen pt-20 bg-gray-100">
+      <div className="max-w-4xl px-4 py-8 mx-auto sm:px-6 lg:px-8">
+        <div className="overflow-hidden bg-white rounded-lg shadow-md">
+          <div className="px-6 py-4 text-white bg-primary">
             <h1 className="text-2xl font-bold">Delivery Interface</h1>
           </div>
           <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <div className="grid grid-cols-1 gap-4 mb-6 md:grid-cols-2">
               <input
                 type="text"
                 placeholder="Enter Delivery ID"
@@ -156,7 +156,7 @@ const DeliveryInterface: React.FC = () => {
             <div className="flex justify-center mb-6">
               <button
                 onClick={() => setShowQrScanner(!showQrScanner)}
-                className="px-6 py-2 bg-primary text-white rounded-full hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary transition duration-300 shadow-md"
+                className="px-6 py-2 text-white transition duration-300 rounded-full shadow-md bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 {showQrScanner ? "Hide QR Scanner" : "Scan QR Code"}
               </button>
@@ -190,19 +190,19 @@ const DeliveryInterface: React.FC = () => {
             <div className="flex flex-wrap gap-4 mb-6">
               <button
                 onClick={() => updateOrderStatus("preparing")}
-                className="px-6 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300"
+                className="px-6 py-2 text-white transition duration-300 bg-blue-500 rounded-full hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
               >
                 Start Preparing
               </button>
               <button
                 onClick={() => updateOrderStatus("on_the_way")}
-                className="px-6 py-2 bg-green-500 text-white rounded-full hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-300"
+                className="px-6 py-2 text-white transition duration-300 bg-green-500 rounded-full hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
               >
                 Start Delivery
               </button>
               <button
                 onClick={() => updateOrderStatus("delivered")}
-                className="px-6 py-2 bg-purple-500 text-white rounded-full hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500 transition duration-300"
+                className="px-6 py-2 text-white transition duration-300 bg-purple-500 rounded-full hover:bg-purple-600 focus:outline-none focus:ring-2 focus:ring-purple-500"
               >
                 Mark as Delivered
               </button>
@@ -211,8 +211,8 @@ const DeliveryInterface: React.FC = () => {
               currentLocation &&
               clientLocation && (
                 <div className="mt-6">
-                  <h2 className="text-2xl font-bold mb-4">Live Tracking</h2>
-                  <div className="h-96 rounded-lg overflow-hidden shadow-lg">
+                  <h2 className="mb-4 text-2xl font-bold">Live Tracking</h2>
+                  <div className="overflow-hidden rounded-lg shadow-lg h-96">
                     <DeliveryMap
                       orderId={orderId}
                       initialDriverLocation={currentLocation}
