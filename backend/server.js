@@ -3,7 +3,7 @@ const morgan = require("morgan");
 const cors = require("cors");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
-const { connectToDatabase } = require("./prisma2/prisma");
+const { connectToDatabase } = require("./prisma/prisma");
 require("dotenv").config();
 
 const authRoutes = require("./routes/auth.route");

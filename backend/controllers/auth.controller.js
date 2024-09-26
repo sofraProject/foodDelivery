@@ -1,4 +1,4 @@
-const { prismaConnection } = require("../prisma2/prisma");
+const { prismaConnection } = require("../prisma/prisma");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");

@@ -1,4 +1,4 @@
-const { prismaConnection } = require("../prisma2/prisma");
+const { prismaConnection } = require("../prisma/prisma");
 
 exports.getAllCategories = async (req, res) => {
   try {
