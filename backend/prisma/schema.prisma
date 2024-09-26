@@ -1,26 +1,141 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
-// prisma/schema.prisma
-
 generator client {
   provider = "prisma-client-js"
 }
 
-// schema.prisma
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
-//azyz model user
+model User {
+  id                        Int                     @id @default(autoincrement())
+  name                      String                  @db.VarChar(255)
+  email                     String                  @unique @db.VarChar(255)
+  password                  String                  @db.VarChar(255)
+  imagesUrl                 String?                 @db.VarChar(255)
+  balance                   Decimal?                @db.Decimal(7, 3)
+  latitude                  Float?                  @db.Float
+  longitude                 Float?                  @db.Float
+  role                      UserRole                @default(customer)
 
-model Sample {
-  id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  
+  restaurantOwnerHasCustomers RestaurantOwnerHasCustomer[] @relation("RestaurantOwner")
+  orders                    Order[]                 @relation("UserOrder")
+  deliveries                Delivery[]
+  cart                      Cart[]                   @relation("UserCart")
+  restaurantCustomers        RestaurantOwnerHasCustomer[] @relation("RestaurantOwnerRelation")
+  cartsAsRestaurantOwner     Cart[]                   @relation("RestaurantOwnerCart")
+  menuItems                 MenuItem[]               @relation("UserMenuItems")
+
+}
+
+enum UserRole {
+  customer
+  restaurant_owner
+  driver
+}
+
+model RestaurantOwnerHasCustomer {
+  customer_id              Int
+  restaurant_owner_id      Int
+  customer                 User    @relation("RestaurantOwner", fields: [customer_id], references: [id])
+  restaurantOwner          User    @relation("RestaurantOwnerRelation", fields: [restaurant_owner_id], references: [id])
+
+  @@id([customer_id, restaurant_owner_id])
+  @@index([restaurant_owner_id])
+  @@index([customer_id])
+}
+
+model Order {
+  id          Int      @id @default(autoincrement())
+  user_id     Int
+  status      OrderStatus @default(pending)
+  total_amount Decimal  @db.Decimal(10, 2)
+
+  orderItems  OrderItem[]
+  deliveries   Delivery[]
+
+  user       User     @relation("UserOrder", fields: [user_id], references: [id])
+  @@index([user_id])
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+enum OrderStatus {
+  pending
+  confirmed
+  completed
+  canceled
+}
+model Cart {
+  customer_id         Int
+  restaurant_owner_id Int
+  menu_item_id       Int
+  quantity           Int   @default(1)
+
+  customer          User     @relation("UserCart", fields: [customer_id], references: [id])
+  restaurantOwner   User     @relation("RestaurantOwnerCart", fields: [restaurant_owner_id], references: [id])
+  menuItem         MenuItem  @relation("MenuItemCart", fields: [menu_item_id], references: [id])
+
+  @@id([customer_id, restaurant_owner_id, menu_item_id]) // Composite primary key
+  @@index([menu_item_id])
+  @@index([customer_id, restaurant_owner_id])
+}
+
+model MenuItem {
+  id         Int      @id @default(autoincrement())
+  name       String   @db.VarChar(255)
+  imageUrl   String   @db.VarChar(500)
+  available   Boolean  @default(true)
+  likes      Int?
+  price      Decimal  @db.Decimal(7, 3)
+  users_id   Int
+  category_id Int
+
+  user       User     @relation("UserMenuItems", fields: [users_id], references: [id])
+  category   Category @relation(fields: [category_id], references: [id])
+  orderItems OrderItem[] 
+  carts      Cart[]   @relation("MenuItemCart")
+
+  @@index([users_id])
+  @@index([category_id])
+}
+
+
+model OrderItem {
+  id          Int     @id @default(autoincrement())
+  order_id    Int
+  menu_item_id Int
+  quantity    Int
+  price       Decimal @db.Decimal(10, 2)
+
+  order       Order    @relation(fields: [order_id], references: [id])
+  menuItem    MenuItem @relation(fields: [menu_item_id], references: [id])
+}
+
+model Delivery {
+  id            Int       @id @default(autoincrement())
+  order_id      Int
+  driver_id     Int
+  status        DeliveryStatus @default(assigned)
+  current_latitude  Float?
+  current_longitude Float?
+
+  order         Order     @relation(fields: [order_id], references: [id])
+  driver        User      @relation(fields: [driver_id], references: [id])
+}
+
+enum DeliveryStatus {
+  assigned
+  in_progress
+  completed
+}
+
+model Category {
+  id      Int      @id @default(autoincrement())
+  name    String   @db.VarChar(45)
+  imageUrl String   @db.VarChar(500)
+
+  menuItems MenuItem[]
 }

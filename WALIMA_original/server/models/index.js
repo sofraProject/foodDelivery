@@ -1,3 +1,4 @@
+
 const { Sequelize, DataTypes } = require("sequelize");
 const connection = require("../config/database");
 const User = require("./User");
@@ -21,7 +22,7 @@ db.Category = Category;
 db.Cart = Cart;
 db.Delivery = Delivery;
 db.OrderItem = OrderItem;
-// connection
+connection
 //   .sync({ force: true })
 //   .then(() => {
 //     console.log("Database synced");
