@@ -92,6 +92,7 @@ const Cart: React.FC = () => {
   const total = parseFloat((subTotal + tax + deliveryFee).toFixed(2));
   console.log(cartItems);
 
+
   return (
     <main className="min-h-screen banner">
       <div className="max-w-screen-xl px-6 py-20 mx-auto">
@@ -237,3 +238,4 @@ const Cart: React.FC = () => {
 };
 
 export default Cart;
+

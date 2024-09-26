@@ -28,6 +28,7 @@ tmp/
 .env.development.local
 .env.test.local
 .env.production.local
+./node_modules/
 
 # MacOS specific
 .DS_Store
@@ -84,3 +85,5 @@ coverage/
 # Temporary files
 *.swp
 *~
+
+./node_modules/
