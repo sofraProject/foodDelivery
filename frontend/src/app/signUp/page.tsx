@@ -60,11 +60,11 @@ const SignUp: React.FC = () => {
   };
 
   return (
-    <main className="h-screen w-full banner">
-      <div className="flex flex-col justify-center items-center h-screen">
+    <main className="w-full h-screen banner">
+      <div className="flex flex-col items-center justify-center h-screen">
         <Brand />
         <form
-          className="bg-white w-96 mt-6 p-4 rounded-lg shadow-lg"
+          className="p-4 mt-6 bg-white rounded-lg shadow-lg w-96"
           onSubmit={handleSubmit}
         >
           <div className="flex flex-col space-y-6">
@@ -103,12 +103,12 @@ const SignUp: React.FC = () => {
           </div>
           <Button text="Sign Up" />
           <Link href="/signin">
-            <p className="text-base text-primary text-center my-6 hover:underline">
+            <p className="my-6 text-base text-center text-primary hover:underline">
               Already have an account?
             </p>
           </Link>
         </form>
-        {error && <p className="text-red-500 mt-4">{error}</p>}
+        {error && <p className="mt-4 text-red-500">{error}</p>}
       </div>
     </main>
   );

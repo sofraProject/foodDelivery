@@ -6,6 +6,7 @@ import React, { useEffect, useState } from "react";
 import { FaStore, FaUtensils } from "react-icons/fa";
 import { useSelector } from "react-redux";
 import { RootState } from "../redux/store";
+const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
 
 const SearchResults: React.FC = () => {
   const { results, loading, error } = useSelector(
@@ -35,7 +36,7 @@ const SearchResults: React.FC = () => {
       });
     }
   }, [results.restaurants]);
-  const mapboxToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN;
+
   const getAddressFromCoordinates = async (lng: number, lat: number) => {
     try {
       const response = await axios.get(
@@ -49,10 +50,10 @@ const SearchResults: React.FC = () => {
   };
 
   if (loading)
-    return <div className="text-center py-8 text-2xl">Loading...</div>;
+    return <div className="py-8 text-2xl text-center">Loading...</div>;
   if (error)
     return (
-      <div className="text-center py-8 text-2xl text-red-500">
+      <div className="py-8 text-2xl text-center text-red-500">
         Error: {error}
       </div>
     );
@@ -67,41 +68,41 @@ const SearchResults: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-12 bg-gray-100">
-      <h2 className="text-4xl font-bold mb-8 text-center text-gray-800">
+    <div className="container px-4 py-12 mx-auto bg-gray-100">
+      <h2 className="mb-8 text-4xl font-bold text-center text-gray-800">
         Search Results
       </h2>
       {!hasMenuItems && !hasRestaurants && (
-        <p className="text-center text-xl text-gray-600">
+        <p className="text-xl text-center text-gray-600">
           No results found. Try a different search term.
         </p>
       )}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+      <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
         {hasMenuItems && (
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h3 className="text-2xl font-semibold mb-4 flex items-center text-orange-600">
+          <div className="p-6 bg-white rounded-lg shadow-lg">
+            <h3 className="flex items-center mb-4 text-2xl font-semibold text-orange-600">
               <FaUtensils className="mr-2" /> Menu Items
             </h3>
             <ul className="space-y-4">
               {paginate(results.menuItems, menuItemsPage).map((item) => (
                 <li
                   key={item.id}
-                  className="border-b border-gray-200 pb-4 last:border-b-0"
+                  className="pb-4 border-b border-gray-200 last:border-b-0"
                 >
                   <Link
                     href={`/OneItemdetail/${item.id}`}
-                    className="flex items-center hover:bg-orange-50 transition duration-300 rounded-lg p-2"
+                    className="flex items-center p-2 transition duration-300 rounded-lg hover:bg-orange-50"
                   >
                     <img
                       src={item.imageUrl || "https://via.placeholder.com/100"}
                       alt={item.name}
-                      className="w-20 h-20 object-cover rounded-lg mr-4"
+                      className="object-cover w-20 h-20 mr-4 rounded-lg"
                     />
                     <div>
-                      <h4 className="font-medium text-lg text-gray-800">
+                      <h4 className="text-lg font-medium text-gray-800">
                         {item.name}
                       </h4>
-                      <p className="text-orange-600 font-bold">
+                      <p className="font-bold text-orange-600">
                         ${Number(item.price).toFixed(2)}
                       </p>
                       <p className="text-sm text-gray-600">
@@ -112,13 +113,13 @@ const SearchResults: React.FC = () => {
                 </li>
               ))}
             </ul>
-            <div className="mt-4 flex justify-center">
+            <div className="flex justify-center mt-4">
               <button
                 onClick={() =>
                   setMenuItemsPage((prev) => Math.max(prev - 1, 1))
                 }
                 disabled={menuItemsPage === 1}
-                className="mx-2 px-4 py-2 bg-gray-200 rounded-md disabled:opacity-50"
+                className="px-4 py-2 mx-2 bg-gray-200 rounded-md disabled:opacity-50"
               >
                 Previous
               </button>
@@ -127,7 +128,7 @@ const SearchResults: React.FC = () => {
                 disabled={
                   menuItemsPage * itemsPerPage >= results.menuItems.length
                 }
-                className="mx-2 px-4 py-2 bg-gray-200 rounded-md disabled:opacity-50"
+                className="px-4 py-2 mx-2 bg-gray-200 rounded-md disabled:opacity-50"
               >
                 Next
               </button>
@@ -135,8 +136,8 @@ const SearchResults: React.FC = () => {
           </div>
         )}
         {hasRestaurants && (
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h3 className="text-2xl font-semibold mb-4 flex items-center text-green-600">
+          <div className="p-6 bg-white rounded-lg shadow-lg">
+            <h3 className="flex items-center mb-4 text-2xl font-semibold text-green-600">
               <FaStore className="mr-2" /> Restaurants
             </h3>
             <ul className="space-y-4">
@@ -144,19 +145,19 @@ const SearchResults: React.FC = () => {
                 (restaurant) => (
                   <li
                     key={restaurant.id}
-                    className="border-b border-gray-200 pb-4 last:border-b-0"
+                    className="pb-4 border-b border-gray-200 last:border-b-0"
                   >
-                    <div className="flex items-center hover:bg-green-50 transition duration-300 rounded-lg p-2">
+                    <div className="flex items-center p-2 transition duration-300 rounded-lg hover:bg-green-50">
                       <img
                         src={
                           restaurant.imagesUrl ||
                           "https://via.placeholder.com/100"
                         }
                         alt={restaurant.name}
-                        className="w-20 h-20 object-cover rounded-lg mr-4"
+                        className="object-cover w-20 h-20 mr-4 rounded-lg"
                       />
                       <div>
-                        <h4 className="font-medium text-lg text-gray-800">
+                        <h4 className="text-lg font-medium text-gray-800">
                           {restaurant.name}
                         </h4>
                         <p className="text-sm text-gray-600">
@@ -171,13 +172,13 @@ const SearchResults: React.FC = () => {
                 )
               )}
             </ul>
-            <div className="mt-4 flex justify-center">
+            <div className="flex justify-center mt-4">
               <button
                 onClick={() =>
                   setRestaurantsPage((prev) => Math.max(prev - 1, 1))
                 }
                 disabled={restaurantsPage === 1}
-                className="mx-2 px-4 py-2 bg-gray-200 rounded-md disabled:opacity-50"
+                className="px-4 py-2 mx-2 bg-gray-200 rounded-md disabled:opacity-50"
               >
                 Previous
               </button>
@@ -186,7 +187,7 @@ const SearchResults: React.FC = () => {
                 disabled={
                   restaurantsPage * itemsPerPage >= results.restaurants.length
                 }
-                className="mx-2 px-4 py-2 bg-gray-200 rounded-md disabled:opacity-50"
+                className="px-4 py-2 mx-2 bg-gray-200 rounded-md disabled:opacity-50"
               >
                 Next
               </button>

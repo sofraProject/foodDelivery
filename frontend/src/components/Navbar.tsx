@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { BsCart2 } from "react-icons/bs";
 import { FiLogOut } from "react-icons/fi";
@@ -87,7 +87,10 @@ const Navbar: React.FC = () => {
           </div>
         ) : (
           <div className="flex items-center justify-end space-x-6">
-            <button className="poppins" onClick={() => router.push("/signin")}>
+            <button
+              className="px-6 py-3 transition transform bg-white rounded-full d uration-700 text-primary poppins ring-red-300 focus:outline-none focus:ring-4 hover:scale-105"
+              onClick={() => router.push("/signin")}
+            >
               Sign In
             </button>
             <button

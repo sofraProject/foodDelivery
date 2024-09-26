@@ -9,6 +9,7 @@ import swal from "sweetalert";
 import Footer from "../../components/HomePage/Footer/Footer";
 import { addToCartAsync } from "../../redux/features/cartSlice";
 import { AppDispatch } from "../../redux/store";
+const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
 
 interface Food {
   id: number;
@@ -36,9 +37,7 @@ const FoodDetailScreen: React.FC = () => {
   useEffect(() => {
     const fetchFood = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:3000/api/menu-items/${id}`
-        );
+        const response = await fetch(`${serverDomain}/api/menu-items/${id}`);
         const data = await response.json();
         setFood(data);
       } catch (error) {
@@ -76,18 +75,18 @@ const FoodDetailScreen: React.FC = () => {
 
   if (!food)
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex items-center justify-center h-screen">
         Loading...
       </div>
     );
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-amber-100 to-orange-200">
-      <main className="flex-grow flex items-center justify-center py-20 px-4 sm:px-6 lg:px-8">
+      <main className="flex items-center justify-center flex-grow px-4 py-20 sm:px-6 lg:px-8">
         <div className="w-full max-w-4xl">
           <button
             onClick={() => router.push("/")}
-            className="inline-flex items-center text-orange-600 hover:text-orange-800 font-medium mb-8"
+            className="inline-flex items-center mb-8 font-medium text-orange-600 hover:text-orange-800"
           >
             <svg
               className="w-5 h-5 mr-2"
@@ -102,20 +101,20 @@ const FoodDetailScreen: React.FC = () => {
             </svg>
             Back to Menu
           </button>
-          <div className="bg-white rounded-3xl shadow-2xl overflow-hidden">
+          <div className="overflow-hidden bg-white shadow-2xl rounded-3xl">
             <div className="md:flex">
               <div className="md:flex-shrink-0 md:w-1/2">
                 <img
-                  className="h-96 w-full object-cover md:h-full"
+                  className="object-cover w-full h-96 md:h-full"
                   src={food.imageUrl}
                   alt={food.name}
                 />
               </div>
               <div className="p-8 md:w-1/2">
-                <h1 className="text-4xl font-extrabold text-gray-900 mb-4">
+                <h1 className="mb-4 text-4xl font-extrabold text-gray-900">
                   {food.name}
                 </h1>
-                <p className="text-gray-600 mb-8 text-lg">
+                <p className="mb-8 text-lg text-gray-600">
                   {food.description || defaultDescription}
                 </p>
                 <div className="flex items-center justify-between mb-8">
@@ -126,10 +125,10 @@ const FoodDetailScreen: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleQuantityChange(quantity - 1)}
-                      className="p-2 rounded-full text-orange-600 hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      className="p-2 text-orange-600 rounded-full hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-500"
                       aria-label="Decrease quantity"
                     >
-                      <AiOutlineMinus className="h-6 w-6" />
+                      <AiOutlineMinus className="w-6 h-6" />
                     </button>
                     <span className="px-4 py-2 text-xl font-semibold text-gray-700">
                       {quantity}
@@ -137,18 +136,18 @@ const FoodDetailScreen: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => handleQuantityChange(quantity + 1)}
-                      className="p-2 rounded-full text-orange-600 hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-500"
+                      className="p-2 text-orange-600 rounded-full hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-500"
                       aria-label="Increase quantity"
                     >
-                      <AiOutlinePlus className="h-6 w-6" />
+                      <AiOutlinePlus className="w-6 h-6" />
                     </button>
                   </div>
                 </div>
                 <button
                   onClick={handleAddToCart}
-                  className="w-full flex items-center justify-center px-8 py-4 border border-transparent text-lg font-semibold rounded-full text-white bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 transition duration-300 ease-in-out transform hover:-translate-y-1"
+                  className="flex items-center justify-center w-full px-8 py-4 text-lg font-semibold text-white transition duration-300 ease-in-out transform border border-transparent rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 hover:-translate-y-1"
                 >
-                  <BsCart2 className="mr-3 h-6 w-6" aria-hidden="true" />
+                  <BsCart2 className="w-6 h-6 mr-3" aria-hidden="true" />
                   Add to Cart
                 </button>
               </div>

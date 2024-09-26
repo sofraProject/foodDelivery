@@ -1,11 +1,10 @@
-// app/layout.tsx
+import Navbar from "@/components/Navbar"; // Assurez-vous que le chemin est correct
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import React from "react";
 import "../styles/globals.css";
-
-import ReduxProvider from "./providers/ReduxProvider"; // Assurez-vous que ce chemin est correct
-
-// Charger les polices locales avec Next.js
+import ReduxProvider from "./providers/ReduxProvider";
+// Charger les polices locales
 const geistSans = localFont({
   src: "../fonts/GeistVF.woff",
   variable: "--font-geist-sans",
@@ -24,7 +23,7 @@ export const metadata: Metadata = {
   description: "Your App Description",
 };
 
-// RootLayout qui englobe toute l'application avec Redux et les polices
+// RootLayout avec Redux et les polices
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -35,8 +34,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* Intégration de ReduxProvider pour toute l'application */}
-        <ReduxProvider>{children}</ReduxProvider>
+        <ReduxProvider>
+          <Navbar />
+          {children}
+        </ReduxProvider>
       </body>
     </html>
   );
