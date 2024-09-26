@@ -19,11 +19,15 @@ const RestaurantList: React.FC = () => {
   useEffect(() => {
     fetchRestaurants();
   }, []);
-
+  const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
   const fetchRestaurants = async () => {
     try {
+      console.log(
+        "sentd okkkkk",
+        `${serverDomain}/api/users/owner/restaurants`
+      );
       const response = await fetch(
-        "http://localhost:3000/api/users/owner/restaurants"
+        `${serverDomain}/api/users/owner/restaurants`
       );
       const data = await response.json();
       if (Array.isArray(data)) {
@@ -59,11 +63,11 @@ const RestaurantList: React.FC = () => {
   }
 
   return (
-    <section className="my-12 max-w-screen-xl mx-auto px-6">
+    <section className="max-w-screen-xl px-6 mx-auto my-12">
       {/* Restaurant Header */}
-      <div className="flex flex-col lg:flex-row items-center justify-between mb-12">
+      <div className="flex flex-col items-center justify-between mb-12 lg:flex-row">
         <div className="lg:w-2/3">
-          <h1 className="text-4xl font-bold mb-4">
+          <h1 className="mb-4 text-4xl font-bold">
             Welcome to Our Partner Restaurants
           </h1>
           <p className="text-lg text-gray-700">
@@ -75,16 +79,16 @@ const RestaurantList: React.FC = () => {
         <img
           src="https://th.bing.com/th/id/OIP.LAKlyp7D03xGufDu_LE6mAHaE8?rs=1&pid=ImgDetMain"
           alt="Restaurant"
-          className="w-full lg:w-1/3 h-64 object-cover rounded-lg shadow-lg"
+          className="object-cover w-full h-64 rounded-lg shadow-lg lg:w-1/3"
         />
       </div>
       {/* Restaurants List with Scrollable Feature */}
-      <h2 className="text-2xl font-semibold mb-6">Our Partners</h2>
+      <h2 className="mb-6 text-2xl font-semibold">Our Partners</h2>
       <div className="relative">
         {/* Left Arrow */}
         <button
           onClick={() => scroll("left")}
-          className="absolute left-0 top-1/2 transform -translate-y-1/2 z-10 bg-gray-100 p-2 rounded-full shadow-md hover:bg-gray-200"
+          className="absolute left-0 z-10 p-2 transform -translate-y-1/2 bg-gray-100 rounded-full shadow-md top-1/2 hover:bg-gray-200"
         >
           &larr;
         </button>
@@ -92,7 +96,7 @@ const RestaurantList: React.FC = () => {
         {/* Scrollable Container */}
         <div
           ref={scrollRef}
-          className="flex overflow-x-scroll space-x-6 p-2 scroll-smooth"
+          className="flex p-2 space-x-6 overflow-x-scroll scroll-smooth"
         >
           {restaurants.map((restaurant) => (
             <div
@@ -102,10 +106,10 @@ const RestaurantList: React.FC = () => {
               <img
                 src={restaurant.imagesUrl}
                 alt={restaurant.name}
-                className="w-full h-32 object-cover"
+                className="object-cover w-full h-32"
               />
               <div className="p-4">
-                <h3 className="text-sm font-semibold text-gray-800 mb-1 truncate">
+                <h3 className="mb-1 text-sm font-semibold text-gray-800 truncate">
                   {restaurant.name}
                 </h3>
                 <p className="text-sm text-gray-600">{restaurant.email}</p>
@@ -117,7 +121,7 @@ const RestaurantList: React.FC = () => {
         {/* Right Arrow */}
         <button
           onClick={() => scroll("right")}
-          className="absolute right-0 top-1/2 transform -translate-y-1/2 z-10 bg-gray-100 p-2 rounded-full shadow-md hover:bg-gray-200"
+          className="absolute right-0 z-10 p-2 transform -translate-y-1/2 bg-gray-100 rounded-full shadow-md top-1/2 hover:bg-gray-200"
         >
           &rarr;
         </button>

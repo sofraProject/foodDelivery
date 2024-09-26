@@ -14,8 +14,8 @@ app.use(morgan("dev")); // Log HTTP requests
 
 //* Import & Register Routes
 // Example Route
-const sampleRoute = require("./routes/sample.route");
-app.use("/api/sample", sampleRoute);
+const userRoute= require("./routes/User.route")
+app.use("/api/user" , userRoute)
 
 // Start the server
 const PORT = process.env.SERVER_PORT || 3306; // Provide a default port

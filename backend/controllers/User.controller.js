@@ -1,11 +1,10 @@
 // userController.js
 
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const {prismaConnection} = require("../prisma/prisma")
 
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await prisma.user.findMany();
+    const users = await prismaConnection.user.findMany();
     res.status(200).json(users);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -15,7 +14,7 @@ exports.getAllUsers = async (req, res) => {
 exports.getUserById = async (req, res) => {
   const { id } = req.params;
   try {
-    const user = await prisma.user.findUnique({
+    const user = await prismaConnection.user.findUnique({
       where: { id: Number(id) },
     });
     if (user) {
@@ -31,7 +30,7 @@ exports.getUserById = async (req, res) => {
 exports.createUser = async (req, res) => {
   const { name, email, password, imagesUrl, balance, location, role } = req.body;
   try {
-    const newUser = await prisma.user.create({
+    const newUser = await prismaConnection.user.create({
       data: {
         name,
         email,
@@ -52,7 +51,7 @@ exports.updateUser = async (req, res) => {
   const { id } = req.params;
   const { name, email, password, imagesUrl, balance, location, role } = req.body;
   try {
-    const updatedUser = await prisma.user.update({
+    const updatedUser = await prismaConnection.user.update({
       where: { id: Number(id) },
       data: { name, email, password, imagesUrl, balance, location, role },
     });
@@ -68,7 +67,7 @@ exports.updateUser = async (req, res) => {
 
 exports.getAllUsersRestaurant = async (req, res) => {
   try {
-    const users = await prisma.user.findMany({
+    const users = await prismaConnection.user.findMany({
       where: { role: "restaurant_owner" },
     });
     res.status(200).json(users);
@@ -81,7 +80,7 @@ exports.findNearbyRestaurants = async (req, res) => {
   const { userId, radius = 1000 } = req.body;
 
   try {
-    const user = await prisma.user.findUnique({
+    const user = await prismaConnection.user.findUnique({
       where: { id: Number(userId) },
     });
     if (!user) {
@@ -98,7 +97,7 @@ exports.findNearbyRestaurants = async (req, res) => {
     }
 
     // Implement your own logic to filter based on distance
-    const nearbyRestaurants = await prisma.user.findMany({
+    const nearbyRestaurants = await prismaConnection.user.findMany({
       where: {
         role: "restaurant_owner",
         // Implement your own logic to filter based on distance
@@ -114,7 +113,7 @@ exports.findNearbyRestaurants = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   const { id } = req.params;
   try {
-    await prisma.user.delete({
+    await prismaConnection.user.delete({
       where: { id: Number(id) },
     });
     res.status(200).json({ message: "User deleted successfully" });
@@ -132,7 +131,7 @@ exports.updateUserLocation = async (req, res) => {
   const { location } = req.body;
 
   try {
-    const user = await prisma.user.findUnique({
+    const user = await prismaConnection.user.findUnique({
       where: { id },
     });
 
@@ -140,7 +139,7 @@ exports.updateUserLocation = async (req, res) => {
       return res.status(404).json({ error: "User not found." });
     }
 
-    await prisma.user.update({
+    await prismaConnection.user.update({
       where: { id },
       data: {
         location: {
