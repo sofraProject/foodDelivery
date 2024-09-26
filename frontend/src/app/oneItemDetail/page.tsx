@@ -1,14 +1,14 @@
-'use client'
+"use client";
 
-import React, { useState, useEffect } from "react";
+import { useParams, useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 import { BsCart2 } from "react-icons/bs";
-import { useParams, useNavigate } from "react-router-dom";
-import { AppDispatch } from "../../redux/store";
 import { useDispatch } from "react-redux";
 import swal from "sweetalert";
 import Footer from "../../components/HomePage/Footer/Footer";
 import { addToCartAsync } from "../../redux/features/cartSlice";
+import { AppDispatch } from "../../redux/store";
 
 interface Food {
   id: number;
@@ -24,12 +24,12 @@ interface Food {
 }
 
 const FoodDetailScreen: React.FC = () => {
-  const navigate = useNavigate();
   const dispatch: AppDispatch = useDispatch();
   const [quantity, setQuantity] = useState(1);
   const [food, setFood] = useState<Food | null>(null);
-  const { id } = useParams<{ id: string }>();
-
+  const router = useRouter();
+  const params = useParams();
+  const { id } = params;
   const defaultDescription =
     "The texture of food that needs to be chewed thoroughly before swallowing. Can be light and bouncy or heavy and sticky.";
 
@@ -86,7 +86,7 @@ const FoodDetailScreen: React.FC = () => {
       <main className="flex-grow flex items-center justify-center py-20 px-4 sm:px-6 lg:px-8">
         <div className="w-full max-w-4xl">
           <button
-            onClick={() => navigate("/")}
+            onClick={() => router.push("/")}
             className="inline-flex items-center text-orange-600 hover:text-orange-800 font-medium mb-8"
           >
             <svg
