@@ -13,8 +13,7 @@ import { useCart } from "../hooks/useCart"; // Import the useCart hook for cart 
 const Navbar: React.FC = () => {
   const router = useRouter();
   const { user, logout, isAuthenticated } = useAuth(); // Use the useAuth hook
-  const { items } = useCart(); // Use the useCart hook to fetch cart items from sessionStorage
-
+  const { items } = useCart();
   const handleLogout = () => {
     logout(); // Call logout function from useAuth
     router.push("/signin");

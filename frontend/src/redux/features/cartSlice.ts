@@ -14,9 +14,9 @@ export const cartSlice = createSlice({
   name: "cart",
   initialState,
   reducers: {
-    // Action pour charger les éléments du panier depuis sessionStorage
+    // Action pour charger les éléments du panier depuis localStorage
     getCartItems: (state) => {
-      const savedItems = sessionStorage.getItem("cartItems");
+      const savedItems = localStorage.getItem("cartItems");
       console.log(savedItems, "chekkkkkkkkk");
       if (savedItems) {
         state.items = JSON.parse(savedItems);
@@ -32,7 +32,7 @@ export const cartSlice = createSlice({
       } else {
         state.items.push(newItem);
       }
-      sessionStorage.setItem("cartItems", JSON.stringify(state.items));
+      localStorage.setItem("cartItems", JSON.stringify(state.items));
     },
 
     // Action pour mettre à jour la quantité d'un élément
@@ -41,20 +41,20 @@ export const cartSlice = createSlice({
       const item = state.items.find((item) => item.id === id);
       if (item) {
         item.quantity = quantity;
-        sessionStorage.setItem("cartItems", JSON.stringify(state.items));
+        localStorage.setItem("cartItems", JSON.stringify(state.items));
       }
     },
 
     // Action pour supprimer un élément du panier
     removeFromCart: (state, action) => {
       state.items = state.items.filter((item) => item.id !== action.payload);
-      sessionStorage.setItem("cartItems", JSON.stringify(state.items));
+      localStorage.setItem("cartItems", JSON.stringify(state.items));
     },
 
     // Action pour vider le panier
     clearCart: (state) => {
       state.items = [];
-      sessionStorage.removeItem("cartItems");
+      localStorage.removeItem("cartItems");
     },
   },
 });

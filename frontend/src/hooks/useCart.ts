@@ -7,9 +7,8 @@ export const useCart = () => {
   const dispatch: AppDispatch = useDispatch();
   const { items } = useSelector((state: RootState) => state.cart);
 
-  // Charger les éléments du panier depuis sessionStorage lorsque le composant est monté
   useEffect(() => {
-    dispatch(getCartItems()); // Charge les éléments depuis sessionStorage
+    dispatch(getCartItems());
   }, [dispatch]);
 
   return { items };
