@@ -29,7 +29,6 @@ const Navbar: React.FC = () => {
         typeof authHelper.decodedUser === "object"
       ) {
         setDecodedUser(authHelper.decodedUser);
-        console.log(authHelper.decodedUser, "Decoded User");
       } else {
         console.log("User not authenticated");
       }
