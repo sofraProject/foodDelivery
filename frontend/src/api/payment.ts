@@ -3,13 +3,14 @@ import swal from "sweetalert";
 import { getUser } from "../helpers/authHelper";
 
 const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
+
 // Fonction pour gérer le paiement
 export const handlePayment = async (
   cartItems: any[], // Vous pouvez ajuster ce type selon votre structure
   totalPrice: number,
   token: string,
   router: any // Next.js router
-) => {
+): Promise<{ success: boolean; error?: string }> => {
   try {
     // Créer une commande via une API Next.js
     const orderResponse = await axios.post(
@@ -43,6 +44,8 @@ export const handlePayment = async (
     // Ouvrir le lien de paiement dans un nouvel onglet
     if (paymentResponse.data.result && paymentResponse.data.result.link) {
       window.open(paymentResponse.data.result.link, "_blank");
+    } else {
+      throw new Error("Payment link not found");
     }
 
     const { order, delivery } = orderResponse.data;
@@ -61,8 +64,11 @@ export const handlePayment = async (
       );
       router.push("/orders"); // Redirection vers la page des commandes
     }
-  } catch (error) {
-    console.error("Error placing order:", error);
+
+    return { success: true }; // Indiquer que tout s'est bien passé
+  } catch (error: any) {
+    console.error("Error placing order:", error.message);
     swal("Error", "Failed to place order. Please try again.", "error");
+    return { success: false, error: error.message }; // Retourner l'erreur
   }
 };

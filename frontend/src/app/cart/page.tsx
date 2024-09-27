@@ -1,18 +1,19 @@
 "use client";
 
-import { useRouter } from "next/navigation"; // Utilisez le hook useRouter de Next.js
+import axios from "axios";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { AiOutlineDelete } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
-import { handlePayment } from "../../api/payment"; // Importez la fonction de paiement
 import { removeFromCart, updateQuantity } from "../../redux/features/cartSlice";
 import { AppDispatch, RootState } from "../../redux/store";
-
+const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
+// Fonction pour gérer le processus de commande
 const Cart: React.FC = () => {
   const cartItems = useSelector((state: RootState) => state.cart.items);
   const dispatch = useDispatch<AppDispatch>();
-  const router = useRouter(); // Utilisez le router de Next.js
-  const token = localStorage.getItem("token") || ""; // Récupérer le token depuis localStorage
+  const router = useRouter();
+  const token = localStorage.getItem("token") || "";
 
   const totalPrice = cartItems.reduce(
     (total, item) => total + Number(item.price) * Number(item.quantity),
@@ -29,8 +30,79 @@ const Cart: React.FC = () => {
     }
   };
 
-  const handlePlaceOrder = () => {
-    handlePayment(cartItems, totalPrice, token, router); // Utilisez la fonction handlePayment
+  // Étape 1 : Gestion du paiement
+  const processPayment = async () => {
+    try {
+      const paymentResponse = await axios.post(
+        ` ${serverDomain}/api/payment/generatePayment`,
+        {
+          amount: totalPrice,
+          developerTrackingId: `order_${Math.random()}`,
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      // Vérification du lien de paiement
+      if (paymentResponse.data.result && paymentResponse.data.result.link) {
+        window.open(paymentResponse.data.result.link, "_blank");
+      } else {
+        throw new Error("Payment link not found");
+      }
+
+      return paymentResponse;
+    } catch (error) {
+      console.error("Error during payment:", error);
+      throw error;
+    }
+  };
+
+  // Étape 2 : Création de la commande
+  const createOrder = async () => {
+    const orderResult = await axios.post("/api/orders", {
+      items: cartItems,
+      user: { id: token },
+    });
+
+    if (orderResult.status !== 201) {
+      throw new Error("Order creation failed");
+    }
+    return orderResult.data.order;
+  };
+
+  // Étape 3 : Assigner un livreur
+  const assignDriver = async (orderId: number) => {
+    const driverResult = await axios.post("/api/assign-driver", {
+      orderId,
+    });
+
+    if (driverResult.status !== 201) {
+      throw new Error("No driver available");
+    }
+    return driverResult.data.driver;
+  };
+
+  // Fonction principale pour gérer tout le processus
+  const handlePlaceOrder = async () => {
+    try {
+      // Étape 1 : Gérer le paiement
+      await processPayment();
+
+      // Étape 2 : Créer la commande
+      const order = await createOrder();
+
+      // Étape 3 : Assigner un livreur
+      const driver = await assignDriver(order.id);
+
+      // Rediriger vers la page de confirmation
+      router.push("/order-confirmation");
+    } catch (error) {
+      console.error("Error during the order process:", error);
+      alert("An error occurred during the order process. Please try again.");
+    }
   };
 
   const subTotal = parseFloat(totalPrice.toFixed(2));

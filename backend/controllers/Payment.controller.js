@@ -1,11 +1,11 @@
 const axios = require("axios");
 require("dotenv").config();
+
 module.exports = {
   generatePayment: async (req, res) => {
     try {
-      console.log(req);
       const { amount, developerTrackingId, orderId } = req.body;
-
+      console.log(amount, developerTrackingId, orderId);
       const response = await axios.post(
         "https://developers.flouci.com/api/generate_payment",
         {
@@ -14,8 +14,8 @@ module.exports = {
           amount: amount * 1000,
           accept_card: "true",
           session_timeout_secs: 1200,
-          success_link: `http://localhost:5173/success?orderId=${orderId}`,
-          fail_link: `http://localhost:5173/failed`,
+          success_link: `${process.env.SUCCESS_LINK}?orderId=${orderId}`,
+          fail_link: process.env.FAILED_LINK,
           developer_tracking_id: developerTrackingId,
         },
         {
@@ -24,10 +24,10 @@ module.exports = {
           },
         }
       );
-
+      console.log("-------flouci response ; ------- ", response);
       res.json(response.data);
     } catch (error) {
-      console.error("Error generating payment:", error);
+      console.log(error);
       res.status(500).json({ error: "Failed to generate payment" });
     }
   },
