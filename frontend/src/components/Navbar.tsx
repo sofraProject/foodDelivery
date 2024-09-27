@@ -29,9 +29,9 @@ const Navbar: React.FC = () => {
         typeof authHelper.decodedUser === "object"
       ) {
         setDecodedUser(authHelper.decodedUser);
-        console.log(authHelper.decodedUser, "Utilisateur décodé");
+        console.log(authHelper.decodedUser, "Decoded User");
       } else {
-        console.log("Utilisateur non authentifié");
+        console.log("User not authenticated");
       }
     };
     decodeUser();
@@ -46,10 +46,7 @@ const Navbar: React.FC = () => {
           );
           setUserData(response.data);
         } catch (error) {
-          console.error(
-            "Erreur lors de la récupération des données utilisateur",
-            error
-          );
+          console.error("Error retrieving user data", error);
         }
       }
     };
@@ -79,7 +76,7 @@ const Navbar: React.FC = () => {
   const renderCartIcon = () => (
     <div
       className="relative flex cursor-pointer"
-      onClick={() => router.push("/cart")}
+      onClick={() => router.push("/Cart")}
     >
       <span className="absolute flex items-center justify-center w-6 h-6 text-white rounded-full bg-primary -right-2 -top-2">
         {items.length}
@@ -94,7 +91,7 @@ const Navbar: React.FC = () => {
         className="flex items-center px-6 py-3 space-x-2 text-white rounded-full bg-primary"
         onClick={() => setDropdownOpen(!dropdownOpen)}
       >
-        <span>{userData ? userData.name : "Utilisateur"}</span>
+        <span>{userData ? userData.name : "User"}</span>
         <svg
           className="w-4 h-4"
           fill="none"
@@ -113,19 +110,19 @@ const Navbar: React.FC = () => {
       {dropdownOpen && (
         <div className="absolute right-0 z-50 mt-2 bg-white rounded-lg shadow-lg w-44 top-full">
           <Link href="/account" className="block px-4 py-2 text-gray-700">
-            Compte
+            Account
           </Link>
           <Link href="/orders" className="block px-4 py-2 text-gray-700">
-            Commandes
+            Orders
           </Link>
           <Link href="/promocodes" className="block px-4 py-2 text-gray-700">
-            Codes Promo
+            Promo Codes
           </Link>
           <button
             onClick={handleLogout}
             className="block w-full px-4 py-2 text-left text-gray-700"
           >
-            Déconnexion
+            Logout
           </button>
         </div>
       )}
@@ -138,13 +135,13 @@ const Navbar: React.FC = () => {
         className="px-6 py-3 bg-white rounded-full text-primary"
         onClick={() => router.push("/signin")}
       >
-        Se connecter
+        Sign In
       </button>
       <button
         className="px-6 py-3 text-white rounded-full bg-primary"
         onClick={() => router.push("/signup")}
       >
-        S'inscrire
+        Sign Up
       </button>
     </div>
   );
@@ -161,6 +158,11 @@ const Navbar: React.FC = () => {
         {userData.role === "restaurant_owner" && (
           <Link href="/dashboard" className="text-gray-600">
             Dashboard
+          </Link>
+        )}
+        {userData.role === "admin" && (
+          <Link href="/admin" className="text-gray-600">
+            Switch to Admin
           </Link>
         )}
       </div>
@@ -181,7 +183,7 @@ const Navbar: React.FC = () => {
         <div className="flex-grow max-w-md mx-auto">
           <input
             type="text"
-            placeholder="Que recherchez-vous ?"
+            placeholder="What are you looking for?"
             className="w-full px-4 py-2 border rounded-full"
           />
         </div>
