@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { MdDashboard, MdOutlineAddBox, MdArchive, MdOutlineArrowForwardIos, MdOutlineMenu } from 'react-icons/md';
 import { NavLink } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-import { RootState } from '../../redux/store';
+import { RootState } from '../../../libs/redux/store';
 
 interface MenuItem {
     id: number;

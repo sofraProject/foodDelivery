@@ -16,6 +16,7 @@ const SignUp: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("customer");
+  const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   // const [location, setLocation] = useState<[number, number] | null>(null);
   const dispatch: AppDispatch = useDispatch();
@@ -42,16 +43,16 @@ const SignUp: React.FC = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+    const formData = new FormData(); // Create FormData object
+    formData.append("name", name); // Append name
+    formData.append("email", email); // Append email
+    formData.append("password", password); // Append password
+    formData.append("role", role); // Append role
+    if (profilePicture) {
+      formData.append("imagesUrl", profilePicture); // Append profile picture if it exists
+    }
     try {
-      await dispatch(
-        signUpUser({
-          name,
-          email,
-          password,
-          role,
-        })
-      );
+      await dispatch(signUpUser(formData))
       router.push("/signIn");
     } catch (error) {
       console.error("Error signing up:", error);
@@ -100,6 +101,11 @@ const SignUp: React.FC = () => {
               <option value="restaurant_owner">Restaurant Owner</option>
               <option value="driver">Driver</option>
             </select>
+            <input
+              type="file"
+              onChange={(e) => setProfilePicture(e.target.files?.[0] || null)} // Handle file input
+              accept="image/*" // Allow only image files
+            />
           </div>
           <Button text="Sign Up" />
           <Link href="/signin">

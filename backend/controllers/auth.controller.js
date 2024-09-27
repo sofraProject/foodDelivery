@@ -11,15 +11,18 @@ module.exports = {
     try {
       const { email, password, role, name, location } = req.body;
 
+      // Validate input
       if (!email || !password || !role || !name) {
-        return res.status(400).json({ message: "Email, password, role and name are required" });
+        return res.status(400).json({ message: "Email, password, role, and name are required" });
       }
 
+      // Check for existing user
       const existingUser = await prismaConnection.user.findUnique({ where: { email } });
       if (existingUser) {
         return res.status(400).json({ message: "Email already in use" });
       }
 
+      // Hash the password
       const hashedPassword = await bcrypt.hash(password, saltRounds);
       let newUser;
 
@@ -31,6 +34,7 @@ module.exports = {
             role,
             name,
             location,
+            imagesUrl: req.file ? req.file.path : null, // Add image upload handling
           },
         });
       } else {
@@ -90,6 +94,8 @@ module.exports = {
           id: user.id,
           email: user.email,
           role: user.role,
+          location: user.location,
+          name: user.name,
           photoURL: user.imagesUrl,
         },
       });
