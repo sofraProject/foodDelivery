@@ -78,33 +78,43 @@ const Foods: React.FC = () => {
   const router = useRouter();
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Fetch categories
+  const fetchCategories = async () => {
+    try {
+      const response = await axios.get(`${serverDomain}/api/categories`);
+      setCategories(response.data);
+    } catch (error) {
+      console.error("Error fetching categories:", error);
+    }
+  };
+
+  // Fetch menu items based on selected category
+  const fetchMenuItems = async (id: number) => {
+    try {
+      const response = await axios.get(
+        `${serverDomain}/api/menu-items/cat/${id}`
+      );
+      const formattedData = response.data.map((item: MenuItem) => ({
+        ...item,
+        price:
+          typeof item.price === "number"
+            ? item.price
+            : parseFloat(item.price) || 0,
+      }));
+      setMenuItems(formattedData);
+    } catch (error) {
+      console.error("Error fetching menu items:", error);
+    }
+  };
+
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await axios.get(`${serverDomain}/api/categories`);
-        setCategories(response.data);
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-    };
     fetchCategories();
   }, []);
 
-  const handleCategoryClick = useCallback(async (id: number) => {
+  const handleCategoryClick = useCallback((id: number) => {
     setSelectedCategory(id);
-    fetch(`${serverDomain}/api/menu-items/cat/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        const formattedData = data.map((item: MenuItem) => ({
-          ...item,
-          price:
-            typeof item.price === "number"
-              ? item.price
-              : parseFloat(item.price) || 0,
-        }));
-        setMenuItems(formattedData);
-      });
-  };
+    fetchMenuItems(id);
+  }, []);
 
   const handleItemClick = useCallback(
     (itemId: number) => {
