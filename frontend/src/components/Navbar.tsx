@@ -76,7 +76,7 @@ const Navbar: React.FC = () => {
   const renderCartIcon = () => (
     <div
       className="relative flex cursor-pointer"
-      onClick={() => router.push("/Cart")}
+      onClick={() => router.push("/cart")}
     >
       <span className="absolute flex items-center justify-center w-6 h-6 text-white rounded-full bg-primary -right-2 -top-2">
         {items.length}
