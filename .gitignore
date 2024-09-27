@@ -1,0 +1,128 @@
+<<<<<<< HEAD
+node_modules
+# Keep environment variables out of version control
+.env
+=======
+# Node.js specific
+node_modules/
+node_modules
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Logs
+logs/
+*.log
+logs/*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Directory for upload files
+uploads/
+temp/
+tmp/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# MacOS specific
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# MacOS files that might appear on external disk
+.Spotlight-V100
+.Trashes
+._*
+
+# Windows specific
+Thumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Editor specific files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Optional npm cache directory
+.npm
+
+# Parcel-bundler cache (if used)
+.cache/
+
+# TypeScript
+*.tsbuildinfo
+
+# Prisma related files
+prisma/migrations/
+prisma/.env
+
+# Build outputs (if you're using a bundler like Webpack or Next.js)
+dist/
+out/
+
+# Coverage directory used by testing tools like Jest or Cypress
+coverage/
+.nyc_output/
+
+# Binaries
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Debugger configurations
+.vscode/launch.json
+.vscode/tasks.json
+
+# Temporary files
+*.swp
+*~
+
+
+# dependencies
+/node_modules
+/.pnp
+.pnp.js
+.yarn/install-state.gz
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc
+.DS_Store
+*.pem
+
+# debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# local env files
+.env*.local
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+>>>>>>> 2044e4f9fd77185218f87b7963958675452400e6

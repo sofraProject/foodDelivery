@@ -5,8 +5,32 @@ const dotenv = require("dotenv");
 // Load environment variables from .env file
 dotenv.config();
 
-//* Initialize Prisma Client with the constructed DATABASE_URL
+// Initialize Prisma Client
 const prismaConnection = new PrismaClient();
 
-//* Export the Prisma connection instance
-module.exports = prismaConnection;
+// Function to connect to the database
+const connectToDatabase = async () => {
+  try {
+    await prismaConnection.$connect();
+    console.log("Connected to the database successfully.");
+  } catch (error) {
+    console.error("Error connecting to the database:", error);
+  }
+};
+
+// Function to disconnect from the database
+const disconnectFromDatabase = async () => {
+  try {
+    await prismaConnection.$disconnect();
+    console.log("Disconnected from the database successfully.");
+  } catch (error) {
+    console.error("Error disconnecting from the database:", error);
+  }
+};
+
+// Export the Prisma connection instance and connection functions
+module.exports = {
+  prismaConnection,
+  connectToDatabase,
+  disconnectFromDatabase,
+};
