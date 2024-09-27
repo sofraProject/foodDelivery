@@ -6,15 +6,14 @@ import { useRouter } from "next/navigation";
 import React from "react";
 import { BsCart2 } from "react-icons/bs";
 import { FiLogOut } from "react-icons/fi";
-import { useSelector } from "react-redux";
 import logo from "../../src/assets/logo2.png";
 import { useAuth } from "../hooks/useAuth"; // Import the useAuth hook
-import { RootState } from "../redux/store";
+import { useCart } from "../hooks/useCart"; // Import the useCart hook for cart management
 
 const Navbar: React.FC = () => {
   const router = useRouter();
   const { user, logout, isAuthenticated } = useAuth(); // Use the useAuth hook
-  const { items } = useSelector((state: RootState) => state.cart);
+  const { items } = useCart(); // Use the useCart hook to fetch cart items from sessionStorage
 
   const handleLogout = () => {
     logout(); // Call logout function from useAuth
@@ -44,7 +43,7 @@ const Navbar: React.FC = () => {
               onClick={() => router.push("/Cart")}
             >
               <span className="absolute flex items-center justify-center w-6 h-6 text-white rounded-full bg-primary -right-2 -top-2">
-                {items.length}
+                {items.length} {/* Display cart items count */}
               </span>
               <BsCart2 className="w-6 h-6 text-gray-700 cursor-pointer" />
             </div>

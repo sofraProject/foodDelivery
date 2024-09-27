@@ -2,22 +2,20 @@
 
 import React from "react";
 import { AiOutlineDelete } from "react-icons/ai";
-import { useDispatch, useSelector } from "react-redux";
-import swal from "sweetalert";
+import { useDispatch } from "react-redux";
+import { useCart } from "../../hooks/useCart"; // Importation du hook personnalisé
 import { removeFromCart, updateQuantity } from "../../redux/features/cartSlice";
-import { AppDispatch, RootState } from "../../redux/store";
+import { AppDispatch } from "../../redux/store";
 import Back from "../back/page";
 
 const Cart: React.FC = () => {
-  const cartItems = useSelector((state: RootState) => state.cart.items);
+  const { items: cartItems } = useCart(); // Utilisation du hook pour récupérer les éléments du panier
   const dispatch = useDispatch<AppDispatch>();
-
-  console.log("Cart Items:", cartItems); // Debugging des items
 
   // Calcul du prix total avec fallback sécurisé
   const totalPrice = cartItems.reduce((total, item) => {
     const price = item?.price ? Number(item.price) : 0;
-    const quantity = item?.quantity ? Number(item.quantity) : 1; // Assurez-vous d'avoir une valeur par défaut pour quantity
+    const quantity = item?.quantity ? Number(item.quantity) : 1;
     return total + price * quantity;
   }, 0);
 
@@ -33,11 +31,7 @@ const Cart: React.FC = () => {
     }
   };
 
-  const subTotal = parseFloat(totalPrice.toFixed(2));
-  const tax = parseFloat((totalPrice * 0.05).toFixed(2));
-  const deliveryFee = parseFloat((totalPrice * 0.1).toFixed(2));
-  const total = parseFloat((subTotal + tax + deliveryFee).toFixed(2));
-
+  // Affichage du panier
   return (
     <main className="min-h-screen banner">
       <div className="max-w-screen-xl px-6 py-20 mx-auto">
@@ -118,6 +112,12 @@ const Cart: React.FC = () => {
                         {cartItems.length}
                       </span>
                     </p>
+                    <p className="text-gray-700 poppins">
+                      Estimated Delivery Time:{" "}
+                      <span className="font-semibold text-black">
+                        20-30 min
+                      </span>
+                    </p>
                   </div>
                   <div className="flex flex-col my-4 space-y-3">
                     <div className="flex items-center">
@@ -125,31 +125,7 @@ const Cart: React.FC = () => {
                         Subtotal
                       </span>
                       <span className="font-semibold text-black poppins">
-                        {subTotal.toFixed(2)} TND
-                      </span>
-                    </div>
-                    <div className="flex items-center">
-                      <span className="flex-grow text-gray-700 poppins">
-                        Tax
-                      </span>
-                      <span className="font-semibold text-black poppins">
-                        {tax.toFixed(2)} TND
-                      </span>
-                    </div>
-                    <div className="flex items-center">
-                      <span className="flex-grow text-gray-700 poppins">
-                        Delivery Fee
-                      </span>
-                      <span className="font-semibold text-black poppins">
-                        {deliveryFee.toFixed(2)} TND
-                      </span>
-                    </div>
-                    <div className="flex items-center">
-                      <span className="flex-grow text-xl text-gray-700 poppins">
-                        Total
-                      </span>
-                      <span className="text-xl font-semibold text-black poppins">
-                        {total.toFixed(2)} TND
+                        {totalPrice.toFixed(2)} TND
                       </span>
                     </div>
                   </div>

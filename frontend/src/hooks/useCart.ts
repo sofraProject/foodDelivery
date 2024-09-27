@@ -12,12 +12,5 @@ export const useCart = () => {
     dispatch(getCartItems()); // Charge les éléments depuis sessionStorage
   }, [dispatch]);
 
-  // Sauvegarder les éléments du panier dans sessionStorage chaque fois qu'ils changent
-  useEffect(() => {
-    if (items.length > 0) {
-      sessionStorage.setItem("cartItems", JSON.stringify(items));
-    }
-  }, [items]);
-
   return { items };
 };
