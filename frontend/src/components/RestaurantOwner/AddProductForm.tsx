@@ -5,7 +5,8 @@ import Button from '../Form/Button';
 import Label from '../Form/Label';
 import TextField from '../Form/TextField';
 import Heading from './Heading';
-import logo2 from '../../assets/logo2.png'; // Import the logo
+import Image from 'next/image';
+import logo2 from '../../assets/logo2.png'; 
 
 interface NewFood {
 

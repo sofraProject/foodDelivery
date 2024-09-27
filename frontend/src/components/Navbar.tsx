@@ -58,13 +58,13 @@ const Navbar: React.FC = () => {
         {user ? (
           <div className="flex items-center justify-end space-x-4">
             {user.role === "driver" && (
-              <Link href="/delivery-interface">
-                <a className="text-gray-600">Delivery Interface</a>
+              <Link href="/delivery-interface" className="text-gray-600">
+               Delivery Interface
               </Link>
             )}
             {user.role === "restaurant_owner" && (
-              <Link href="/dashboard">
-                <a className="text-gray-600">Dashboard</a>
+              <Link href="/dashboard" className="text-gray-600">
+                Dashboard
               </Link>
             )}
             <div
