@@ -8,7 +8,7 @@ import { BsCart2 } from "react-icons/bs";
 import { useDispatch } from "react-redux";
 import swal from "sweetalert";
 import Footer from "../../../components/HomePage/Footer/Footer";
-import { addToCartAsync } from "../../../redux/features/cartSlice";
+import { addToCart } from "../../../redux/features/cartSlice";
 import { AppDispatch } from "../../../redux/store";
 
 const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
@@ -68,7 +68,7 @@ const FoodDetailScreen: React.FC = () => {
   const handleAddToCart = () => {
     if (food && quantity > 0) {
       dispatch(
-        addToCartAsync({
+        addToCart({
           id: food.id, // food.id should correspond to menu_item_id in your backend
           name: food.name,
           price: parseFloat(food.price), // Convert price to float

@@ -1,86 +1,35 @@
 "use client";
 
-import axios from "axios";
-import { useRouter } from "next/navigation";
 import React from "react";
 import { AiOutlineDelete } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
 import swal from "sweetalert";
-import {
-  removeFromCartAsync,
-  updateQuantityAsync,
-} from "../../redux/features/cartSlice";
+import { removeFromCart, updateQuantity } from "../../redux/features/cartSlice";
 import { AppDispatch, RootState } from "../../redux/store";
 import Back from "../back/page";
-
-const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
 
 const Cart: React.FC = () => {
   const cartItems = useSelector((state: RootState) => state.cart.items);
   const dispatch = useDispatch<AppDispatch>();
-  const router = useRouter();
 
   console.log("Cart Items:", cartItems); // Debugging des items
 
+  // Calcul du prix total avec fallback sécurisé
   const totalPrice = cartItems.reduce((total, item) => {
     const price = item?.price ? Number(item.price) : 0;
-    return total + price * Number(item.quantity);
+    const quantity = item?.quantity ? Number(item.quantity) : 1; // Assurez-vous d'avoir une valeur par défaut pour quantity
+    return total + price * quantity;
   }, 0);
 
+  // Fonction pour supprimer un élément du panier
   const handleRemoveItem = (id: number) => {
-    dispatch(removeFromCartAsync(id));
+    dispatch(removeFromCart(id));
   };
 
+  // Fonction pour mettre à jour la quantité d'un élément
   const handleUpdateQuantity = (id: number, newQuantity: number) => {
     if (newQuantity > 0) {
-      dispatch(updateQuantityAsync({ id, quantity: newQuantity }));
-    }
-  };
-
-  const handlePlaceOrder = async () => {
-    try {
-      const orderResponse = await axios.post(
-        `${serverDomain}/api/orders/create`,
-        { items: cartItems },
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
-      );
-
-      const paymentResponse = await axios.post(
-        `${serverDomain}/api/payment/generatePayment`,
-        {
-          amount: Math.round(totalPrice),
-          developerTrackingId: `order_${Math.random()}`,
-          orderId: orderResponse.data.order.id,
-        },
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
-      );
-
-      if (paymentResponse.data.result && paymentResponse.data.result.link) {
-        window.open(paymentResponse.data.result.link, "_blank");
-      }
-
-      const { order, delivery } = orderResponse.data;
-      if (delivery) {
-        swal(
-          "Congratulations!!!",
-          `Your order has been placed successfully. Order ID: ${order.id}\nDriver: ${delivery.driver.name}\nDriver Phone: ${delivery.driver.email}`,
-          "success"
-        );
-      } else {
-        swal(
-          "Order Placed",
-          `Your order has been placed successfully. Order ID: ${order.id}\nNo driver is currently available. Please check back later.`,
-          "success"
-        );
-        router.push("/orders"); // Navigate to orders page
-      }
-    } catch (error) {
-      console.error("Error placing order:", error);
-      swal("Error", "Failed to place order. Please try again.", "error");
+      dispatch(updateQuantity({ id, quantity: newQuantity }));
     }
   };
 
@@ -121,7 +70,8 @@ const Cart: React.FC = () => {
                           {item.name}
                         </h5>
                         <h1 className="text-lg font-semibold text-primary poppins">
-                          {Number(item.price).toFixed(2)} TND
+                          {item.price ? Number(item.price).toFixed(2) : "N/A"}{" "}
+                          TND
                         </h1>
                         <div className="flex items-center">
                           <button
@@ -168,12 +118,6 @@ const Cart: React.FC = () => {
                         {cartItems.length}
                       </span>
                     </p>
-                    <p className="text-gray-700 poppins">
-                      Estimated Delivery Time:{" "}
-                      <span className="font-semibold text-black">
-                        20-30 min
-                      </span>
-                    </p>
                   </div>
                   <div className="flex flex-col my-4 space-y-3">
                     <div className="flex items-center">
@@ -208,14 +152,6 @@ const Cart: React.FC = () => {
                         {total.toFixed(2)} TND
                       </span>
                     </div>
-                  </div>
-                  <div className="mt-6">
-                    <button
-                      onClick={handlePlaceOrder}
-                      className="w-full px-6 py-3 text-white transition duration-500 rounded-lg bg-primary poppins ring-red-300 focus:ring-4"
-                    >
-                      Place Order
-                    </button>
                   </div>
                 </div>
               </div>

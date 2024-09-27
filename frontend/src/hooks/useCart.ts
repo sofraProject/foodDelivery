@@ -9,7 +9,7 @@ export const useCart = () => {
 
   // Charger les éléments du panier depuis sessionStorage lorsque le composant est monté
   useEffect(() => {
-    dispatch(getCartItems()); // Charge les éléments depuis sessionStorage ou API
+    dispatch(getCartItems()); // Charge les éléments depuis sessionStorage
   }, [dispatch]);
 
   // Sauvegarder les éléments du panier dans sessionStorage chaque fois qu'ils changent
