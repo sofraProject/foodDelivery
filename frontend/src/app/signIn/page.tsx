@@ -9,8 +9,8 @@ import { unwrapResult } from "@reduxjs/toolkit";
 import Brand from "../../components/Form/Brand";
 import Button from "../../components/Form/Button";
 import TextField from "../../components/Form/TextField";
-import { loginUser } from "../../redux/features/authSlice";
-import { AppDispatch, RootState } from "../../redux/store";
+import { loginUser } from "../../../libs/redux/features/authSlice";
+import { AppDispatch, RootState } from "../../../libs/redux/store";
 import "../../styles/globals.css";
 import "../../styles/tailwind.css";
 
@@ -71,7 +71,7 @@ const SignIn: React.FC = () => {
           {status === "failed" && (
             <p className="mt-2 text-center text-red-500">{error}</p>
           )}
-          <Link href="/signup">
+          <Link href="/signUp">
             <p className="my-6 text-base text-center text-primary hover:underline">
               Need an account?
             </p>

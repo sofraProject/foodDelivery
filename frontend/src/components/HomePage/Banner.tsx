@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from "react";
 import { FaSearch } from "react-icons/fa";
 import { useDispatch, useSelector } from "react-redux";
-import { searchProductsAndRestaurants } from "../../redux/features/searchSlice";
-import { AppDispatch, RootState } from "../../redux/store";
+import { searchProductsAndRestaurants } from "../../../libs/redux/features/searchSlice";
+import { AppDispatch, RootState } from "../../../libs/redux/store";
 import LocationPrompt from "../LocationPrompt";
 
 const Banner: React.FC = () => {

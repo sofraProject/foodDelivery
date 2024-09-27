@@ -8,8 +8,8 @@ import { BsCart2 } from "react-icons/bs";
 import { FiLogOut } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import logo from "../../src/assets/logo2.png";
-import { logoutUser } from "../redux/features/authSlice";
-import { AppDispatch, RootState } from "../redux/store";
+import { logoutUser } from "../../libs/redux/features/authSlice";
+import { AppDispatch, RootState } from "../../libs/redux/store";
 
 const Navbar: React.FC = () => {
   const [changeHeader, setChangeHeader] = useState<boolean>(false);
@@ -58,13 +58,13 @@ const Navbar: React.FC = () => {
         {user ? (
           <div className="flex items-center justify-end space-x-4">
             {user.role === "driver" && (
-              <Link href="/delivery-interface">
-                <a className="text-gray-600">Delivery Interface</a>
-              </Link>
+              <Link href="/delivery-interface" className="text-gray-600">
+              Delivery Interface
+            </Link>
             )}
             {user.role === "restaurant_owner" && (
-              <Link href="/dashboard">
-                <a className="text-gray-600">Dashboard</a>
+              <Link href="/dashboard" className="text-gray-600">
+                Dashboard
               </Link>
             )}
             <div

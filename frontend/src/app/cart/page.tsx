@@ -7,11 +7,9 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { useRouter } from "next/navigation";
 import swal from "sweetalert";
-import {
-  removeFromCartAsync,
-  updateQuantityAsync,
-} from "../../redux/features/cartSlice";
-import { AppDispatch, RootState } from "../../redux/store";
+
+import { removeFromCartAsync, updateQuantityAsync } from "../../../libs/redux/features/cartSlice";
+import { AppDispatch, RootState } from "../../../libs/redux/store";
 import Back from "../back/page";
 
 const Cart: React.FC = () => {

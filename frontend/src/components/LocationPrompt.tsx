@@ -2,9 +2,8 @@
 
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { updateUserLocation } from "../redux/features/authSlice";
-import { AppDispatch } from "../redux/store";
-
+import { updateUserLocation } from "../../libs/redux/features/authSlice";
+import { AppDispatch } from "../../libs/redux/store";
 const LocationPrompt: React.FC<{ onLocationSet: () => void }> = ({
   onLocationSet,
 }) => {
