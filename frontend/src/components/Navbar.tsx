@@ -89,13 +89,13 @@ const Navbar: React.FC = () => {
           <div className="flex items-center justify-end space-x-6">
             <button
               className="px-6 py-3 transition transform bg-white rounded-full d uration-700 text-primary poppins ring-red-300 focus:outline-none focus:ring-4 hover:scale-105"
-              onClick={() => router.push("/signin")}
+              onClick={() => router.push("/signIn")}
             >
               Sign In
             </button>
             <button
               className="px-6 py-3 text-white transition duration-700 transform rounded-full bg-primary poppins ring-red-300 focus:outline-none focus:ring-4 hover:scale-105"
-              onClick={() => router.push("/signup")}
+              onClick={() => router.push("/signUp")}
             >
               Sign Up
             </button>

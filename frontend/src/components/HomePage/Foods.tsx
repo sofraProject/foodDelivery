@@ -30,33 +30,26 @@ const Foods: React.FC = () => {
       .then((data) => setCategories(data));
   }, []);
 
-  useEffect(() => {
-    if (selectedCategory !== null) {
-      fetch(`${serverDomain}/api/menu-items/${selectedCategory}`)
-        .then((res) => res.json())
-        .then((data) => {
-          console.log(data);
-          if (Array.isArray(data)) {
-            const formattedData = data.map((item: MenuItem) => ({
-              ...item,
-              price: typeof item.price === "number" ? item.price : parseFloat(item.price) || 0,
-            }));
-            setMenuItems(formattedData);
-          } else {
-            console.error("Expected data to be an array, but got:", data);
-            setMenuItems([]);
-          }
-        });
-    }
-  }, [selectedCategory]);
+  const handleCategoryClick = (id: number) => {
+    setSelectedCategory(id);
+    fetch(`${serverDomain}/api/menu-items/cat/${id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        const formattedData = data?.map((item: MenuItem) => ({
+          ...item,
+          price:
+            typeof item.price === "number"
+              ? item.price
+              : parseFloat(item.price) || 0,
+        }));
+        setMenuItems(formattedData);
+      });
+  };
 
   const handleItemClick = (itemId: number) => {
     router.push(`/OneItemdetail/${itemId}`);
   };
 
-  const handleCategoryClick = (categoryId: number) => {
-    setSelectedCategory(categoryId);
-  };
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
