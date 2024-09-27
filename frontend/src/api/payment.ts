@@ -1,8 +1,8 @@
 import axios from "axios";
 import swal from "sweetalert";
+import { getUser } from "../helpers/authHelper";
 
 const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
-
 // Fonction pour gérer le paiement
 export const handlePayment = async (
   cartItems: any[], // Vous pouvez ajuster ce type selon votre structure
@@ -16,7 +16,7 @@ export const handlePayment = async (
       `${serverDomain}/api/orders`,
       {
         items: cartItems,
-        user_id: 1,
+        user: getUser(),
       },
       {
         headers: {

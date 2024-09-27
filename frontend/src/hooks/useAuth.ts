@@ -1,6 +1,7 @@
 // hooks/useAuth.ts
 
 import { unwrapResult } from "@reduxjs/toolkit";
+import jwt from "jsonwebtoken";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser, logoutUser, signUpUser } from "../redux/features/authSlice";
@@ -55,8 +56,24 @@ export const useAuth = () => {
     }
   };
 
+  // Fonction pour décoder le token
+  const getUser = () => {
+    const Token = localStorage.getItem("token");
+    if (Token) {
+      try {
+        const decoded = jwt.decode(Token) as any; // Utilisation de decode pour extraire les infos du token
+        return decoded; // Renvoie les données décodées (e.g., id, email, role, etc.)
+      } catch (err) {
+        console.error("Error decoding token:", err);
+        return null;
+      }
+    }
+    return null;
+  };
+
   // Check authentication status from localStorage
   const Token = localStorage.getItem("token");
+  const decodedUser = getUser();
   const isAuthenticated = !!Token;
   const isAdmin = user?.role === "admin";
   const isClient = user?.role === "customer";
@@ -64,6 +81,7 @@ export const useAuth = () => {
   const isRestaurantOwner = user?.role === "restaurant_owner";
 
   return {
+    decodedUser,
     user,
     loading,
     error,

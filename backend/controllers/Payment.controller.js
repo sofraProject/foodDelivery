@@ -3,8 +3,8 @@ require("dotenv").config();
 module.exports = {
   generatePayment: async (req, res) => {
     try {
+      console.log(req);
       const { amount, developerTrackingId, orderId } = req.body;
-      console.log(amount, "amount is heeeere");
 
       const response = await axios.post(
         "https://developers.flouci.com/api/generate_payment",

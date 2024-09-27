@@ -7,8 +7,8 @@ module.exports = {
     try {
       console.log("Requête reçue :", req.body); // Étape 1 : Vérifier le corps de la requête
 
-      const { items, user_id } = req.body;
-      const userId = user_id; // Assurez-vous que l'utilisateur est bien récupéré
+      const { items, user } = req.body;
+      const userId = user.id; // Assurez-vous que l'utilisateur est bien récupéré
       console.log("ID utilisateur récupéré :", userId); // Étape 2 : Vérifier l'ID de l'utilisateur
 
       if (!userId) {
