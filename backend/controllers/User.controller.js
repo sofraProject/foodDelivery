@@ -1,6 +1,7 @@
 // userController.js
 
 const { prismaConnection } = require("../prisma/prisma");
+const upload = require("../middleware/multer");
 
 exports.getAllUsers = async (req, res) => {
   try {
@@ -28,20 +29,25 @@ exports.getUserById = async (req, res) => {
 };
 
 exports.createUser = async (req, res) => {
-  const { name, email, password, imagesUrl, balance, location, role } =
-    req.body;
+  const { name, email, password, balance, location, role } = req.body;
+  
+  // Access the uploaded file
+  const profilePicturePath = req.file ? req.file.path : null; // Get the path of the uploaded file
+
   try {
+
     const newUser = await prismaConnection.user.create({
       data: {
         name,
         email,
-        password, // Make sure to hash the password before storing it
-        imagesUrl,
+        password,
+        imagesUrl: profilePicturePath, // Store the profile picture path
         balance,
         location,
         role,
       },
     });
+
     res.status(201).json(newUser);
   } catch (error) {
     res.status(500).json({ error: error.message });

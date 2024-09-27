@@ -44,11 +44,16 @@ export const loginUser = createAsyncThunk(
 
 export const signUpUser = createAsyncThunk(
   "user/signUpUser",
-  async (body: object, { rejectWithValue }) => {
+  async (body: FormData, { rejectWithValue }) => { 
     try {
       const response = await axios.post<User>(
         `http://localhost:4000/api/auth/signup`,
-        body
+        body,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data', 
+          },
+        }
       );
 
       return response.data;
@@ -57,6 +62,7 @@ export const signUpUser = createAsyncThunk(
     }
   }
 );
+
 export const updateUserLocation = createAsyncThunk(
   "user/updateLocation",
   async (location: [number, number], { getState, rejectWithValue }) => {
