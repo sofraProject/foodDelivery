@@ -92,22 +92,19 @@ const Foods: React.FC = () => {
 
   const handleCategoryClick = useCallback(async (id: number) => {
     setSelectedCategory(id);
-    try {
-      const response = await axios.get(
-        `${serverDomain}/api/menu-items/cat/${id}`
-      );
-      const formattedData = response.data.map((item: MenuItem) => ({
-        ...item,
-        price:
-          typeof item.price === "number"
-            ? item.price
-            : parseFloat(item.price) || 0,
-      }));
-      setMenuItems(formattedData);
-    } catch (error) {
-      console.error("Error fetching menu items:", error);
-    }
-  }, []);
+    fetch(`${serverDomain}/api/menu-items/cat/${id}`)
+      .then((res) => res.json())
+      .then((data) => {
+        const formattedData = data.map((item: MenuItem) => ({
+          ...item,
+          price:
+            typeof item.price === "number"
+              ? item.price
+              : parseFloat(item.price) || 0,
+        }));
+        setMenuItems(formattedData);
+      });
+  };
 
   const handleItemClick = useCallback(
     (itemId: number) => {
