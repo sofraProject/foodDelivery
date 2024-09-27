@@ -6,7 +6,7 @@ export const searchProductsAndRestaurants = createAsyncThunk(
   async (searchTerm: string, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `http://localhost:5000/api/search?q=${encodeURIComponent(searchTerm)}`
+        `http://localhost:4000/api/search?q=${encodeURIComponent(searchTerm)}`
       );
       console.log(response.data, "ya hafaaaaaaaaaa");
       return response.data;

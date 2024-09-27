@@ -8,8 +8,8 @@ import { BsCart2 } from "react-icons/bs";
 import { FiLogOut } from "react-icons/fi";
 import { useDispatch, useSelector } from "react-redux";
 import logo from "../../src/assets/logo2.png";
-import { logoutUser } from "../redux/features/authSlice";
-import { AppDispatch, RootState } from "../redux/store";
+import { logoutUser } from "../../libs/redux/features/authSlice";
+import { AppDispatch, RootState } from "../../libs/redux/store";
 
 const Navbar: React.FC = () => {
   const [changeHeader, setChangeHeader] = useState<boolean>(false);
@@ -59,8 +59,8 @@ const Navbar: React.FC = () => {
           <div className="flex items-center justify-end space-x-4">
             {user.role === "driver" && (
               <Link href="/delivery-interface" className="text-gray-600">
-               Delivery Interface
-              </Link>
+              Delivery Interface
+            </Link>
             )}
             {user.role === "restaurant_owner" && (
               <Link href="/dashboard" className="text-gray-600">
@@ -89,13 +89,13 @@ const Navbar: React.FC = () => {
           <div className="flex items-center justify-end space-x-6">
             <button
               className="px-6 py-3 transition transform bg-white rounded-full d uration-700 text-primary poppins ring-red-300 focus:outline-none focus:ring-4 hover:scale-105"
-              onClick={() => router.push("/signin")}
+              onClick={() => router.push("/signIn")}
             >
               Sign In
             </button>
             <button
               className="px-6 py-3 text-white transition duration-700 transform rounded-full bg-primary poppins ring-red-300 focus:outline-none focus:ring-4 hover:scale-105"
-              onClick={() => router.push("/signup")}
+              onClick={() => router.push("/signUp")}
             >
               Sign Up
             </button>

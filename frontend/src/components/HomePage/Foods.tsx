@@ -35,7 +35,7 @@ const Foods: React.FC = () => {
     fetch(`${serverDomain}/api/menu-items/cat/${id}`)
       .then((res) => res.json())
       .then((data) => {
-        const formattedData = data.map((item: MenuItem) => ({
+        const formattedData = data?.map((item: MenuItem) => ({
           ...item,
           price:
             typeof item.price === "number"
@@ -49,6 +49,7 @@ const Foods: React.FC = () => {
   const handleItemClick = (itemId: number) => {
     router.push(`/OneItemdetail/${itemId}`);
   };
+
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {

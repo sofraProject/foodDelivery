@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { User } from "../../types/userTypes";
+import { User } from "../types/userType";
 import { RootState } from "../store";
 // Define the type for user data
 
@@ -25,12 +25,12 @@ export const loginUser = createAsyncThunk(
     try {
       let response;
       if (credentials.token) {
-        response = await axios.get(`http://localhost:5000/api/auth/me`, {
+        response = await axios.get(`http://localhost:4000/api/auth/me`, {
           headers: { Authorization: `Bearer ${credentials.token}` },
         });
       } else {
         response = await axios.post<User>(
-          `http://localhost:5000/api/auth/signin`,
+          `http://localhost:4000/api/auth/signin`,
           credentials
         );
       }
@@ -47,7 +47,7 @@ export const signUpUser = createAsyncThunk(
   async (body: object, { rejectWithValue }) => {
     try {
       const response = await axios.post<User>(
-        `http://localhost:5000/api/auth/signup`,
+        `http://localhost:4000/api/auth/signup`,
         body
       );
 
@@ -65,7 +65,7 @@ export const updateUserLocation = createAsyncThunk(
     if (user) {
       try {
         const response = await axios.put<User>(
-          `http://localhost:5000/api/users/location`,
+          `http://localhost:4000/api/users/location`,
           { location },
           {
             headers: {

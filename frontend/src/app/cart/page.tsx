@@ -7,11 +7,9 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { useRouter } from "next/navigation";
 import swal from "sweetalert";
-import {
-  removeFromCartAsync,
-  updateQuantityAsync,
-} from "../../redux/features/cartSlice";
-import { AppDispatch, RootState } from "../../redux/store";
+
+import { removeFromCartAsync, updateQuantityAsync } from "../../../libs/redux/features/cartSlice";
+import { AppDispatch, RootState } from "../../../libs/redux/store";
 import Back from "../back/page";
 
 const Cart: React.FC = () => {
@@ -37,7 +35,7 @@ const Cart: React.FC = () => {
   const handlePlaceOrder = async () => {
     try {
       const orderResponse = await axios.post(
-        "http://localhost:3000/api/orders/create",
+        "http://localhost:4000/api/orders/create",
         {
           items: cartItems,
         },
@@ -91,6 +89,7 @@ const Cart: React.FC = () => {
   const deliveryFee = parseFloat((totalPrice * 0.1).toFixed(2));
   const total = parseFloat((subTotal + tax + deliveryFee).toFixed(2));
   console.log(cartItems);
+
 
   return (
     <main className="min-h-screen banner">
@@ -237,3 +236,4 @@ const Cart: React.FC = () => {
 };
 
 export default Cart;
+

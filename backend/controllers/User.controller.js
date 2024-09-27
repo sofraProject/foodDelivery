@@ -1,6 +1,6 @@
 // userController.js
 
-const {prismaConnection} = require("../prisma/prisma")
+const { prismaConnection } = require("../prisma/prisma");
 
 exports.getAllUsers = async (req, res) => {
   try {
@@ -28,7 +28,8 @@ exports.getUserById = async (req, res) => {
 };
 
 exports.createUser = async (req, res) => {
-  const { name, email, password, imagesUrl, balance, location, role } = req.body;
+  const { name, email, password, imagesUrl, balance, location, role } =
+    req.body;
   try {
     const newUser = await prismaConnection.user.create({
       data: {
@@ -49,7 +50,8 @@ exports.createUser = async (req, res) => {
 
 exports.updateUser = async (req, res) => {
   const { id } = req.params;
-  const { name, email, password, imagesUrl, balance, location, role } = req.body;
+  const { name, email, password, imagesUrl, balance, location, role } =
+    req.body;
   try {
     const updatedUser = await prismaConnection.user.update({
       where: { id: Number(id) },
@@ -57,7 +59,7 @@ exports.updateUser = async (req, res) => {
     });
     res.status(200).json({ message: "User updated successfully" });
   } catch (error) {
-    if (error.code === 'P2025') {
+    if (error.code === "P2025") {
       res.status(404).json({ message: "User not found" });
     } else {
       res.status(500).json({ error: error.message });
@@ -106,7 +108,9 @@ exports.findNearbyRestaurants = async (req, res) => {
 
     res.status(200).json(nearbyRestaurants);
   } catch (error) {
-    res.status(500).json({ error: "An error occurred while finding nearby restaurants." });
+    res
+      .status(500)
+      .json({ error: "An error occurred while finding nearby restaurants." });
   }
 };
 
@@ -118,7 +122,7 @@ exports.deleteUser = async (req, res) => {
     });
     res.status(200).json({ message: "User deleted successfully" });
   } catch (error) {
-    if (error.code === 'P2025') {
+    if (error.code === "P2025") {
       res.status(404).json({ message: "User not found" });
     } else {
       res.status(500).json({ error: error.message });
