@@ -50,6 +50,7 @@ const Foods: React.FC = () => {
     router.push(`/OneItemdetail/${itemId}`);
   };
 
+
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
       const { scrollLeft, clientWidth } = scrollRef.current;

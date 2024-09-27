@@ -27,7 +27,7 @@ const RestaurantList: React.FC = () => {
         `${serverDomain}/api/users/owner/restaurants`
       );
       const response = await fetch(
-        `${serverDomain}/api/users/owner/restaurants`
+        `${serverDomain}/api/users/`
       );
       const data = await response.json();
       if (Array.isArray(data)) {

@@ -7,24 +7,28 @@ const { connectToDatabase } = require("./prisma/prisma");
 require("dotenv").config();
 
 const orderRoutes = require("./routes/Order.route");
-const menuItemRoutes = require("./routes/MenuItem.route");
+
 const deliveryRoutes = require("./routes/Delivery.route");
 const paymentRoutes = require("./routes/Payment.route");
 
 const authRoutes = require("./routes/auth.route");
 const cartRoutes = require("./routes/cart.route");
 const categoryRoutes = require("./routes/category.route");
+const userRoutes=require("./routes/User.route")
+const menuItemRoutes=require("./routes/MenuItem.route")
 // const { connectToDatabase } = require("./prisma"); // Import connectToDatabase function
 
 // App configuration
 
 const app = express();
+
 app.use(cors());
 app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("dev"));
 
+app.use("/api/users" ,userRoutes )
 app.use("/api/orders", orderRoutes);
 app.use("/api/menu-items", menuItemRoutes);
 app.use("/api/deliveries", deliveryRoutes);
