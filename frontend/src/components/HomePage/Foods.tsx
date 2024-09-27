@@ -32,7 +32,7 @@ const Foods: React.FC = () => {
 
   useEffect(() => {
     if (selectedCategory !== null) {
-      fetch(`${serverDomain}/api/menu-items/menu-items/${selectedCategory}`)
+      fetch(`${serverDomain}/api/menu-items/${selectedCategory}`)
         .then((res) => res.json())
         .then((data) => {
           console.log(data);

@@ -15,6 +15,7 @@ const authRoutes = require("./routes/auth.route");
 const cartRoutes = require("./routes/cart.route");
 const categoryRoutes = require("./routes/category.route");
 const userRoutes=require("./routes/User.route")
+const menuItemRoutes=require("./routes/MenuItem.route")
 // const { connectToDatabase } = require("./prisma"); // Import connectToDatabase function
 
 // App configuration

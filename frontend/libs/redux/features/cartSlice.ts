@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { CartItem } from "../../types/cartTypes";
+import { CartItem } from "../types/cartType";
 
 interface CartState {
   items: CartItem[];
@@ -14,7 +14,7 @@ export const getCartItems = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/api/carts/withid`,
+        `http://localhost:4000/api/carts/withid`,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -35,7 +35,7 @@ export const addToCartAsync = createAsyncThunk(
   async (item: CartItem, { rejectWithValue }) => {
     try {
       const response = await axios.post(
-        "http://localhost:3000/api/carts",
+        "http://localhost:4000/api/carts",
         {
           restaurant_owner_id: item.user_id,
           menuitems_id: item.id,
@@ -60,7 +60,7 @@ export const removeFromCartAsync = createAsyncThunk(
   "cart/removeFromCartAsync",
   async (id: number, { rejectWithValue }) => {
     try {
-      await axios.delete(`http://localhost:3000/api/carts/delete/${id}`, {
+      await axios.delete(`http://localhost:4000/api/carts/delete/${id}`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
@@ -82,7 +82,7 @@ export const updateQuantityAsync = createAsyncThunk(
   ) => {
     try {
       const response = await axios.put(
-        `http://localhost:3000/api/carts/update/${id}`,
+        `http://localhost:4000/api/carts/update/${id}`,
         { quantity },
         {
           headers: {
@@ -103,7 +103,7 @@ export const clearCartAsync = createAsyncThunk(
   "cart/clearCartAsync",
   async (_, { rejectWithValue }) => {
     try {
-      await axios.delete(`http://localhost:3000/api/carts/clear`, {
+      await axios.delete(`http://localhost:4000/api/carts/clear`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
