@@ -32,7 +32,7 @@ const Foods: React.FC = () => {
 
   const handleCategoryClick = (id: number) => {
     setSelectedCategory(id);
-    fetch(`${serverDomain}/api/menu-items/${id}`)
+    fetch(`${serverDomain}/api/menu-items/cat/${id}`)
       .then((res) => res.json())
       .then((data) => {
         const formattedData = data?.map((item: MenuItem) => ({
