@@ -23,7 +23,7 @@ export const useAuth = () => {
       setLoading(false);
     }
   };
-
+  console.log(user);
   const logout = async () => {
     setLoading(true);
     try {

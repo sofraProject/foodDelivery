@@ -99,14 +99,18 @@ module.exports = {
     }
   },
 };
-exports.getDashboardData = async (req, res) => { 
+exports.getDashboardData = async (req, res) => {
   try {
     const id = req.user.id;
     const whereClause = { users_id: id };
 
     const totalOrders = await Order.count({ where: whereClause });
-    const pendingOrders = await Order.count({ where: { ...whereClause, status: "pending" } });
-    const completedOrders = await Order.count({ where: { ...whereClause, status: "completed" } });
+    const pendingOrders = await Order.count({
+      where: { ...whereClause, status: "pending" },
+    });
+    const completedOrders = await Order.count({
+      where: { ...whereClause, status: "completed" },
+    });
     const revenue = await Order.sum("total_amount", { where: whereClause });
 
     res.status(200).json({
@@ -115,9 +119,8 @@ exports.getDashboardData = async (req, res) => {
       completedOrders,
       revenue,
     });
-
   } catch (error) {
-    console.error('Error fetching dashboard data:', error);
-    res.status(500).json({ message: 'Internal server error' });
+    console.error("Error fetching dashboard data:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
