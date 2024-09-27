@@ -1,14 +1,16 @@
 "use client";
 
+import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
 import { BsCart2 } from "react-icons/bs";
 import { useDispatch } from "react-redux";
 import swal from "sweetalert";
-import Footer from "../../components/HomePage/Footer/Footer";
-import { addToCartAsync } from "../../redux/features/cartSlice";
-import { AppDispatch } from "../../redux/store";
+import Footer from "../../../components/HomePage/Footer/Footer";
+import { addToCartAsync } from "../../../redux/features/cartSlice";
+import { AppDispatch } from "../../../redux/store";
+
 const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
 
 interface Food {
@@ -30,22 +32,26 @@ const FoodDetailScreen: React.FC = () => {
   const [food, setFood] = useState<Food | null>(null);
   const router = useRouter();
   const params = useParams();
-  const { id } = params;
+  console.log(params);
+  const { productId } = params;
   const defaultDescription =
     "The texture of food that needs to be chewed thoroughly before swallowing. Can be light and bouncy or heavy and sticky.";
 
   useEffect(() => {
     const fetchFood = async () => {
       try {
-        const response = await fetch(`${serverDomain}/api/menu-items/${id}`);
-        const data = await response.json();
-        setFood(data);
+        const response = await axios.get(
+          `${serverDomain}/api/menu-items/${productId}`
+        );
+        console.log("helloooooos", response);
+        setFood(response.data);
       } catch (error) {
         console.error("Error fetching food item:", error);
       }
     };
+
     fetchFood();
-  }, [id]);
+  }, [productId]);
 
   const handleQuantityChange = (newQuantity: number) => {
     setQuantity(Math.max(1, newQuantity));

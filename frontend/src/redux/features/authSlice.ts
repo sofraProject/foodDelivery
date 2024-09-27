@@ -1,8 +1,9 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import { User } from "../../types/userTypes";
 import { RootState } from "../store";
 // Define the type for user data
+const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
 
 interface AuthState {
   user: User | null;
@@ -25,12 +26,12 @@ export const loginUser = createAsyncThunk(
     try {
       let response;
       if (credentials.token) {
-        response = await axios.get(`http://localhost:3000/api/auth/me`, {
+        response = await axios.get(`${serverDomain}/api/auth/me`, {
           headers: { Authorization: `Bearer ${credentials.token}` },
         });
       } else {
         response = await axios.post<User>(
-          `http://localhost:3000/api/auth/signin`,
+          `${serverDomain}/api/auth/signin`,
           credentials
         );
       }
@@ -47,7 +48,7 @@ export const signUpUser = createAsyncThunk(
   async (body: object, { rejectWithValue }) => {
     try {
       const response = await axios.post<User>(
-        `http://localhost:3000/api/auth/signup`,
+        `${serverDomain}/api/auth/signup`,
         body
       );
 
@@ -65,7 +66,7 @@ export const updateUserLocation = createAsyncThunk(
     if (user) {
       try {
         const response = await axios.put<User>(
-          `http://localhost:3000/api/users/location`,
+          `${serverDomain}/api/users/location`,
           { location },
           {
             headers: {

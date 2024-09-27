@@ -1,14 +1,14 @@
-'use client'
+"use client";
 
+import Image from "next/image";
+import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { MdError } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
 import Spinner from "../../components/Spinner";
 import paymentFailed from "../assets/undraw_Not_found_re_bh2e.png";
-
 const PaymentFailedScreen = () => {
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
+  const router = useRouter();
 
   useEffect(() => {
     setLoading(true);
@@ -19,26 +19,26 @@ const PaymentFailedScreen = () => {
 
   return (
     <main className="h-screen banner">
-      <div className="max-w-screen-xl py-20 mx-auto px-6">
+      <div className="max-w-screen-xl px-6 py-20 mx-auto">
         {loading ? (
           <Spinner loading={loading} />
         ) : (
-          <div className="flex flex-col items-center justify-center h-3/4 pt-24">
-            <h1 className="text-3xl text-center text-red-600 font-semibold poppins flex space-x-6 items-center">
-              <MdError className="text-red-600 text-3xl" /> Payment Failed
+          <div className="flex flex-col items-center justify-center pt-24 h-3/4">
+            <h1 className="flex items-center space-x-6 text-3xl font-semibold text-center text-red-600 poppins">
+              <MdError className="text-3xl text-red-600" /> Payment Failed
             </h1>
-            <img
-              className="w-96 object-contain"
-              src={paymentFailed}
+            <Image
+              className="object-contain w-96"
+              href={paymentFailed}
               alt="paymentFailed"
             />
-            <p className="text-gray-600 mt-4 text-center">
+            <p className="mt-4 text-center text-gray-600">
               We're sorry, but your payment couldn't be processed. Please try
               again or contact support.
             </p>
             <button
-              className="bg-red-600 text-white px-8 py-2 focus:outline-none poppins rounded-full mt-12 transform transition duration-300 hover:scale-105"
-              onClick={() => navigate("/cart")}
+              className="px-8 py-2 mt-12 text-white transition duration-300 transform bg-red-600 rounded-full focus:outline-none poppins hover:scale-105"
+              onClick={() => router.push("/cart")}
             >
               Try Again
             </button>

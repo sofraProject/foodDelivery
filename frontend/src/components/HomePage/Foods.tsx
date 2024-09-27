@@ -1,6 +1,13 @@
 "use client";
+import axios from "axios";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
 
 interface FoodItem {
@@ -15,7 +22,54 @@ interface MenuItem {
   imageUrl: string;
   price: number;
 }
+
 const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
+
+const CategoryCard: React.FC<{
+  category: FoodItem;
+  selected: boolean;
+  onClick: () => void;
+}> = ({ category, selected, onClick }) => (
+  <div
+    onClick={onClick}
+    className={`bg-white shadow-md rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer min-w-[180px] flex-shrink-0 ${
+      selected ? "ring-2 ring-primary" : ""
+    }`}
+  >
+    <img
+      src={category.imageUrl}
+      alt={category.name}
+      className="object-cover w-full h-32"
+    />
+    <div className="p-4">
+      <h3 className="mb-1 text-lg font-semibold text-gray-800 truncate">
+        {category.name}
+      </h3>
+    </div>
+  </div>
+);
+
+const MenuItemCard: React.FC<{ item: MenuItem; onClick: () => void }> = ({
+  item,
+  onClick,
+}) => (
+  <div
+    onClick={onClick}
+    className="overflow-hidden transition-all duration-300 bg-white rounded-lg shadow-md cursor-pointer hover:shadow-lg hover:scale-105"
+  >
+    <img
+      src={item.imageUrl}
+      alt={item.name}
+      className="object-cover w-full h-48"
+    />
+    <div className="p-4">
+      <h3 className="mb-2 text-xl font-semibold text-gray-800 truncate">
+        {item.name}
+      </h3>
+      <p className="text-lg font-bold text-primary">${item.price.toFixed(2)}</p>
+    </div>
+  </div>
+);
 
 const Foods: React.FC = () => {
   const [categories, setCategories] = useState<FoodItem[]>([]);
@@ -25,32 +79,44 @@ const Foods: React.FC = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    fetch(`${serverDomain}/api/categories`)
-      .then((res) => res.json())
-      .then((data) => setCategories(data));
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(`${serverDomain}/api/categories`);
+        setCategories(response.data);
+      } catch (error) {
+        console.error("Error fetching categories:", error);
+      }
+    };
+    fetchCategories();
   }, []);
 
-  const handleCategoryClick = (id: number) => {
+  const handleCategoryClick = useCallback(async (id: number) => {
     setSelectedCategory(id);
-    fetch(`${serverDomain}/api/menu-items/cat/${id}`)
-      .then((res) => res.json())
-      .then((data) => {
-        const formattedData = data.map((item: MenuItem) => ({
-          ...item,
-          price:
-            typeof item.price === "number"
-              ? item.price
-              : parseFloat(item.price) || 0,
-        }));
-        setMenuItems(formattedData);
-      });
-  };
+    try {
+      const response = await axios.get(
+        `${serverDomain}/api/menu-items/cat/${id}`
+      );
+      const formattedData = response.data.map((item: MenuItem) => ({
+        ...item,
+        price:
+          typeof item.price === "number"
+            ? item.price
+            : parseFloat(item.price) || 0,
+      }));
+      setMenuItems(formattedData);
+    } catch (error) {
+      console.error("Error fetching menu items:", error);
+    }
+  }, []);
 
-  const handleItemClick = (itemId: number) => {
-    router.push(`/OneItemdetail/${itemId}`);
-  };
+  const handleItemClick = useCallback(
+    (itemId: number) => {
+      router.push(`/OneItemDetail/${itemId}`);
+    },
+    [router]
+  );
 
-  const scroll = (direction: "left" | "right") => {
+  const scroll = useCallback((direction: "left" | "right") => {
     if (scrollRef.current) {
       const { scrollLeft, clientWidth } = scrollRef.current;
       const scrollTo =
@@ -59,7 +125,32 @@ const Foods: React.FC = () => {
           : scrollLeft + clientWidth;
       scrollRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
     }
-  };
+  }, []);
+
+  const categoryList = useMemo(
+    () =>
+      categories.map((category) => (
+        <CategoryCard
+          key={category.id}
+          category={category}
+          selected={selectedCategory === category.id}
+          onClick={() => handleCategoryClick(category.id)}
+        />
+      )),
+    [categories, selectedCategory, handleCategoryClick]
+  );
+
+  const menuItemList = useMemo(
+    () =>
+      menuItems.map((item) => (
+        <MenuItemCard
+          key={item.id}
+          item={item}
+          onClick={() => handleItemClick(item.id)}
+        />
+      )),
+    [menuItems, handleItemClick]
+  );
 
   return (
     <section className="max-w-screen-xl px-6 mx-auto my-16">
@@ -78,26 +169,7 @@ const Foods: React.FC = () => {
           ref={scrollRef}
           className="flex p-4 space-x-6 overflow-x-scroll scroll-smooth hide-scrollbar"
         >
-          {categories.map((category) => (
-            <div
-              key={category.id}
-              onClick={() => handleCategoryClick(category.id)}
-              className={`bg-white shadow-md rounded-lg overflow-hidden transition-all duration-300 hover:shadow-lg hover:scale-105 cursor-pointer min-w-[180px] flex-shrink-0 ${
-                selectedCategory === category.id ? "ring-2 ring-primary" : ""
-              }`}
-            >
-              <img
-                src={category.imageUrl}
-                alt={category.name}
-                className="object-cover w-full h-32"
-              />
-              <div className="p-4">
-                <h3 className="mb-1 text-lg font-semibold text-gray-800 truncate">
-                  {category.name}
-                </h3>
-              </div>
-            </div>
-          ))}
+          {categoryList}
         </div>
 
         <button
@@ -114,27 +186,7 @@ const Foods: React.FC = () => {
             Menu Items
           </h2>
           <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {menuItems.map((item) => (
-              <div
-                key={item.id}
-                onClick={() => handleItemClick(item.id)}
-                className="overflow-hidden transition-all duration-300 bg-white rounded-lg shadow-md cursor-pointer hover:shadow-lg hover:scale-105"
-              >
-                <img
-                  src={item.imageUrl}
-                  alt={item.name}
-                  className="object-cover w-full h-48"
-                />
-                <div className="p-4">
-                  <h3 className="mb-2 text-xl font-semibold text-gray-800 truncate">
-                    {item.name}
-                  </h3>
-                  <p className="text-lg font-bold text-primary">
-                    ${item.price.toFixed(2)}
-                  </p>
-                </div>
-              </div>
-            ))}
+            {menuItemList}
           </div>
         </div>
       )}
