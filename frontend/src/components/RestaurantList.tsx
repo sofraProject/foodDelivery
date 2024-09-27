@@ -1,5 +1,6 @@
 "use client";
 
+import axios from "axios";
 import React, { useEffect, useRef, useState } from "react";
 
 interface Restaurant {
@@ -19,19 +20,18 @@ const RestaurantList: React.FC = () => {
   useEffect(() => {
     fetchRestaurants();
   }, []);
+
   const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
+
   const fetchRestaurants = async () => {
     try {
-      console.log(
-        "sentd okkkkk",
+      const response = await axios.get(
         `${serverDomain}/api/users/owner/restaurants`
       );
-      const response = await fetch(
-        `${serverDomain}/api/users/owner/restaurants`
-      );
-      const data = await response.json();
-      if (Array.isArray(data)) {
-        setRestaurants(data);
+
+      // Check if the response data is an array
+      if (Array.isArray(response.data)) {
+        setRestaurants(response.data);
       } else {
         setError("Received invalid data format");
       }

@@ -1,13 +1,13 @@
-// userController.js
-
 const { prismaConnection } = require("../prisma/prisma");
+const bcrypt = require("bcrypt");
 
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await prismaConnection.user.findMany();
     res.status(200).json(users);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error fetching users:", error);
+    res.status(500).json({ error: "Failed to fetch users." });
   }
 };
 
@@ -20,22 +20,34 @@ exports.getUserById = async (req, res) => {
     if (user) {
       res.status(200).json(user);
     } else {
-      res.status(404).json({ message: "User not found" });
+      res.status(404).json({ message: "User not found." });
     }
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error fetching user:", error);
+    res.status(500).json({ error: "Failed to fetch user." });
   }
 };
 
 exports.createUser = async (req, res) => {
   const { name, email, password, imagesUrl, balance, location, role } =
     req.body;
+
+  // Validate required fields
+  if (!name || !email || !password) {
+    return res
+      .status(400)
+      .json({ error: "Name, email, and password are required." });
+  }
+
   try {
+    // Hash the password before storing
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const newUser = await prismaConnection.user.create({
       data: {
         name,
         email,
-        password, // Make sure to hash the password before storing it
+        password: hashedPassword,
         imagesUrl,
         balance,
         location,
@@ -44,7 +56,8 @@ exports.createUser = async (req, res) => {
     });
     res.status(201).json(newUser);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error creating user:", error);
+    res.status(500).json({ error: "Failed to create user." });
   }
 };
 
@@ -52,17 +65,43 @@ exports.updateUser = async (req, res) => {
   const { id } = req.params;
   const { name, email, password, imagesUrl, balance, location, role } =
     req.body;
+
+  // Validate required fields
+  if (
+    !name &&
+    !email &&
+    !password &&
+    !imagesUrl &&
+    !balance &&
+    !location &&
+    !role
+  ) {
+    return res
+      .status(400)
+      .json({ error: "At least one field must be provided for update." });
+  }
+
   try {
+    const updatedData = { name, email, imagesUrl, balance, location, role };
+
+    // Hash the password if it's being updated
+    if (password) {
+      updatedData.password = await bcrypt.hash(password, 10);
+    }
+
     const updatedUser = await prismaConnection.user.update({
       where: { id: Number(id) },
-      data: { name, email, password, imagesUrl, balance, location, role },
+      data: updatedData,
     });
-    res.status(200).json({ message: "User updated successfully" });
+    res
+      .status(200)
+      .json({ message: "User updated successfully.", updatedUser });
   } catch (error) {
     if (error.code === "P2025") {
-      res.status(404).json({ message: "User not found" });
+      res.status(404).json({ message: "User not found." });
     } else {
-      res.status(500).json({ error: error.message });
+      console.error("Error updating user:", error);
+      res.status(500).json({ error: "Failed to update user." });
     }
   }
 };
@@ -74,7 +113,8 @@ exports.getAllUsersRestaurant = async (req, res) => {
     });
     res.status(200).json(users);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error fetching restaurant owners:", error);
+    res.status(500).json({ error: "Failed to fetch restaurant owners." });
   }
 };
 
@@ -102,12 +142,13 @@ exports.findNearbyRestaurants = async (req, res) => {
     const nearbyRestaurants = await prismaConnection.user.findMany({
       where: {
         role: "restaurant_owner",
-        // Implement your own logic to filter based on distance
+        // You will need to implement your own logic to filter based on distance here
       },
     });
 
     res.status(200).json(nearbyRestaurants);
   } catch (error) {
+    console.error("Error finding nearby restaurants:", error);
     res
       .status(500)
       .json({ error: "An error occurred while finding nearby restaurants." });
@@ -120,12 +161,13 @@ exports.deleteUser = async (req, res) => {
     await prismaConnection.user.delete({
       where: { id: Number(id) },
     });
-    res.status(200).json({ message: "User deleted successfully" });
+    res.status(200).json({ message: "User deleted successfully." });
   } catch (error) {
     if (error.code === "P2025") {
-      res.status(404).json({ message: "User not found" });
+      res.status(404).json({ message: "User not found." });
     } else {
-      res.status(500).json({ error: error.message });
+      console.error("Error deleting user:", error);
+      res.status(500).json({ error: "Failed to delete user." });
     }
   }
 };
@@ -133,6 +175,10 @@ exports.deleteUser = async (req, res) => {
 exports.updateUserLocation = async (req, res) => {
   const { id } = req.user;
   const { location } = req.body;
+
+  if (!location) {
+    return res.status(400).json({ error: "Location is required." });
+  }
 
   try {
     const user = await prismaConnection.user.findUnique({
@@ -148,12 +194,13 @@ exports.updateUserLocation = async (req, res) => {
       data: {
         location: {
           type: "Point",
-          coordinates: location,
+          coordinates: location, // Ensure this matches your location data structure
         },
       },
     });
-    res.status(200).json({ message: "User location updated successfully" });
+    res.status(200).json({ message: "User location updated successfully." });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    console.error("Error updating user location:", error);
+    res.status(500).json({ error: "Failed to update user location." });
   }
 };

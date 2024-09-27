@@ -5,7 +5,9 @@ exports.getAllCarts = async (req, res) => {
     const carts = await prismaConnection.cart.findMany();
     res.status(200).json(carts);
   } catch (error) {
-    res.status(500).json({ message: "Error retrieving carts", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error retrieving carts", error: error.message });
   }
 };
 
@@ -30,7 +32,7 @@ exports.getCartById = async (req, res) => {
     if (carts.length > 0) {
       const cartsWithNumberPrice = carts.map((cart) => ({
         ...cart,
-        menuItem: cart.menuItem.map(item => ({
+        menuItem: cart.menuItem.map((item) => ({
           ...item,
           price: parseFloat(item.price),
         })),
@@ -41,31 +43,42 @@ exports.getCartById = async (req, res) => {
     }
   } catch (error) {
     console.error("Error retrieving cart:", error);
-    res.status(500).json({ message: "Error retrieving cart", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error retrieving cart", error: error.message });
   }
 };
 
 exports.createCart = async (req, res) => {
   try {
-    const { id } = req.user;
-    const { restaurant_owner_id, menuitems_id, quantity } = req.body;
+    const { id } = req.user; // ID du client
+    const { restaurant_owner_id, menu_item_id, quantity } = req.body; // Correction: menu_item_id
+    console.log(req.body);
+    if (!menu_item_id) {
+      return res.status(400).json({ message: "menu_item_id is required" });
+    }
 
+    // Vérifier si l'utilisateur est un client valide
     const customer = await prismaConnection.user.findUnique({ where: { id } });
     if (!customer || customer.role !== "customer") {
       return res.status(400).json({ message: "Invalid customer ID" });
     }
 
-    const restaurantOwner = await prismaConnection.user.findUnique({ where: { id: restaurant_owner_id } });
+    // Vérifier si le propriétaire du restaurant est valide
+    const restaurantOwner = await prismaConnection.user.findUnique({
+      where: { id: restaurant_owner_id },
+    });
     if (!restaurantOwner || restaurantOwner.role !== "restaurant_owner") {
       return res.status(400).json({ message: "Invalid restaurant owner ID" });
     }
 
+    // Vérifier si l'article de menu existe déjà dans le panier du client
     const existingCartItem = await prismaConnection.cart.findUnique({
       where: {
-        customer_id_restaurant_owner_id_menuitems_id: {
+        customer_id_restaurant_owner_id_menu_item_id: {
           customer_id: id,
           restaurant_owner_id,
-          menuitems_id,
+          menu_item_id, // Correction: assurer que menu_item_id est bien utilisé ici
         },
       },
       include: {
@@ -80,30 +93,19 @@ exports.createCart = async (req, res) => {
       },
     });
 
+    // Si l'article existe déjà dans le panier, mettre à jour la quantité
     if (existingCartItem) {
-      existingCartItem.quantity += quantity;
       const updatedCartItem = await prismaConnection.cart.update({
-        where: { id: existingCartItem.id },
-        data: { quantity: existingCartItem.quantity },
-        include: {
-          menuItem: {
-            select: {
-              id: true,
-              name: true,
-              price: true,
-              imageUrl: true,
-            },
+        where: {
+          customer_id_restaurant_owner_id_menu_item_id: {
+            // Utiliser la clé composée
+            customer_id: id,
+            restaurant_owner_id,
+            menu_item_id,
           },
         },
-      });
-      res.status(200).json(updatedCartItem);
-    } else {
-      const newCart = await prismaConnection.cart.create({
         data: {
-          customer_id: id,
-          restaurant_owner_id,
-          menuitems_id,
-          quantity,
+          quantity: existingCartItem.quantity + quantity, // Augmenter la quantité
         },
         include: {
           menuItem: {
@@ -116,11 +118,34 @@ exports.createCart = async (req, res) => {
           },
         },
       });
-      res.status(201).json(newCart);
+      return res.status(200).json(updatedCartItem);
     }
+
+    // Sinon, créer un nouvel article dans le panier
+    const newCart = await prismaConnection.cart.create({
+      data: {
+        customer_id: id,
+        restaurant_owner_id,
+        menu_item_id, // Utiliser le nom correct
+        quantity,
+      },
+      include: {
+        menuItem: {
+          select: {
+            id: true,
+            name: true,
+            price: true,
+            imageUrl: true,
+          },
+        },
+      },
+    });
+    return res.status(201).json(newCart);
   } catch (error) {
     console.error("Error creating cart:", error);
-    res.status(500).json({ message: "Error creating cart", error: error.message });
+    return res
+      .status(500)
+      .json({ message: "Error creating cart", error: error.message });
   }
 };
 
@@ -143,7 +168,9 @@ exports.updateCart = async (req, res) => {
     res.status(200).json(updatedCart);
   } catch (error) {
     console.error("Error updating cart:", error);
-    res.status(500).json({ message: "Error updating cart", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error updating cart", error: error.message });
   }
 };
 
@@ -155,7 +182,9 @@ exports.deleteCart = async (req, res) => {
     res.status(204).json({ message: "Cart deleted" });
   } catch (error) {
     console.error("Error deleting cart:", error);
-    res.status(500).json({ message: "Error deleting cart", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error deleting cart", error: error.message });
   }
 };
 
@@ -171,7 +200,10 @@ exports.getCartByCustomerId = async (req, res) => {
     }
   } catch (error) {
     console.error("Error retrieving carts by customer:", error);
-    res.status(500).json({ message: "Error retrieving carts by customer", error: error.message });
+    res.status(500).json({
+      message: "Error retrieving carts by customer",
+      error: error.message,
+    });
   }
 };
 
@@ -187,7 +219,10 @@ exports.getCartByMenuItemId = async (req, res) => {
     }
   } catch (error) {
     console.error("Error retrieving carts by menu item:", error);
-    res.status(500).json({ message: "Error retrieving carts by menu item", error: error.message });
+    res.status(500).json({
+      message: "Error retrieving carts by menu item",
+      error: error.message,
+    });
   }
 };
 
@@ -199,11 +234,16 @@ exports.getCartByRestaurantOwnerId = async (req, res) => {
     if (carts.length > 0) {
       res.status(200).json(carts);
     } else {
-      res.status(404).json({ message: "No carts found for this restaurant owner" });
+      res
+        .status(404)
+        .json({ message: "No carts found for this restaurant owner" });
     }
   } catch (error) {
     console.error("Error retrieving carts by restaurant owner:", error);
-    res.status(500).json({ message: "Error retrieving carts by restaurant owner", error: error.message });
+    res.status(500).json({
+      message: "Error retrieving carts by restaurant owner",
+      error: error.message,
+    });
   }
 };
 
@@ -216,6 +256,8 @@ exports.clearCart = async (req, res) => {
     res.status(200).json({ message: "Cart cleared successfully" });
   } catch (error) {
     console.error("Error clearing cart:", error);
-    res.status(500).json({ message: "Error clearing cart", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error clearing cart", error: error.message });
   }
 };

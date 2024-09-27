@@ -13,17 +13,22 @@ import { AppDispatch } from "../../../redux/store";
 
 const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
 
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+}
+
 interface Food {
   id: number;
   name: string;
-  price: number;
+  price: string;
   imageUrl: string;
   description?: string;
-  User: {
-    id: number;
-  };
-  availble: number;
+  available: boolean;
   likes: number;
+  user: User; // This represents the restaurant owner
 }
 
 const FoodDetailScreen: React.FC = () => {
@@ -32,19 +37,20 @@ const FoodDetailScreen: React.FC = () => {
   const [food, setFood] = useState<Food | null>(null);
   const router = useRouter();
   const params = useParams();
-  console.log(params);
   const { productId } = params;
+
   const defaultDescription =
     "The texture of food that needs to be chewed thoroughly before swallowing. Can be light and bouncy or heavy and sticky.";
 
+  // Fetch the food details when the component mounts
   useEffect(() => {
     const fetchFood = async () => {
       try {
         const response = await axios.get(
-          `${serverDomain}/api/menu-items/${productId}`
+          `${serverDomain}/api/menu-items/${productId}` // Ensure productId corresponds to menu_item_id in your backend
         );
-        console.log("helloooooos", response);
-        setFood(response.data);
+
+        setFood(response.data[0]);
       } catch (error) {
         console.error("Error fetching food item:", error);
       }
@@ -53,21 +59,23 @@ const FoodDetailScreen: React.FC = () => {
     fetchFood();
   }, [productId]);
 
+  // Handle quantity changes
   const handleQuantityChange = (newQuantity: number) => {
     setQuantity(Math.max(1, newQuantity));
   };
 
+  // Handle adding the item to the cart
   const handleAddToCart = () => {
-    if (food) {
+    if (food && quantity > 0) {
       dispatch(
         addToCartAsync({
-          id: food.id,
+          id: food.id, // food.id should correspond to menu_item_id in your backend
           name: food.name,
-          price: food.price,
-          quantity: quantity,
-          user_id: food.User.id,
+          price: parseFloat(food.price), // Convert price to float
+          quantity: Math.max(1, quantity),
+          user_id: food.user.id, // Ensure this corresponds to restaurant_owner_id
           imageUrl: food.imageUrl,
-          availble: food.availble,
+          available: food.available,
           likes: food.likes,
         })
       );
@@ -76,6 +84,8 @@ const FoodDetailScreen: React.FC = () => {
         "Your order has been added to the cart",
         "success"
       );
+    } else {
+      swal("Error", "Unable to add this item to the cart", "error");
     }
   };
 
@@ -125,7 +135,7 @@ const FoodDetailScreen: React.FC = () => {
                 </p>
                 <div className="flex items-center justify-between mb-8">
                   <span className="text-4xl font-bold text-orange-600">
-                    {(food.price * quantity).toFixed(2)} TND
+                    {(parseFloat(food.price) * quantity).toFixed(2)} TND
                   </span>
                   <div className="flex items-center border-2 border-orange-200 rounded-full">
                     <button

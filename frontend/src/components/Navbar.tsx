@@ -3,49 +3,27 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { BsCart2 } from "react-icons/bs";
 import { FiLogOut } from "react-icons/fi";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import logo from "../../src/assets/logo2.png";
-import { logoutUser } from "../redux/features/authSlice";
-import { AppDispatch, RootState } from "../redux/store";
+import { useAuth } from "../hooks/useAuth"; // Import the useAuth hook
+import { RootState } from "../redux/store";
 
 const Navbar: React.FC = () => {
-  const [changeHeader, setChangeHeader] = useState<boolean>(false);
   const router = useRouter();
-  const dispatch: AppDispatch = useDispatch();
-  const { user } = useSelector((state: RootState) => state.users);
+  const { user, logout, isAuthenticated } = useAuth(); // Use the useAuth hook
   const { items } = useSelector((state: RootState) => state.cart);
 
-  const onChangeHeader = () => {
-    if (window.scrollY >= 50) {
-      setChangeHeader(true);
-    } else {
-      setChangeHeader(false);
-    }
-  };
-
-  useEffect(() => {
-    window.addEventListener("scroll", onChangeHeader);
-    return () => window.removeEventListener("scroll", onChangeHeader);
-  }, []);
-
   const handleLogout = () => {
-    dispatch(logoutUser());
+    logout(); // Call logout function from useAuth
     router.push("/signin");
   };
 
   return (
-    <header
-      className={
-        changeHeader
-          ? "bg-white fixed z-50 top-0 left-0 w-full shadow-md transition duration-500"
-          : "bg-transparent fixed z-50 top-0 left-0 w-full transition duration-500"
-      }
-    >
+    <header className="fixed top-0 left-0 z-50 w-full bg-white shadow-md">
       <nav className="flex items-center max-w-screen-xl px-6 py-3 mx-auto">
-        {/* left */}
         <div className="flex flex-grow">
           <Image
             className="cursor-pointer w-36"
@@ -54,32 +32,23 @@ const Navbar: React.FC = () => {
             onClick={() => router.push("/")}
           />
         </div>
-        {/* right */}
-        {user ? (
+        {isAuthenticated ? ( // Check if user is authenticated
           <div className="flex items-center justify-end space-x-4">
-            {user.role === "driver" && (
-              <Link href="/delivery-interface">
-                <a className="text-gray-600">Delivery Interface</a>
-              </Link>
-            )}
-            {user.role === "restaurant_owner" && (
+            {user?.role === "restaurant_owner" && (
               <Link href="/dashboard">
                 <a className="text-gray-600">Dashboard</a>
               </Link>
             )}
             <div
               className="relative flex cursor-pointer"
-              onClick={() => router.push("/cart")}
+              onClick={() => router.push("/Cart")}
             >
-              <span className="absolute flex items-center justify-center w-6 h-6 text-white rounded-full bg-primary poppins -right-2 -top-2">
+              <span className="absolute flex items-center justify-center w-6 h-6 text-white rounded-full bg-primary -right-2 -top-2">
                 {items.length}
               </span>
               <BsCart2 className="w-6 h-6 text-gray-700 cursor-pointer" />
             </div>
-
-            <p className="hidden text-gray-700 poppins md:block lg:block">
-              {user.name}
-            </p>
+            <p className="hidden text-gray-700 md:block">{user?.name}</p>
             <FiLogOut
               className="w-6 h-6 text-gray-700 cursor-pointer"
               onClick={handleLogout}
@@ -88,13 +57,13 @@ const Navbar: React.FC = () => {
         ) : (
           <div className="flex items-center justify-end space-x-6">
             <button
-              className="px-6 py-3 transition transform bg-white rounded-full d uration-700 text-primary poppins ring-red-300 focus:outline-none focus:ring-4 hover:scale-105"
+              className="px-6 py-3 bg-white rounded-full text-primary"
               onClick={() => router.push("/signin")}
             >
               Sign In
             </button>
             <button
-              className="px-6 py-3 text-white transition duration-700 transform rounded-full bg-primary poppins ring-red-300 focus:outline-none focus:ring-4 hover:scale-105"
+              className="px-6 py-3 text-white rounded-full bg-primary"
               onClick={() => router.push("/signup")}
             >
               Sign Up

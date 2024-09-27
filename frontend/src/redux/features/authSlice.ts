@@ -1,8 +1,12 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-import { User } from "../../types/userTypes";
-import { RootState } from "../store";
-// Define the type for user data
+import {
+  LoginCredentials,
+  SignUpCredentials,
+  User,
+  UserResponse,
+} from "../../types/userTypes";
+
 const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
 
 interface AuthState {
@@ -17,86 +21,43 @@ const initialState: AuthState = {
   error: null,
 };
 
-export const loginUser = createAsyncThunk(
-  "user/loginUser",
-  async (
-    credentials: { email?: string; password?: string; token?: string },
-    { rejectWithValue }
-  ) => {
-    try {
-      let response;
-      if (credentials.token) {
-        response = await axios.get(`${serverDomain}/api/auth/me`, {
-          headers: { Authorization: `Bearer ${credentials.token}` },
-        });
-      } else {
-        response = await axios.post<User>(
-          `${serverDomain}/api/auth/signin`,
-          credentials
-        );
-      }
+// Logout action
+export const logoutUser = createAsyncThunk("auth/logoutUser", async () => {});
 
-      return response.data;
-    } catch (error) {
-      return rejectWithValue((error as Error).message);
-    }
-  }
-);
-
-export const signUpUser = createAsyncThunk(
-  "user/signUpUser",
-  async (body: object, { rejectWithValue }) => {
+// Login action
+export const loginUser = createAsyncThunk<UserResponse, LoginCredentials>(
+  "auth/loginUser",
+  async (credentials, { rejectWithValue }) => {
     try {
-      const response = await axios.post<User>(
-        `${serverDomain}/api/auth/signup`,
-        body
+      const response = await axios.post<UserResponse>(
+        `${serverDomain}/api/auth/signin`,
+        credentials
       );
-
       return response.data;
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }
   }
 );
-export const updateUserLocation = createAsyncThunk(
-  "user/updateLocation",
-  async (location: [number, number], { getState, rejectWithValue }) => {
-    const state = getState() as RootState;
-    const { user } = state.users;
-    if (user) {
-      try {
-        const response = await axios.put<User>(
-          `${serverDomain}/api/users/location`,
-          { location },
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
-        return response.data;
-      } catch (error) {
-        return rejectWithValue((error as Error).message);
-      }
-    }
-    return rejectWithValue("User not logged in");
-  }
-);
 
-export const logoutUser = createAsyncThunk(
-  "auth/logout",
-  async (_, { rejectWithValue }) => {
+// Sign-up action
+export const signUpUser = createAsyncThunk<UserResponse, SignUpCredentials>(
+  "auth/signUpUser",
+  async (credentials, { rejectWithValue }) => {
     try {
-      localStorage.removeItem("token");
-      return null;
+      const response = await axios.post<UserResponse>(
+        `${serverDomain}/api/auth/signup`,
+        credentials
+      );
+      return response.data;
     } catch (error) {
       return rejectWithValue((error as Error).message);
     }
   }
 );
 
-const userSlice = createSlice({
-  name: "user",
+const authSlice = createSlice({
+  name: "auth",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -107,10 +68,6 @@ const userSlice = createSlice({
       .addCase(loginUser.fulfilled, (state, action) => {
         state.status = "succeeded";
         state.user = action.payload.user;
-        console.log(
-          action.payload,
-          "===================================================payloaaaaaaaaaaaaaaaaaaaaaaaaad"
-        );
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.status = "failed";
@@ -119,23 +76,18 @@ const userSlice = createSlice({
       .addCase(signUpUser.pending, (state) => {
         state.status = "loading";
       })
-      .addCase(signUpUser.fulfilled, (state) => {
+      .addCase(signUpUser.fulfilled, (state, action) => {
         state.status = "succeeded";
+        state.user = action.payload.user;
       })
       .addCase(signUpUser.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload as string;
       })
-      .addCase(updateUserLocation.fulfilled, (state, action) => {
-        if (state.user) {
-          state.user.location = action.payload.location;
-        }
-      })
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
-        state.status = "idle";
       });
   },
 });
 
-export default userSlice.reducer;
+export default authSlice.reducer;
