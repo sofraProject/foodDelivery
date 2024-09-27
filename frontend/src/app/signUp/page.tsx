@@ -4,8 +4,8 @@ import { useRouter } from "next/navigation";
 import React, { useState, FormEvent } from "react";
 import { useDispatch } from "react-redux";
 // import { useNavigate, Link } from "react-router-dom";
-import { signUpUser } from "../../redux/features/authSlice";
-import { AppDispatch } from "../../redux/store";
+import { signUpUser } from "../../../libs/redux/features/authSlice";
+import { AppDispatch } from "../../../libs/redux/store";
 import Brand from "../../components/Form/Brand";
 import Button from "../../components/Form/Button";
 import TextField from "../../components/Form/TextField";
@@ -52,7 +52,7 @@ const SignUp: React.FC = () => {
           role,
         })
       );
-      router.push("/signin");
+      router.push("/signIn");
     } catch (error) {
       console.error("Error signing up:", error);
       setError("Sign up failed");
