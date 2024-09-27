@@ -250,3 +250,21 @@ exports.gagafalse = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+exports.getMenuItemsByCategory = async (req, res) => {
+  try {
+    const categoryId = parseInt(req.params.category_id, 10);
+
+    const menuItems = await prismaConnection.menuItem.findMany({
+      where: { category_id: categoryId },
+      include: {
+        user: true,
+      },
+    });
+
+    res.status(200).json(menuItems);
+  } catch (error) {
+    console.error("Error fetching menu items by category:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
