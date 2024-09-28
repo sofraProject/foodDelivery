@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useRef, useState } from "react";
 import { BsCart2 } from "react-icons/bs";
 import logo from "../../src/assets/logo2.png";
-import { authHelper } from "../helpers/authHelper";
 import { useAuth } from "../hooks/useAuth";
 import { useCart } from "../hooks/useCart";
 
@@ -15,28 +14,13 @@ const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
 
 const Navbar: React.FC = () => {
   const router = useRouter();
-  const { logout, isAuthenticated } = useAuth();
+  const { logout, isAuthenticated, decodedUser } = useAuth();
   const { items } = useCart();
-  const [dropdownOpen, setDropdownOpen] = useState(false);
   const [userData, setUserData] = useState<any>(null);
-  const [decodedUser, setDecodedUser] = useState<any>(null);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    const decodeUser = () => {
-      if (
-        authHelper?.decodedUser &&
-        typeof authHelper.decodedUser === "object"
-      ) {
-        setDecodedUser(authHelper.decodedUser);
-        console.log(authHelper.decodedUser, "Decoded User");
-      } else {
-        console.log("User not authenticated");
-      }
-    };
-    decodeUser();
-  }, []);
-
+  // Fetch user data based on decodedUser
   useEffect(() => {
     const fetchUserData = async () => {
       if (isAuthenticated && decodedUser?.id) {
@@ -53,11 +37,7 @@ const Navbar: React.FC = () => {
     fetchUserData();
   }, [isAuthenticated, decodedUser]);
 
-  const handleLogout = () => {
-    logout();
-    router.push("/signin");
-  };
-
+  // Handle click outside dropdown
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -68,10 +48,13 @@ const Navbar: React.FC = () => {
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const handleLogout = () => {
+    logout();
+    router.push("/signin");
+  };
 
   const renderCartIcon = () => (
     <div
@@ -91,7 +74,7 @@ const Navbar: React.FC = () => {
         className="flex items-center px-6 py-3 space-x-2 text-white rounded-full bg-primary"
         onClick={() => setDropdownOpen(!dropdownOpen)}
       >
-        <span>{userData ? userData.name : "User"}</span>
+        <span>{userData?.name || "User"}</span>
         <svg
           className="w-4 h-4"
           fill="none"
@@ -108,7 +91,7 @@ const Navbar: React.FC = () => {
       </button>
 
       {dropdownOpen && (
-        <div className="absolute right-0 z-50 mt-2 bg-white rounded-lg shadow-lg w-44 top-full">
+        <div className="absolute right-0 z-50 mt-5 bg-white rounded-lg shadow-lg w-44 top-full">
           <Link href="/account" className="block px-4 py-2 text-gray-700">
             Account
           </Link>
@@ -148,25 +131,18 @@ const Navbar: React.FC = () => {
 
   const renderRoleSpecificLinks = () => {
     if (!userData?.role) return null;
-    return (
-      <div className="flex items-center justify-end space-x-4">
-        {userData.role === "driver" && (
-          <Link href="/delivery-interface" className="text-gray-600">
-            Delivery Interface
-          </Link>
-        )}
-        {userData.role === "restaurant_owner" && (
-          <Link href="/dashboard" className="text-gray-600">
-            Dashboard
-          </Link>
-        )}
-        {userData.role === "admin" && (
-          <Link href="/admin" className="text-gray-600">
-            Switch to Admin
-          </Link>
-        )}
-      </div>
-    );
+
+    const roleLinks: { [key: string]: string } = {
+      driver: "/delivery-interface",
+      restaurant_owner: "/dashboard",
+      admin: "/admin",
+    };
+
+    return roleLinks[userData.role] ? (
+      <Link href={roleLinks[userData.role]} className="text-gray-600">
+        {userData.role === "admin" ? "Switch to Admin" : "Dashboard"}
+      </Link>
+    ) : null;
   };
 
   return (
