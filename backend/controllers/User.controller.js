@@ -1,6 +1,7 @@
 const { prismaConnection } = require("../prisma/prisma");
 const bcrypt = require("bcrypt");
 
+// Récupère tous les utilisateurs
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await prismaConnection.user.findMany();
@@ -11,6 +12,7 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
+// Récupère un utilisateur par son ID
 exports.getUserById = async (req, res) => {
   const { id } = req.params;
   try {
@@ -28,11 +30,11 @@ exports.getUserById = async (req, res) => {
   }
 };
 
+// Crée un nouvel utilisateur
 exports.createUser = async (req, res) => {
   const { name, email, password, imagesUrl, balance, location, role } =
     req.body;
 
-  // Validate required fields
   if (!name || !email || !password) {
     return res
       .status(400)
@@ -40,7 +42,6 @@ exports.createUser = async (req, res) => {
   }
 
   try {
-    // Hash the password before storing
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const newUser = await prismaConnection.user.create({
@@ -61,12 +62,12 @@ exports.createUser = async (req, res) => {
   }
 };
 
+// Met à jour un utilisateur
 exports.updateUser = async (req, res) => {
   const { id } = req.params;
   const { name, email, password, imagesUrl, balance, location, role } =
     req.body;
 
-  // Validate required fields
   if (
     !name &&
     !email &&
@@ -84,7 +85,6 @@ exports.updateUser = async (req, res) => {
   try {
     const updatedData = { name, email, imagesUrl, balance, location, role };
 
-    // Hash the password if it's being updated
     if (password) {
       updatedData.password = await bcrypt.hash(password, 10);
     }
@@ -106,10 +106,11 @@ exports.updateUser = async (req, res) => {
   }
 };
 
+// Récupère tous les propriétaires de restaurant
 exports.getAllUsersRestaurant = async (req, res) => {
   try {
     const users = await prismaConnection.user.findMany({
-      where: { role: "restaurant_owner" },
+      where: { role: "RESTAURANT_OWNER" },
     });
     res.status(200).json(users);
   } catch (error) {
@@ -118,6 +119,7 @@ exports.getAllUsersRestaurant = async (req, res) => {
   }
 };
 
+// Recherche les restaurants à proximité (logiciel à implémenter)
 exports.findNearbyRestaurants = async (req, res) => {
   const { userId, radius = 1000 } = req.body;
 
@@ -129,7 +131,7 @@ exports.findNearbyRestaurants = async (req, res) => {
       return res.status(404).json({ error: "User not found." });
     }
 
-    if (user.role !== "customer") {
+    if (user.role !== "CUSTOMER") {
       return res.status(403).json({ error: "The user is not a customer." });
     }
 
@@ -138,11 +140,10 @@ exports.findNearbyRestaurants = async (req, res) => {
       return res.status(404).json({ error: "Customer location not found." });
     }
 
-    // Implement your own logic to filter based on distance
+    // Implémentez votre propre logique de calcul de distance ici
     const nearbyRestaurants = await prismaConnection.user.findMany({
       where: {
-        role: "restaurant_owner",
-        // You will need to implement your own logic to filter based on distance here
+        role: "RESTAURANT_OWNER",
       },
     });
 
@@ -155,6 +156,7 @@ exports.findNearbyRestaurants = async (req, res) => {
   }
 };
 
+// Supprime un utilisateur
 exports.deleteUser = async (req, res) => {
   const { id } = req.params;
   try {
@@ -172,6 +174,7 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
+// Met à jour la localisation de l'utilisateur
 exports.updateUserLocation = async (req, res) => {
   const { id } = req.user;
   const { location } = req.body;
@@ -194,7 +197,7 @@ exports.updateUserLocation = async (req, res) => {
       data: {
         location: {
           type: "Point",
-          coordinates: location, // Ensure this matches your location data structure
+          coordinates: location, // Assurez-vous que cela correspond à votre structure de données de localisation
         },
       },
     });
