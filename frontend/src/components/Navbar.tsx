@@ -53,7 +53,7 @@ const Navbar: React.FC = () => {
 
   const handleLogout = () => {
     logout();
-    router.push("/signin");
+    router.push("/signIn");
   };
 
   const renderCartIcon = () => (
@@ -116,13 +116,13 @@ const Navbar: React.FC = () => {
     <div className="flex space-x-4">
       <button
         className="px-6 py-3 bg-white rounded-full text-primary"
-        onClick={() => router.push("/signin")}
+        onClick={() => router.push("/signIn")}
       >
         Sign In
       </button>
       <button
         className="px-6 py-3 text-white rounded-full bg-primary"
-        onClick={() => router.push("/signup")}
+        onClick={() => router.push("/signUp")}
       >
         Sign Up
       </button>

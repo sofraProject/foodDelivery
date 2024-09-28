@@ -11,14 +11,12 @@ module.exports = {
     try {
       const { email, password, role, name, location } = req.body;
 
-      // Validate required fields
       if (!email || !password || !role || !name) {
-        return res
-          .status(400)
-          .json({ message: "Email, password, role, and name are required." });
+        return res.status(400).json({
+          message: "Email, password, role, and name are required.",
+        });
       }
 
-      // Check for existing user
       const existingUser = await prismaConnection.user.findUnique({
         where: { email },
       });
@@ -26,36 +24,36 @@ module.exports = {
         return res.status(400).json({ message: "Email already in use." });
       }
 
-      // Hash the password
       const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-      // Validate the role
       if (!["customer", "restaurant_owner", "driver"].includes(role)) {
         return res.status(400).json({ message: "Invalid role specified." });
       }
 
-      // Create new user
+      const domain = process.env.DOMAIN || "http://localhost:3100/uploads/";
+      const profilePicture = req.file ? `${domain}${req.file.filename}` : null;
+
       const newUser = await prismaConnection.user.create({
         data: {
           email,
           password: hashedPassword,
           role,
           name,
+          imagesUrl: profilePicture,
           location,
         },
       });
 
-      // Generate JWT token
       const token = jwt.sign(
         { id: newUser.id, role: newUser.role },
         process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN || "1h" } // Default to 1h if not specified
+        { expiresIn: process.env.JWT_EXPIRES_IN || "1h" }
       );
 
       res.status(201).json({
         message: "Account created successfully.",
         userId: newUser.id,
-        token, // Include the token in the response
+        token,
       });
     } catch (error) {
       console.error("Error creating account:", error);

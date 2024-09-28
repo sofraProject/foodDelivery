@@ -13,6 +13,7 @@ interface AuthState {
   user: User | null;
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
+  
 }
 
 const initialState: AuthState = {
@@ -20,6 +21,8 @@ const initialState: AuthState = {
   status: "idle",
   error: null,
 };
+
+
 
 // Logout action
 export const logoutUser = createAsyncThunk("auth/logoutUser", async () => {});
@@ -41,13 +44,19 @@ export const loginUser = createAsyncThunk<UserResponse, LoginCredentials>(
 );
 
 // Sign-up action
-export const signUpUser = createAsyncThunk<UserResponse, SignUpCredentials>(
+export const signUpUser = createAsyncThunk<UserResponse, FormData>(
   "auth/signUpUser",
-  async (credentials, { rejectWithValue }) => {
+  async (formData, { rejectWithValue }) => {
     try {
       const response = await axios.post<UserResponse>(
         `${serverDomain}/api/auth/signup`,
-        credentials
+        formData, 
+        {
+          headers: {
+            // Let the browser handle the content-type with FormData
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
       return response.data;
     } catch (error) {

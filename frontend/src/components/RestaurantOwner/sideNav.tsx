@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MdDashboard, MdOutlineAddBox, MdArchive, MdOutlineArrowForwardIos, MdOutlineMenu } from 'react-icons/md';
-import { NavLink } from 'react-router-dom';
+// import { NavLink } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 
@@ -63,7 +63,7 @@ const SideNav: React.FC = () => {
                             <ul className="ml-4">
                                 {menu.map(item => (
                                     <li className="flex items-center mb-2" key={item.id}>
-                                        <NavLink
+                                        {/* <NavLink
                                             to={item.to}
                                             className={({ isActive }) =>
                                                 `p-2 rounded-md transition-colors duration-200 flex items-center space-x-2 ${isActive ? 'bg-purple-500 text-white' : 'text-white hover:bg-purple-300'}`
@@ -71,7 +71,7 @@ const SideNav: React.FC = () => {
   }>
                                             <span className="text-lg">{item.icon}</span>
                                             <span className="ml-1 poppins text-sm">{item.text}</span>
-                                        </NavLink>
+                                        </NavLink> */}
                                     </li>
                                 ))}
                             </ul>

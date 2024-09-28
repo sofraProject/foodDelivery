@@ -16,6 +16,7 @@ const SignUp: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [role, setRole] = useState("customer");
+  const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [error, setError] = useState<string | null>(null);
   // const [location, setLocation] = useState<[number, number] | null>(null);
   const dispatch: AppDispatch = useDispatch();
@@ -39,20 +40,20 @@ const SignUp: React.FC = () => {
   //     setError("Geolocation is not supported by your browser.");
   //   }
   // };
-
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
+    const formData = new FormData();
+    formData.append("name", name);
+    formData.append("email", email);
+    formData.append("password", password);
+    formData.append("role", role);
+    if (profilePicture) {
+      formData.append("imagesUrl", profilePicture); // This needs to match what your backend expects
+    }
+  
     try {
-      await dispatch(
-        signUpUser({
-          name,
-          email,
-          password,
-          role,
-        })
-      );
-      router.push("/signin");
+      await dispatch(signUpUser(formData));
+      router.push("/signIn");
     } catch (error) {
       console.error("Error signing up:", error);
       setError("Sign up failed");
@@ -100,6 +101,11 @@ const SignUp: React.FC = () => {
               <option value="restaurant_owner">Restaurant Owner</option>
               <option value="driver">Driver</option>
             </select>
+            <input
+              type="file"
+              onChange={(e) => setProfilePicture(e.target.files?.[0] || null)} // Handle file input
+              accept="image/*" // Allow only image files
+            />
           </div>
           <Button text="Sign Up" />
           <Link href="/signin">

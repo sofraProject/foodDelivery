@@ -12,8 +12,7 @@ export interface User {
 }
 
 export interface UserResponse {
-  user: User; // Pour le typage de la réponse d'API
-  token: string; // Pour stocker le token JWT
+  user: User;
 }
 
 export interface LoginCredentials {
@@ -21,9 +20,20 @@ export interface LoginCredentials {
   password: string;
 }
 
+
+
+// export interface UserResponse {
+//   id: string;
+//   name: string;
+//   email: string;
+//   role: string;
+//   imageUrl?: string; // Assuming this exists in your response
+// }
+
 export interface SignUpCredentials {
   name: string;
   email: string;
   password: string;
   role: string;
+  imagesUrl?: File; // Accept a File for image upload
 }
