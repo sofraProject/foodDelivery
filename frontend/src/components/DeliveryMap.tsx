@@ -55,7 +55,7 @@ const DeliveryMap: React.FC<DeliveryMapProps> = ({
       el.className = "delivery-guy-marker";
 
       const img = document.createElement("img");
-      img.src = deliveryIcon;
+      img.src = deliveryIcon.src;
       img.style.width = "40px";
       img.style.height = "40px";
       el.appendChild(img);

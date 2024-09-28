@@ -20,7 +20,7 @@ const LocationPrompt: React.FC<{ onLocationSet: () => void }> = ({
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const { latitude, longitude } = position.coords;
-          dispatch(updateUserLocation([longitude, latitude]));
+          dispatch(updateUserLocation({id:'user-id',location:[longitude, latitude]}));
           onLocationSet();
         },
         (error) => {

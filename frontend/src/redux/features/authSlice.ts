@@ -19,6 +19,7 @@ const initialState: AuthState = {
   user: null,
   status: "idle",
   error: null,
+
 };
 
 // Logout action
@@ -48,6 +49,23 @@ export const signUpUser = createAsyncThunk<UserResponse, SignUpCredentials>(
       const response = await axios.post<UserResponse>(
         `${serverDomain}/api/auth/signup`,
         credentials
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue((error as Error).message);
+    }
+  }
+);
+
+// Update user location action
+export const updateUserLocation = createAsyncThunk<UserResponse, { id: string; location: number[] }>(
+  "auth/updateUserLocation",
+  async ({ id, location }, { rejectWithValue }) => {
+    try {
+      const response = await axios.put<UserResponse>(
+        `${serverDomain}/api/user/location`, // Adjust the endpoint as necessary
+        { location },
+        { headers: { Authorization: `Bearer ${id}` } } // Include token if needed
       );
       return response.data;
     } catch (error) {
@@ -86,6 +104,16 @@ const authSlice = createSlice({
       })
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
+      })
+      .addCase(updateUserLocation.fulfilled, (state, action) => {
+        const payload = action.payload as UserResponse; // Type assertion for correct structure
+      
+        if (state.user) {
+          state.user = {
+            ...state.user, // Preserve other user properties
+            location: payload.user.location, // Assuming the updated location is inside `payload.user.location`
+          };
+        }
       });
   },
 });
