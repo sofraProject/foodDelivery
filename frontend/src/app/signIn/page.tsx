@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import React, { FormEvent, useState } from "react";
+import React, { FormEvent, useEffect, useState } from "react";
 import Brand from "../../components/Form/Brand";
 import Button from "../../components/Form/Button";
 import TextField from "../../components/Form/TextField";
@@ -12,17 +12,19 @@ const SignIn: React.FC = () => {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login, loading, error, isAuthenticated } = useAuth(); // Use useAuth hook
+  const { login, loading, error, isAuthenticated } = useAuth();
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    await login(email, password); // Call the login function from useAuth
-
-    if (isAuthenticated) {
-      // Check if user is authenticated after login
-      router.push("/"); // Redirect to home or specific route based on role
-    }
+    await login(email, password);
   };
+
+  // Redirect immediately if authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      router.push("/"); // Redirect to home after successful login
+    }
+  }, [isAuthenticated, router]);
 
   return (
     <main className="w-full h-screen banner">

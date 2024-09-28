@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 
 // Helper pour récupérer l'utilisateur à partir du token stocké dans localStorage
 export const getUser = () => {
+  if (typeof window === "undefined") return null;
   const token = localStorage.getItem("token"); // Récupération du token
   if (token) {
     try {
