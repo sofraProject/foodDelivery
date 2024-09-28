@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MdDashboard, MdOutlineAddBox, MdArchive, MdOutlineArrowForwardIos, MdOutlineMenu } from 'react-icons/md';
-import { NavLink } from 'react-router-dom';
+import Link from 'next/link'; // Use Link from Next.js
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 
@@ -49,7 +49,7 @@ const SideNav: React.FC = () => {
                         <div className="flex flex-col items-center flex-wrap mt-8 pt-12">
                             <div className="">
                                 <img
-                                    src={user?.imageUrl}
+                                    src={user?.imagesUrl}
                                     className="mx-auto w-20 h-20 rounded-full border-2 border-gray-300"
                                     alt={user?.email}
                                 />
@@ -63,15 +63,10 @@ const SideNav: React.FC = () => {
                             <ul className="ml-4">
                                 {menu.map(item => (
                                     <li className="flex items-center mb-2" key={item.id}>
-                                        <NavLink
-                                            to={item.to}
-                                            className={({ isActive }) =>
-                                                `p-2 rounded-md transition-colors duration-200 flex items-center space-x-2 ${isActive ? 'bg-purple-500 text-white' : 'text-white hover:bg-purple-300'}`
-
-  }>
+                                        <Link href={item.to} className="p-2 rounded-md transition-colors duration-200 flex items-center space-x-2 text-white hover:bg-purple-300">
                                             <span className="text-lg">{item.icon}</span>
                                             <span className="ml-1 poppins text-sm">{item.text}</span>
-                                        </NavLink>
+                                        </Link>
                                     </li>
                                 ))}
                             </ul>

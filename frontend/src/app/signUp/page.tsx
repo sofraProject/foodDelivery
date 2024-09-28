@@ -52,7 +52,7 @@ const SignUp: React.FC = () => {
           role,
         })
       );
-      router.push("/signin");
+      router.push("/signIn");
     } catch (error) {
       console.error("Error signing up:", error);
       setError("Sign up failed");
@@ -102,7 +102,7 @@ const SignUp: React.FC = () => {
             </select>
           </div>
           <Button text="Sign Up" />
-          <Link href="/signin">
+          <Link href="/signIn">
             <p className="my-6 text-base text-center text-primary hover:underline">
               Already have an account?
             </p>

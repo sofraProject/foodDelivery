@@ -26,12 +26,12 @@ const ManageProductScreen: React.FC = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
     const [dep, setDep] = useState(false);
-
+    const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
     useEffect(() => {
         setLoading(true);
-        axios.get(`http://localhost:3000/api/menu-items/owner/restaurant`, {
+        axios.get(${serverDomain}/api/menu-items/owner/restaurant, {
             headers: {
-                'Authorization': `Bearer ${localStorage.getItem('token')}`
+                'Authorization': Bearer ${localStorage.getItem('token')}
             }
         })
             .then(response => {
@@ -46,7 +46,7 @@ const ManageProductScreen: React.FC = () => {
 
     const handleUpdateAvailble = async (item: MenuItem) => { // Changement de l'orthographe
         try {
-            const response = await axios.patch(`http://localhost:3000/api/menu-items/${item.id}/availability`);
+            const response = await axios.patch(http://localhost:3000/api/menu-items/${item.id}/availability);
             
             if (response.status === 200) {
                 swal("Succès !", "Disponibilité mise à jour avec succès !", "success");
@@ -97,7 +97,7 @@ const ManageProductScreen: React.FC = () => {
                                         </thead>
                                         <tbody>
                                             {currentItems.map((item, index) => {
-                                                const key = item.id ? `food-${item.id}` : `food-${index}`;
+                                                const key = item.id ? food-${item.id} : food-${index};
                                                 return (
                                                     <tr className="bg-white border-b poppins" key={key}>
                                                         <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -114,12 +114,12 @@ const ManageProductScreen: React.FC = () => {
                                                         <td className="px-6 py-4 whitespace-nowrap flex space-x-2">
                                                             <button 
                                                                 onClick={() => handleUpdateAvailble(item)}
-                                                                className={`px-4 py-2 rounded text-base ${item.available ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}`}
+                                                                className={px-4 py-2 rounded text-base ${item.available ? 'bg-red-500 text-white' : 'bg-green-500 text-white'}}
                                                             >
                                                                 {item.available ? <AiOutlineFileExclamation size={20} /> : <AiOutlineFileDone size={20} />}
                                                             </button>
                                                             <Link 
-                                                                to={`/dashboard/updateProduct/${item.id}`}
+                                                                to={/dashboard/updateProduct/${item.id}}
                                                                 className="px-4 py-2 rounded bg-blue-500 text-white flex items-center justify-center"
                                                             >
                                                                 <AiOutlineEdit size={20} />
@@ -138,7 +138,7 @@ const ManageProductScreen: React.FC = () => {
                                 <button
                                     key={i}
                                     onClick={() => paginate(i + 1)}
-                                    className={`mx-1 px-4 py-2 rounded text-base ${currentPage === i + 1 ? 'bg-teal-500 text-white' : 'bg-gray-200'}`}
+                                    className={mx-1 px-4 py-2 rounded text-base ${currentPage === i + 1 ? 'bg-teal-500 text-white' : 'bg-gray-200'}}
                                 >
                                     {i + 1}
                                 </button>

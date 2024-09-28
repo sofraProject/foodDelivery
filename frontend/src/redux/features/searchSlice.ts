@@ -1,12 +1,12 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-
+const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
 export const searchProductsAndRestaurants = createAsyncThunk(
   "search/productsAndRestaurants",
   async (searchTerm: string, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `http://localhost:3000/api/search?q=${encodeURIComponent(searchTerm)}`
+        `${serverDomain}/api/search?q=${encodeURIComponent(searchTerm)}`
       );
       console.log(response.data, "ya hafaaaaaaaaaa");
       return response.data;

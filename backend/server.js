@@ -6,6 +6,7 @@ const cookieParser = require("cookie-parser");
 const { connectToDatabase } = require("./prisma/prisma");
 require("dotenv").config();
 
+const restaurantRoutes = require("./routes/restaurant.route");
 const orderRoutes = require("./routes/Order.route");
 const menuItemRoutes = require("./routes/MenuItem.route");
 const deliveryRoutes = require("./routes/Delivery.route");
@@ -31,6 +32,7 @@ app.use("/api/menu-items", menuItemRoutes);
 app.use("/api/deliveries", deliveryRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/restaurants", restaurantRoutes);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/carts", cartRoutes);

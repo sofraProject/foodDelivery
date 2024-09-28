@@ -7,8 +7,9 @@ import { AiOutlineDelete } from "react-icons/ai";
 import { useDispatch, useSelector } from "react-redux";
 import { removeFromCart, updateQuantity } from "../../redux/features/cartSlice";
 import { AppDispatch, RootState } from "../../redux/store";
+
 const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
-// Fonction pour gérer le processus de commande
+
 const Cart: React.FC = () => {
   const cartItems = useSelector((state: RootState) => state.cart.items);
   const dispatch = useDispatch<AppDispatch>();
@@ -34,7 +35,7 @@ const Cart: React.FC = () => {
   const processPayment = async () => {
     try {
       const paymentResponse = await axios.post(
-        ` ${serverDomain}/api/payment/generatePayment`,
+        `${serverDomain}/api/payment/generatePayment`,
         {
           amount: totalPrice,
           developerTrackingId: `order_${Math.random()}`,
@@ -48,7 +49,8 @@ const Cart: React.FC = () => {
 
       // Vérification du lien de paiement
       if (paymentResponse.data.result && paymentResponse.data.result.link) {
-        window.open(paymentResponse.data.result.link, "_blank");
+        // Redirect to the payment link in the same window
+        window.location.href = paymentResponse.data.result.link;
       } else {
         throw new Error("Payment link not found");
       }
