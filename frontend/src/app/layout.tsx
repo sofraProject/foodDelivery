@@ -1,4 +1,4 @@
-import Navbar from "@/components/Navbar"; // Assurez-vous que le chemin est correct
+import Navbar from "../components/Navbar"; 
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import React from "react";
