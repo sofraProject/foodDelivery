@@ -133,17 +133,22 @@ const Navbar: React.FC = () => {
     if (!userData?.role) return null;
 
     const roleLinks: { [key: string]: string } = {
-      driver: "/delivery-interface",
-      restaurant_owner: "/dashboard",
-      admin: "/admin",
+        driver: "/delivery-interface",
+        restaurant_owner: "/dashboard",
+        admin: "/admin",
     };
 
-    return roleLinks[userData.role] ? (
-      <Link href={roleLinks[userData.role]} className="text-gray-600">
-        {userData.role === "admin" ? "Switch to Admin" : "Dashboard"}
-      </Link>
-    ) : null;
-  };
+    return (
+        <>
+            {roleLinks[userData.role] && (
+                <Link href={roleLinks[userData.role]} className="text-gray-600">
+                    {userData.role === "admin" ? "Switch to Admin" : "Dashboard"}
+                </Link>
+            )}
+            <Link href="/orders" className="text-gray-600">Orders</Link> 
+        </>
+    );
+};
 
   return (
     <header className="fixed top-0 left-0 z-50 w-full bg-white shadow-md">

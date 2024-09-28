@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { MdDashboard, MdOutlineAddBox, MdArchive, MdOutlineArrowForwardIos, MdOutlineMenu } from 'react-icons/md';
-// import { NavLink } from 'react-router-dom';
+import Link from 'next/link';
 import { useSelector } from 'react-redux';
 import { RootState } from '../../redux/store';
 
@@ -16,7 +16,7 @@ const SideNav: React.FC = () => {
     const [sidenav, setSidenav] = useState(true);
 
     // Toggling the side nav
-    const handlenav = () => {
+    const handleNav = () => {
         setSidenav(!sidenav);
     };
 
@@ -44,44 +44,39 @@ const SideNav: React.FC = () => {
     return (
         <div>
             {sidenav && (
-                <>
-                    <nav className="flex fixed flex-col w-64 bg-gradient-to-b from-teal-400 to-cyan-500 h-screen px-4 shadow-lg">
-                        <div className="flex flex-col items-center flex-wrap mt-8 pt-12">
-                            <div className="">
-                                <img
-                                    src={user?.imageUrl}
-                                    className="mx-auto w-20 h-20 rounded-full border-2 border-gray-300"
-                                    alt={user?.email}
-                                />
-                            </div>
-                            <div className="pt-2">
-                                <span className="font-semibold text-lg text-white">{user?.name}</span>
-                            </div>
+                <nav className="flex fixed flex-col w-64 bg-gradient-to-b from-teal-400 to-cyan-500 h-screen px-4 shadow-lg">
+                    <div className="flex flex-col items-center flex-wrap mt-8 pt-12">
+                        <div className="">
+                            <img
+                                src={user?.imagesUrl}
+                                className="mx-auto w-20 h-20 rounded-full border-2 border-gray-300"
+                                alt={user?.email}
+                            />
                         </div>
+                        <div className="pt-2">
+                            <span className="font-semibold text-lg text-white">{user?.name}</span>
+                        </div>
+                    </div>
 
-                        <div className="mt-10 mb-4">
-                            <ul className="ml-4">
-                                {menu.map(item => (
-                                    <li className="flex items-center mb-2" key={item.id}>
-                                        {/* <NavLink
-                                            to={item.to}
-                                            className={({ isActive }) =>
-                                                `p-2 rounded-md transition-colors duration-200 flex items-center space-x-2 ${isActive ? 'bg-purple-500 text-white' : 'text-white hover:bg-purple-300'}`
-
-  }>
+                    <div className="mt-10 mb-4">
+                        <ul className="ml-4">
+                            {menu.map(item => (
+                                <li className="flex items-center mb-2" key={item.id}>
+                                    <Link href={item.to}>
+                                        <a className="p-2 rounded-md transition-colors duration-200 flex items-center space-x-2 text-white hover:bg-purple-300">
                                             <span className="text-lg">{item.icon}</span>
                                             <span className="ml-1 poppins text-sm">{item.text}</span>
-                                        </NavLink> */}
-                                    </li>
-                                ))}
-                            </ul>
-                        </div>
-                    </nav>
-                </>
+                                        </a>
+                                    </Link>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+                </nav>
             )}
 
             {/* Menu icon */}
-            <div className="lg:hidden block fixed bottom-10 left-10 bg-purple-500 p-2 rounded-full cursor-pointer shadow-xl border border-gray-300" onClick={handlenav}>
+            <div className="lg:hidden block fixed bottom-10 left-10 bg-purple-500 p-2 rounded-full cursor-pointer shadow-xl border border-gray-300" onClick={handleNav}>
                 <MdOutlineArrowForwardIos className="text-2xl text-white" />
             </div>
         </div>
