@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server.js",
-    "prisma": "rm -rf prisma/migrations && npx prisma migrate dev dev init",
+    "prismaMac": "rm -rf prisma/migrations && npx prisma migrate dev dev init",
+    "prismaWin": "rimraf prisma/migrations && npx prisma migrate dev dev init",
     "seed": "node seeds/seedsAll.js"
   },
   "author": "",
