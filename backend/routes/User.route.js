@@ -13,5 +13,14 @@ router.get("/owner/restaurants", userController.getAllUsersRestaurant);
 router.post("/findNearby", userController.findNearbyRestaurants);
 router.delete("/:id", userController.deleteUser);
 router.put("/location", userController.updateUserLocation);
+// Fetch all customers
+router.get("/customers", customerController.getAllCustomers);
+
+// Create a new customer
+router.post("/customers", customerController.createUser);
+
+// Delete a customer by ID
+router.delete("/customers/:id", customerController.deleteCustomer);
+
 
 module.exports = router;
