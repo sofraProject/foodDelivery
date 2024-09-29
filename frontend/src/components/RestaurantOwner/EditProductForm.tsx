@@ -122,7 +122,7 @@ const EditProductForm: React.FC = () => {
               <Label htmlFor="type" text="Select the type of food" />
               <select
                 id="type"
-                className="w-full px-4 py-3 transition duration-500 border border-gray-200 rounded-lg focus:outline-none ring-red-200 focus:ring-4"
+                className="w-full px-4 py-3 transition duration-500 border border-gray-200 rounded-lg focus:outline-none ring-gray-200 focus:ring-4"
                 value={categoryId}
                 onChange={handleFoodType}
                 title="Select the type of food"

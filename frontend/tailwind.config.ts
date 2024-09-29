@@ -6,11 +6,11 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: "#FFB700", // Glovo yellow
+        primary: "#BFF38A", // Glovo yellow
         secondary: "#FFFFFF", // White for backgrounds
-        accent: "#9BBB4F", // Orange accents (buttons)
+        accent: "#e0ffbc", // Orange accents (buttons)
         neutral: "#F2F2F2", // Light background for sections
-        darkText: "#2E2E2E", // Dark text for readability
+        dark: "#101827", // Dark text for readability
         lightText: "#717171", // Light gray for secondary text
         success: "#34C759", // Green for positive elements
         warning: "#FF3B30", // Red for alerts or warnings
@@ -29,6 +29,12 @@ module.exports = {
       },
       boxShadow: {
         card: "0px 10px 30px rgba(0, 0, 0, 0.05)", // Soft shadow for card-like elements
+      },
+      animation: {
+        "slow-spin": "spin 10s linear infinite",
+        "slow-bounce": "bounce 3s infinite",
+        "slow-ping": "ping 3s cubic-bezier(0, 0, 0.2, 1) infinite",
+        "slow-pulse": "pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
     },
   },

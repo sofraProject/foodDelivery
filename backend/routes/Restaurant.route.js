@@ -5,6 +5,9 @@ const restaurantController = require("../controllers/Restaurant.controller");
 // Create a new restaurant
 router.post("/", restaurantController.createRestaurant);
 
+// Retrieve all restaurants with catorgies
+router.get("/category", restaurantController.getAllRestaurantswithCat);
+
 // Retrieve all restaurants
 router.get("/", restaurantController.getAllRestaurants);
 

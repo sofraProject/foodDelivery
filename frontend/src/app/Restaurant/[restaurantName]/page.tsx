@@ -1,15 +1,13 @@
 "use client";
-
 import axios from "axios";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { BsCart2 } from "react-icons/bs";
 import { AiOutlineArrowLeft } from "react-icons/ai"; // Importing arrow icon
-import image from "../../../assets/imagecheck.png";
+import { IoIosAddCircle } from "react-icons/io";
 import { useDispatch } from "react-redux";
-import swal from "sweetalert";
-import { addToCart } from "../../../redux/features/cartSlice";
+import image from "../../../assets/preview.svg";
+import { handleAddToCartHelper } from "../../../helpers/cartHelper"; // Utilisation du helper existant
 import { AppDispatch } from "../../../redux/store";
 
 const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
@@ -91,23 +89,20 @@ const RestaurantPage: React.FC = () => {
     ? menuItems.filter((item) => item.categoryId === selectedCategory)
     : menuItems;
 
-  // Handle adding the item to the cart
+  // Handle adding the item to the cart using the helper
   const handleAddToCart = (item: MenuItem) => {
-    dispatch(
-      addToCart({
+    handleAddToCartHelper(
+      {
         id: item.id,
         name: item.name,
         price: item.price,
-        quantity: 1, // Default to adding 1 item at a time
+        quantity: 1, // Par défaut, on ajoute 1 article à la fois
         imageUrl: item.imageUrl,
         available: true,
-        likes: 0, // Add likes if applicable
-      })
-    );
-    swal(
-      "Delicious choice!",
-      "Your order has been added to the cart",
-      "success"
+        likes: 0, // À adapter si nécessaire
+        restaurantId: item.restaurantId,
+      },
+      dispatch
     );
   };
 
@@ -152,7 +147,7 @@ const RestaurantPage: React.FC = () => {
             {/* Back Button */}
             <button
               onClick={() => router.back()} // Go back to the previous page
-              className="inline-flex items-center mb-4 text-orange-600 hover:text-orange-800"
+              className="inline-flex items-center px-4 py-1 mb-4 rounded-lg bg-primary text-dark hover:text-primary hover:bg-dark"
             >
               <AiOutlineArrowLeft className="w-5 h-5 mr-2" />
               Back
@@ -166,12 +161,9 @@ const RestaurantPage: React.FC = () => {
             </p>
           </div>
           <div className="flex items-center space-x-4 text-gray-600">
-            <span>Owner ID: {restaurant.ownerId}</span>
             <span>
-              Created: {new Date(restaurant.createdAt).toLocaleDateString()}
-            </span>
-            <span>
-              Updated: {new Date(restaurant.updatedAt).toLocaleDateString()}
+              With us since :{" "}
+              {new Date(restaurant.createdAt).toLocaleDateString()}
             </span>
           </div>
         </div>
@@ -186,7 +178,7 @@ const RestaurantPage: React.FC = () => {
             <ul className="space-y-4">
               <li
                 className={`cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition ${
-                  !selectedCategory ? "font-bold text-orange-500" : ""
+                  !selectedCategory ? "font-bold text-primary" : ""
                 }`}
                 onClick={() => handleCategoryClick(null)}
               >
@@ -197,7 +189,7 @@ const RestaurantPage: React.FC = () => {
                   key={category.id}
                   className={`cursor-pointer p-2 rounded-lg hover:bg-gray-100 transition ${
                     selectedCategory === category.id
-                      ? "font-bold text-orange-500"
+                      ? "font-bold text-primary"
                       : ""
                   }`}
                   onClick={() => handleCategoryClick(category.id)}
@@ -248,9 +240,9 @@ const RestaurantPage: React.FC = () => {
                         e.stopPropagation(); // Prevent triggering the redirect
                         handleAddToCart(item);
                       }}
-                      className="flex items-center px-4 py-2 text-white transition-colors bg-orange-500 rounded-full hover:bg-orange-600"
+                      className="flex items-center px-4 py-2 transition-colors rounded-full text-dark bg-primary hover:bg-dark hover:text-primary"
                     >
-                      <BsCart2 className="mr-2" /> Add to cart
+                      <IoIosAddCircle className="mr-2" /> Add to cart
                     </button>
                   </div>
                 </div>

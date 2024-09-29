@@ -21,7 +21,7 @@ enum OrderStatus {
   PENDING
   PAID
   CONFIRMED
-  PREPARING
+  READY
   DELIVERED
   UNAVAILABLE
   CANCELED
@@ -49,7 +49,7 @@ model User {
   role      Role
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  imageUrl  String?
+  imageUrl  String?  @db.Text
 
   // Relations
   locations      Location[] // Localisations liées à l'utilisateur
@@ -66,21 +66,35 @@ model User {
 
 // Modèle Restaurant : représente les restaurants
 model Restaurant {
-  id          Int      @id @default(autoincrement())
+  id          Int                 @id @default(autoincrement())
   name        String
   description String?
-  owner       User     @relation(fields: [ownerId], references: [id]) // Propriétaire du restaurant
+  owner       User                @relation(fields: [ownerId], references: [id]) // Propriétaire du restaurant
   ownerId     Int
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  imageUrl    String?             @db.Text
+  // Relations
+  categories  Category[] // Catégories du menu
+  addresses   Address[] // Adresses du restaurant
+  menuItems   MenuItem[] // Éléments du menu
+  orders      Order[] // Commandes passées
+  reviews     Review[] // Avis des clients
+  Location    Location[]
+  // Catégorie du restaurant (ex : "Italien", "Chinois")
+  category    RestaurantCategory? @relation(fields: [categoryId], references: [id])
+  categoryId  Int? // Peut être null
+}
+
+model RestaurantCategory {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique // Nom du type de cuisine (ex : "Italien", "Chinois")
+  description String? // Description optionnelle du type de cuisine
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
   // Relations
-  categories Category[] // Catégories du menu
-  addresses  Address[] // Adresses du restaurant
-  menuItems  MenuItem[] // Éléments du menu
-  orders     Order[] // Commandes passées
-  reviews    Review[] // Avis des clients
-  Location   Location[]
+  restaurants Restaurant[] // Les restaurants qui appartiennent à cette catégorie
 }
 
 // Modèle Category : catégories du menu
@@ -91,9 +105,9 @@ model Category {
   restaurantId Int
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
-
+  imageUrl     String?    @db.Text
   // Relations
-  menuItems MenuItem[] // Éléments du menu de cette catégorie
+  menuItems    MenuItem[] // Éléments du menu de cette catégorie
 }
 
 // Modèle MenuItem : articles du menu
@@ -106,7 +120,7 @@ model MenuItem {
   categoryId   Int
   restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
   restaurantId Int
-  imageUrl     String?
+  imageUrl     String?    @db.Text
   createdAt    DateTime   @default(now())
   updatedAt    DateTime   @updatedAt
 

@@ -1,10 +1,10 @@
 "use client";
 
 import axios from "axios";
-import "leaflet/dist/leaflet.css";
+// import "leaflet/dist/leaflet.css";
 import React, { useCallback, useEffect, useState } from "react";
-import DeliveryMap from "../../components/DeliveryMap";
-import useSocket from "../../hooks/useSocket";
+import DeliveryMap from "../../../components/DeliveryMap";
+import useSocket from "../../../hooks/useSocket";
 // import { QrReader } from "react-qr-reader";
 
 const DeliveryInterface: React.FC = () => {
@@ -161,7 +161,7 @@ const DeliveryInterface: React.FC = () => {
                 {showQrScanner ? "Hide QR Scanner" : "Scan QR Code"}
               </button>
             </div>
-            {showQrScanner && (
+            {/* {showQrScanner && (
               <div className="mb-6">
                 <QrReader
                   onResult={(result, error) => {
@@ -186,7 +186,7 @@ const DeliveryInterface: React.FC = () => {
                   containerStyle={{ width: "100%" }}
                 />
               </div>
-            )}
+            )} */}
             <div className="flex flex-wrap gap-4 mb-6">
               <button
                 onClick={() => updateOrderStatus("preparing")}

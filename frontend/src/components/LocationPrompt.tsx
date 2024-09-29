@@ -2,9 +2,9 @@
 
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
+import swal from "sweetalert"; // For user feedback
 import { updateUserLocation } from "../redux/features/authSlice";
 import { AppDispatch } from "../redux/store";
-import swal from "sweetalert"; // For user feedback
 
 interface LocationPromptProps {
   onLocationSet: () => void;
@@ -94,28 +94,28 @@ const LocationPrompt: React.FC<LocationPromptProps> = ({ onLocationSet }) => {
     <div className="w-full">
       <form
         onSubmit={handleSubmit}
-        className="rounded-full p-1 box-border bg-white overflow-hidden ring-red-300 focus-within:ring-4 w-full flex items-center"
+        className="box-border flex items-center w-full p-1 overflow-hidden bg-white rounded-full ring-gray-300 focus-within:ring-4"
       >
         <input
           type="text"
           placeholder="Enter your address"
           value={address}
           onChange={handleAddressChange}
-          className="rounded-full px-4 py-2 focus:outline-none w-full bg-transparent"
+          className="w-full px-4 py-2 bg-transparent rounded-full focus:outline-none"
         />
         <button
           type="button"
           onClick={handleUseCurrentLocation}
-          className="text-sm bg-primary py-2 px-4 rounded-full text-white poppins ring-red-300 focus:ring-4 transition duration-300 hover:scale-105 transform"
+          className="px-4 py-2 text-sm transition duration-300 transform rounded-full bg-dark text-primary poppins ring-gray-300 focus:ring-4 hover:scale-105"
         >
           {loading ? "Loading..." : "Use current location"}
         </button>
       </form>
 
       {/* Display error or success messages */}
-      {error && <p className="text-red-500 mt-2">{error}</p>}
+      {error && <p className="mt-2 text-red-500">{error}</p>}
       {loading && !error && (
-        <p className="text-blue-500 mt-2">Fetching location...</p>
+        <p className="mt-2 text-blue-500">Fetching location...</p>
       )}
     </div>
   );

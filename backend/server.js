@@ -1,14 +1,13 @@
-// Import des modules nécessaires
+// Import required modules
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const http = require("http");
-const { Server } = require("socket.io");
 require("dotenv").config();
 
-// Import des routes
+// Import routes
 const orderRoutes = require("./routes/Order.route");
 const menuItemRoutes = require("./routes/MenuItem.route");
 const deliveryRoutes = require("./routes/Delivery.route");
@@ -19,21 +18,22 @@ const cartRoutes = require("./routes/cart.route");
 const categoryRoutes = require("./routes/category.route");
 const restaurantRoutes = require("./routes/Restaurant.route");
 
-// Import des fonctions utilitaires
+// Import utility functions
 const { connectToDatabase } = require("./prisma/prisma");
+const { initSocket } = require("./socketManager");
 
-// Configuration de l'application Express
+// Create Express app
 const app = express();
-const PORT = process.env.SERVER_PORT;
+const PORT = process.env.SERVER_PORT || 3000;
 
-// Configuration des middlewares
+// Middleware configuration
 app.use(cors());
 app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("dev"));
 
-// Définition des routes API
+// Define API routes
 app.use("/api/orders", orderRoutes);
 app.use("/api/menu-items", menuItemRoutes);
 app.use("/api/deliveries", deliveryRoutes);
@@ -44,38 +44,17 @@ app.use("/api/auth", authRoutes);
 app.use("/api/carts", cartRoutes);
 app.use("/api/categories", categoryRoutes);
 
-// Création du serveur HTTP et initialisation de Socket.io
+// Create HTTP server
 const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: `http://localhost:${PORT}`,
-  },
-});
 
-// Attacher l'instance de Socket.io à l'application pour un accès global
-app.set("io", io);
+// Initialize Socket.IO (make sure this comes after server creation)
+initSocket(server);
 
-// Gestion des événements Socket.io
-io.on("connection", (socket) => {
-  console.log("A user connected");
-
-  // Événement pour mettre à jour la localisation de livraison
-  socket.on("updateDeliveryLocation", (data) => {
-    console.log("Emitting delivery update:", data);
-    io.emit(`deliveryUpdate-${data.orderId}`, data.location);
-  });
-
-  // Gestion de la déconnexion des utilisateurs
-  socket.on("disconnect", () => {
-    console.log("User disconnected");
-  });
-});
-
-// Lancement du serveur et connexion à la base de données
+// Start server and connect to the database
 server.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
 
-  // Connexion à la base de données Prisma
+  // Connect to Prisma database
   try {
     await connectToDatabase();
     console.log("Connected to the database successfully");

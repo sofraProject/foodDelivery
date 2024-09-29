@@ -17,7 +17,7 @@ export const cartSlice = createSlice({
     // Action pour charger les éléments du panier depuis localStorage
     getCartItems: (state) => {
       const savedItems = localStorage.getItem("cartItems");
-      console.log(savedItems, "chekkkkkkkkk");
+
       if (savedItems) {
         state.items = JSON.parse(savedItems);
       }
@@ -26,6 +26,7 @@ export const cartSlice = createSlice({
     // Action pour ajouter un élément au panier
     addToCart: (state, action) => {
       const newItem = action.payload;
+
       const existingItem = state.items.find((item) => item.id === newItem.id);
       if (existingItem) {
         existingItem.quantity += newItem.quantity;
@@ -56,6 +57,15 @@ export const cartSlice = createSlice({
       state.items = [];
       localStorage.removeItem("cartItems");
     },
+
+    // Nouvelle action pour supprimer tous les éléments associés à un restaurantId spécifique
+    removeItemsByRestaurantId: (state, action) => {
+      const restaurantId = action.payload;
+      state.items = state.items.filter(
+        (item) => item.restaurantId !== restaurantId
+      );
+      localStorage.setItem("cartItems", JSON.stringify(state.items));
+    },
   },
 });
 
@@ -65,6 +75,7 @@ export const {
   updateQuantity,
   removeFromCart,
   clearCart,
+  removeItemsByRestaurantId, // Export de la nouvelle action
 } = cartSlice.actions;
 
 export default cartSlice.reducer;

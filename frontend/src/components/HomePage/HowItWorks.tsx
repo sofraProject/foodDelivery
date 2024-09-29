@@ -1,6 +1,6 @@
 "use client";
 import React from "react";
-import { FaSearch, FaTruck, FaUtensils } from "react-icons/fa";
+import { FaSearch, FaTruck, FaUtensils, FaCreditCard } from "react-icons/fa";
 
 const steps = [
   {
@@ -14,9 +14,9 @@ const steps = [
     description: "Customize your order and proceed to checkout",
   },
   {
-    icon: FaTruck,
-    title: "Pay your producti",
-    description: "Enjoy your meal delivered right to your doorstep",
+    icon: FaCreditCard,
+    title: "Make a Payment",
+    description: "Securely pay for your order using our payment methods",
   },
   {
     icon: FaTruck,
@@ -27,14 +27,14 @@ const steps = [
 
 const HowItWorks: React.FC = () => {
   return (
-    <section className="py-16 bg-gray-100">
+    <section className="py-16 ">
       <div className="container px-4 mx-auto">
         <h2 className="mb-12 text-3xl font-bold text-center">How It Works</h2>
-        <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-4">
           {steps.map((step, index) => (
             <div key={index} className="text-center">
-              <div className="inline-block p-6 mb-4 bg-white rounded-full">
-                <step.icon className="text-4xl text-primary" />
+              <div className="inline-block p-6 mb-4 rounded-full bg-primary">
+                <step.icon className="text-4xl text-dark" />
               </div>
               <h3 className="mb-2 text-xl font-semibold">{step.title}</h3>
               <p className="text-gray-600">{step.description}</p>

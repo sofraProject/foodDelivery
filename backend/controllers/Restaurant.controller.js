@@ -163,3 +163,23 @@ exports.getRestaurantByName = async (req, res) => {
       .json({ message: "Internal server error", error: error.message });
   }
 };
+
+// Retrieve all restaurants with menu items and their categories
+exports.getAllRestaurantswithCat = async (req, res) => {
+  try {
+    const restaurants = await prismaConnection.restaurant.findMany({
+      include: {
+        menuItems: {
+          include: {
+            category: true, // Include the category for each menu item
+          },
+        },
+      },
+    });
+
+    res.status(200).json(restaurants);
+  } catch (error) {
+    console.error("Error fetching restaurants:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};

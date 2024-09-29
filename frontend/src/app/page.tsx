@@ -31,7 +31,6 @@ export const HomePage: React.FC = () => {
           <Testimonials />
         </>
       )}
-      <Footer />
     </div>
   );
 };
