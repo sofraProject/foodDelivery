@@ -13,7 +13,7 @@ const CustomerManagementPage = () => {
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const response = await axios.get(`${serverDomain}/api/customers`);
+        const response = await axios.get(`${serverDomain}/api/customers/get`);
         setCustomers(response.data);
         setLoading(false);
       } catch (error) {
