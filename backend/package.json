@@ -6,10 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "nodemon server.js",
-    "prisma": "npx prisma migrate dev dev init",
-    "seed": "node seedsUsers.js",
-    "seedCategory": "node seedsCategory.js",
-    "seedMenuItem": "node seedsMenuItem.js"
+    "prisma": "rm -rf prisma/migrations && npx prisma migrate dev dev init",
+    "seed": "node seeds/seedsAll.js"
   },
   "author": "",
   "license": "ISC",

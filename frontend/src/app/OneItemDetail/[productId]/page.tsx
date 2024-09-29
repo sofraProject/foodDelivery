@@ -1,14 +1,16 @@
 "use client";
-
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { AiOutlineMinus, AiOutlinePlus } from "react-icons/ai";
+import {
+  AiOutlineArrowLeft,
+  AiOutlineMinus,
+  AiOutlinePlus,
+} from "react-icons/ai";
 import { BsCart2 } from "react-icons/bs";
 import { useDispatch } from "react-redux";
-import swal from "sweetalert";
 import Footer from "../../../components/HomePage/Footer/Footer";
-import { addToCart } from "../../../redux/features/cartSlice";
+import { handleAddToCartHelper } from "../../../helpers/cartHelper"; // Assurez-vous que le chemin est correct
 import { AppDispatch } from "../../../redux/store";
 
 const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
@@ -28,13 +30,16 @@ interface Food {
   description?: string;
   available: boolean;
   likes: number;
-  user: User; // This represents the restaurant owner
+  user: User;
+  restaurantId: any;
 }
 
 const FoodDetailScreen: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const [quantity, setQuantity] = useState(1);
   const [food, setFood] = useState<Food | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const params = useParams();
   const { productId } = params;
@@ -42,131 +47,130 @@ const FoodDetailScreen: React.FC = () => {
   const defaultDescription =
     "The texture of food that needs to be chewed thoroughly before swallowing. Can be light and bouncy or heavy and sticky.";
 
-  // Fetch the food details when the component mounts
   useEffect(() => {
     const fetchFood = async () => {
+      setLoading(true);
+      setError(null);
       try {
         const response = await axios.get(
-          `${serverDomain}/api/menu-items/${productId}` // Ensure productId corresponds to menu_item_id in your backend
+          `${serverDomain}/api/menu-items/${productId}`
         );
 
-        setFood(response.data[0]);
+        if (response.data) {
+          setFood(response.data);
+        } else {
+          setError("Food item not found.");
+        }
       } catch (error) {
+        setError("Error fetching food item. Please try again later.");
         console.error("Error fetching food item:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchFood();
   }, [productId]);
 
-  // Handle quantity changes
   const handleQuantityChange = (newQuantity: number) => {
     setQuantity(Math.max(1, newQuantity));
   };
 
-  // Handle adding the item to the cart
   const handleAddToCart = () => {
-    if (food && quantity > 0) {
-      dispatch(
-        addToCart({
-          id: food.id, // food.id should correspond to menu_item_id in your backend
+    if (food) {
+      handleAddToCartHelper(
+        {
+          id: food.id,
           name: food.name,
-          price: parseFloat(food.price), // Convert price to float
+          price: parseFloat(food.price),
           quantity: Math.max(1, quantity),
-          user_id: food.user.id, // Ensure this corresponds to restaurant_owner_id
           imageUrl: food.imageUrl,
           available: food.available,
           likes: food.likes,
-        })
+          restaurantId: food.restaurantId,
+        },
+        dispatch
       );
-      swal(
-        "Delicious choice!",
-        "Your order has been added to the cart",
-        "success"
-      );
-    } else {
-      swal("Error", "Unable to add this item to the cart", "error");
     }
   };
 
-  if (!food)
+  if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
         Loading...
       </div>
     );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-amber-100 to-orange-200">
-      <main className="flex items-center justify-center flex-grow px-4 py-20 sm:px-6 lg:px-8">
-        <div className="w-full max-w-4xl">
+    <div className="flex flex-col min-h-screen bg-gray-50">
+      <main className="flex items-center justify-center flex-grow px-4 py-20 mt-12 sm:px-6 lg:px-8">
+        <div className="w-full max-w-7xl">
           <button
-            onClick={() => router.push("/")}
-            className="inline-flex items-center mb-8 font-medium text-orange-600 hover:text-orange-800"
+            onClick={() => router.back()}
+            className="inline-flex items-center px-4 py-1 mb-4 rounded-lg bg-primary text-dark hover:text-primary hover:bg-dark"
           >
-            <svg
-              className="w-5 h-5 mr-2"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
-                clipRule="evenodd"
-              />
-            </svg>
-            Back to Menu
+            <AiOutlineArrowLeft className="w-5 h-5 mr-2" />
+            Back
           </button>
-          <div className="overflow-hidden bg-white shadow-2xl rounded-3xl">
-            <div className="md:flex">
-              <div className="md:flex-shrink-0 md:w-1/2">
-                <img
-                  className="object-cover w-full h-96 md:h-full"
-                  src={food.imageUrl}
-                  alt={food.name}
-                />
-              </div>
-              <div className="p-8 md:w-1/2">
+          <div className="flex p-8 bg-white rounded-lg shadow-md">
+            <div className="w-1/2 mr-6">
+              <img
+                className="object-cover w-full rounded-lg h-96"
+                src={food?.imageUrl}
+                alt={food?.name}
+              />
+            </div>
+            <div className="flex flex-col justify-between w-1/2">
+              <div>
                 <h1 className="mb-4 text-4xl font-extrabold text-gray-900">
-                  {food.name}
+                  {food?.name}
                 </h1>
-                <p className="mb-8 text-lg text-gray-600">
-                  {food.description || defaultDescription}
+                <p className="mb-6 text-lg text-gray-600">
+                  {food?.description || defaultDescription}
                 </p>
-                <div className="flex items-center justify-between mb-8">
-                  <span className="text-4xl font-bold text-orange-600">
-                    {(parseFloat(food.price) * quantity).toFixed(2)} TND
-                  </span>
-                  <div className="flex items-center border-2 border-orange-200 rounded-full">
-                    <button
-                      type="button"
-                      onClick={() => handleQuantityChange(quantity - 1)}
-                      className="p-2 text-orange-600 rounded-full hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      aria-label="Decrease quantity"
-                    >
-                      <AiOutlineMinus className="w-6 h-6" />
-                    </button>
-                    <span className="px-4 py-2 text-xl font-semibold text-gray-700">
-                      {quantity}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => handleQuantityChange(quantity + 1)}
-                      className="p-2 text-orange-600 rounded-full hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-500"
-                      aria-label="Increase quantity"
-                    >
-                      <AiOutlinePlus className="w-6 h-6" />
-                    </button>
-                  </div>
-                </div>
-                <button
-                  onClick={handleAddToCart}
-                  className="flex items-center justify-center w-full px-8 py-4 text-lg font-semibold text-white transition duration-300 ease-in-out transform border border-transparent rounded-full bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-orange-500 hover:-translate-y-1"
-                >
-                  <BsCart2 className="w-6 h-6 mr-3" aria-hidden="true" />
-                  Add to Cart
-                </button>
               </div>
+              <div className="flex items-center justify-between mb-8">
+                <span className="text-4xl font-bold text-primary">
+                  {(parseFloat(food?.price || "0") * quantity).toFixed(2)} TND
+                </span>
+                <div className="flex items-center border-2 rounded-full border-primary">
+                  <button
+                    type="button"
+                    onClick={() => handleQuantityChange(quantity - 1)}
+                    className="p-2 rounded-full text-primary hover:bg-primary/20 focus:outline-none focus:ring-2 focus:ring-primary"
+                    aria-label="Decrease quantity"
+                  >
+                    <AiOutlineMinus className="w-6 h-6" />
+                  </button>
+                  <span className="px-4 py-2 text-xl font-semibold text-gray-700">
+                    {quantity}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => handleQuantityChange(quantity + 1)}
+                    className="p-2 rounded-full text-primary hover:bg-primary/20 focus:outline-none focus:ring-2 focus:ring-primary"
+                    aria-label="Increase quantity"
+                  >
+                    <AiOutlinePlus className="w-6 h-6" />
+                  </button>
+                </div>
+              </div>
+              <button
+                onClick={handleAddToCart}
+                className="flex items-center justify-center w-full px-8 py-4 text-lg font-semibold text-white transition duration-300 ease-in-out transform border border-transparent rounded-full bg-gradient-to-r from-primary to-primary-dark hover:from-primary-dark hover:to-emerald-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary hover:-translate-y-1"
+              >
+                <BsCart2 className="w-6 h-6 mr-3" aria-hidden="true" />
+                Add to Cart
+              </button>
             </div>
           </div>
         </div>

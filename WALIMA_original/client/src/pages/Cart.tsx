@@ -212,7 +212,7 @@ const Cart: React.FC = () => {
                   <div className="mt-6">
                     <button
                       onClick={handlePlaceOrder}
-                      className="w-full px-6 py-3 rounded-lg bg-primary text-white poppins ring-red-300 focus:ring-4 transition duration-500"
+                      className="w-full px-6 py-3 rounded-lg bg-primary text-white poppins ring-gray-300 focus:ring-4 transition duration-500"
                     >
                       Place Order
                     </button>

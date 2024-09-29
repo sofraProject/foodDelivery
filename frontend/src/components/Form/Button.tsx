@@ -3,11 +3,23 @@ import React from "react";
 
 interface ButtonProps {
   text: string;
+  className?: string;
+  onClick?: () => void; // Correction du type de onClick
+  disabled?: boolean; // Correction du type de onClick
 }
 
-const Button: React.FC<ButtonProps> = ({ text }) => {
+const Button: React.FC<ButtonProps> = ({
+  disabled,
+  text,
+  className,
+  onClick,
+}) => {
   return (
-    <button className="w-full py-3 bg-primary text-white ring-red-400 focus:outline-none focus:ring-4 mt-6 rounded-lg transition duration-300 poppins">
+    <button
+      disabled={disabled}
+      onClick={onClick}
+      className={`w-full py-3 mt-6 font-bold transition duration-300 rounded-lg bg-primary text-dark ring-gray-400 focus:outline-none focus:ring-4 poppins ${className}`}
+    >
       {text}
     </button>
   );

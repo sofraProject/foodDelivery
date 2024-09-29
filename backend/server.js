@@ -1,66 +1,64 @@
+// Import required modules
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
-const { connectToDatabase } = require("./prisma/prisma");
+const http = require("http");
 require("dotenv").config();
 
+// Import routes
 const orderRoutes = require("./routes/Order.route");
 const menuItemRoutes = require("./routes/MenuItem.route");
 const deliveryRoutes = require("./routes/Delivery.route");
 const paymentRoutes = require("./routes/Payment.route");
-
 const userRoutes = require("./routes/User.route");
 const authRoutes = require("./routes/auth.route");
 const cartRoutes = require("./routes/cart.route");
 const categoryRoutes = require("./routes/category.route");
-// const { connectToDatabase } = require("./prisma"); // Import connectToDatabase function
+const restaurantRoutes = require("./routes/Restaurant.route");
 
-// App configuration
+// Import utility functions
+const { connectToDatabase } = require("./prisma/prisma");
+const { initSocket } = require("./socketManager");
 
+// Create Express app
 const app = express();
+const PORT = process.env.SERVER_PORT || 3000;
+
+// Middleware configuration
 app.use(cors());
 app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("dev"));
 
+// Define API routes
 app.use("/api/orders", orderRoutes);
 app.use("/api/menu-items", menuItemRoutes);
 app.use("/api/deliveries", deliveryRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/users", userRoutes);
-
+app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/carts", cartRoutes);
 app.use("/api/categories", categoryRoutes);
 
-const PORT = process.env.SERVER_PORT;
-const http = require("http");
-const { Server } = require("socket.io");
+// Create HTTP server
 const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: `http://localhost:${PORT}`,
-  },
-});
-app.set("io", io);
 
-io.on("connection", (socket) => {
-  console.log("A user connected");
+// Initialize Socket.IO (make sure this comes after server creation)
+initSocket(server);
 
-  socket.on("updateDeliveryLocation", (data) => {
-    console.log("Emitting delivery update:", data);
-    io.emit(`deliveryUpdate-${data.orderId}`, data.location);
-  });
-
-  socket.on("disconnect", () => {
-    console.log("User disconnected");
-  });
-});
-
+// Start server and connect to the database
 server.listen(PORT, async () => {
   console.log(`Server is running on port ${PORT}`);
-  await connectToDatabase();
+
+  // Connect to Prisma database
+  try {
+    await connectToDatabase();
+    console.log("Connected to the database successfully");
+  } catch (error) {
+    console.error("Database connection failed:", error);
+  }
 });

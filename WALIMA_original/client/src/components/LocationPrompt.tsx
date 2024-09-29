@@ -39,7 +39,7 @@ const LocationPrompt: React.FC<{ onLocationSet: () => void }> = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-full p-1 box-border bg-white overflow-hidden ring-red-300 focus-within:ring-4 w-full flex items-center"
+      className="rounded-full p-1 box-border bg-white overflow-hidden ring-gray-300 focus-within:ring-4 w-full flex items-center"
     >
       <input
         type="text"
@@ -51,7 +51,7 @@ const LocationPrompt: React.FC<{ onLocationSet: () => void }> = ({
       <button
         type="button"
         onClick={handleUseCurrentLocation}
-        className="text-sm bg-primary py-2 px-4 rounded-full text-white poppins ring-red-300 focus:ring-4 transition duration-300 hover:scale-105 transform"
+        className="text-sm bg-primary py-2 px-4 rounded-full text-white poppins ring-gray-300 focus:ring-4 transition duration-300 hover:scale-105 transform"
       >
         Use current location
       </button>

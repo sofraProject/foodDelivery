@@ -1,140 +1,258 @@
+// Générateur pour Prisma Client
 generator client {
   provider = "prisma-client-js"
 }
 
+// Configuration de la source de données
 datasource db {
   provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
+// Enums pour représenter les rôles, statuts de commande, etc.
+enum Role {
+  CUSTOMER
+  RESTAURANT_OWNER
+  DRIVER
+  ADMIN
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  CONFIRMED
+  READY
+  DELIVERED
+  UNAVAILABLE
+  CANCELED
+}
+
+enum DeliveryStatus {
+  PENDING
+  IN_TRANSIT
+  DELIVERED
+  FAILED
+}
+
+enum PaymentStatus {
+  PAID
+  PENDING
+  FAILED
+}
+
+// Modèle User : représente les utilisateurs
 model User {
-  id                        Int                     @id @default(autoincrement())
-  name                      String                  @db.VarChar(255)
-  email                     String                  @unique @db.VarChar(255)
-  password                  String                  @db.VarChar(255)
-  imagesUrl                 String?                 @db.VarChar(255)
-  balance                   Decimal?                @db.Decimal(7, 3)
- location                  Json?                   // Using Json to represent location data
-  role                      UserRole                @default(customer)
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  role      Role
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  imageUrl  String?  @db.Text
 
-  
-  restaurantOwnerHasCustomers RestaurantOwnerHasCustomer[] @relation("RestaurantOwner")
-  orders                    Order[]                 @relation("UserOrder")
-  deliveries                Delivery[]
-  cart                      Cart[]                   @relation("UserCart")
-  restaurantCustomers        RestaurantOwnerHasCustomer[] @relation("RestaurantOwnerRelation")
-  cartsAsRestaurantOwner     Cart[]                   @relation("RestaurantOwnerCart")
-  menuItems                 MenuItem[]               @relation("UserMenuItems")
+  // Relations
+  locations      Location[] // Localisations liées à l'utilisateur
+  customerOrders Order[]        @relation("CustomerOrders") // Commandes en tant que client
+  driverOrders   Order[]        @relation("DriverOrders") // Commandes en tant que livreur
+  reviews        Review[] // Avis rédigés par l'utilisateur
+  addresses      Address[] // Adresses liées à l'utilisateur
+  notifications  Notification[] // Notifications liées
+  deliveries     Delivery[]     @relation("DriverDeliveries") // Livraisons en tant que livreur
 
+  // Propriétaire de restaurant
+  Restaurant Restaurant[]
 }
 
-enum UserRole {
-  customer
-  restaurant_owner
-  driver
+// Modèle Restaurant : représente les restaurants
+model Restaurant {
+  id          Int                 @id @default(autoincrement())
+  name        String
+  description String?
+  owner       User                @relation(fields: [ownerId], references: [id]) // Propriétaire du restaurant
+  ownerId     Int
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  imageUrl    String?             @db.Text
+  // Relations
+  categories  Category[] // Catégories du menu
+  addresses   Address[] // Adresses du restaurant
+  menuItems   MenuItem[] // Éléments du menu
+  orders      Order[] // Commandes passées
+  reviews     Review[] // Avis des clients
+  Location    Location[]
+  // Catégorie du restaurant (ex : "Italien", "Chinois")
+  category    RestaurantCategory? @relation(fields: [categoryId], references: [id])
+  categoryId  Int? // Peut être null
 }
 
-model RestaurantOwnerHasCustomer {
-  customer_id              Int
-  restaurant_owner_id      Int
-  customer                 User    @relation("RestaurantOwner", fields: [customer_id], references: [id])
-  restaurantOwner          User    @relation("RestaurantOwnerRelation", fields: [restaurant_owner_id], references: [id])
-
-  @@id([customer_id, restaurant_owner_id])
-  @@index([restaurant_owner_id])
-  @@index([customer_id])
-}
-
-model Order {
+model RestaurantCategory {
   id          Int      @id @default(autoincrement())
-  user_id     Int
-  status      OrderStatus @default(pending)
-  total_amount Decimal  @db.Decimal(10, 2)
+  name        String   @unique // Nom du type de cuisine (ex : "Italien", "Chinois")
+  description String? // Description optionnelle du type de cuisine
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  orderItems  OrderItem[]
-  deliveries   Delivery[]
+  // Relations
+  restaurants Restaurant[] // Les restaurants qui appartiennent à cette catégorie
+}
 
-  user       User     @relation("UserOrder", fields: [user_id], references: [id])
-  @@index([user_id])
+// Modèle Category : catégories du menu
+model Category {
+  id           Int        @id @default(autoincrement())
+  name         String
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId Int
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+  imageUrl     String?    @db.Text
+  // Relations
+  menuItems    MenuItem[] // Éléments du menu de cette catégorie
+}
 
+// Modèle MenuItem : articles du menu
+model MenuItem {
+  id           Int        @id @default(autoincrement())
+  name         String
+  description  String?
+  price        Float
+  category     Category   @relation(fields: [categoryId], references: [id])
+  categoryId   Int
+  restaurant   Restaurant @relation(fields: [restaurantId], references: [id])
+  restaurantId Int
+  imageUrl     String?    @db.Text
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  // Relations
+  orderItems OrderItem[] // Articles de commande liés
+}
+
+// Modèle Order : commandes des clients
+model Order {
+  id           Int         @id @default(autoincrement())
+  customer     User        @relation("CustomerOrders", fields: [customerId], references: [id])
+  customerId   Int
+  restaurant   Restaurant  @relation(fields: [restaurantId], references: [id])
+  restaurantId Int
+  driver       User?       @relation("DriverOrders", fields: [driverId], references: [id])
+  driverId     Int?
+  status       OrderStatus
+  totalPrice   Float
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  // Relations
+  orderItems    OrderItem[] // Articles de la commande
+  payments      Payment[] // Paiements
+  delivery      Delivery? // Détails de livraison
+  notifications Notification[] // Notifications
+}
+
+// Modèle OrderItem : articles dans une commande
+model OrderItem {
+  id         Int      @id @default(autoincrement())
+  order      Order    @relation(fields: [orderId], references: [id])
+  orderId    Int
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
+  menuItemId Int
+  quantity   Int
+  price      Float
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 }
 
-enum OrderStatus {
-  pending
-  confirmed
-  completed
-  canceled
-}
-model Cart {
-  customer_id         Int
-  restaurant_owner_id Int
-  menu_item_id       Int
-  quantity           Int   @default(1)
-
-  customer          User     @relation("UserCart", fields: [customer_id], references: [id])
-  restaurantOwner   User     @relation("RestaurantOwnerCart", fields: [restaurant_owner_id], references: [id])
-  menuItem         MenuItem  @relation("MenuItemCart", fields: [menu_item_id], references: [id])
-
-  @@id([customer_id, restaurant_owner_id, menu_item_id]) // Composite primary key
-  @@index([menu_item_id])
-  @@index([customer_id, restaurant_owner_id])
+// Modèle Address : adresses de livraison ou du restaurant
+model Address {
+  id           Int         @id @default(autoincrement())
+  user         User?       @relation(fields: [userId], references: [id])
+  userId       Int?
+  restaurant   Restaurant? @relation(fields: [restaurantId], references: [id])
+  restaurantId Int?
+  addressLine  String
+  city         String
+  postalCode   String
+  country      String
+  location     Location?   @relation(fields: [locationId], references: [id])
+  locationId   Int?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 }
 
-model MenuItem {
-  id         Int      @id @default(autoincrement())
-  name       String   @db.VarChar(255)
-  imageUrl   String   @db.VarChar(500)
-  available   Boolean  @default(true)
-  likes      Int?
-  price      Decimal  @db.Decimal(7, 3)
-  users_id   Int
-  category_id Int
-
-  user       User     @relation("UserMenuItems", fields: [users_id], references: [id])
-  category   Category @relation(fields: [category_id], references: [id])
-  orderItems OrderItem[] 
-  carts      Cart[]   @relation("MenuItemCart")
-
-  @@index([users_id])
-  @@index([category_id])
+// Modèle Payment : paiements associés aux commandes
+model Payment {
+  id            Int           @id @default(autoincrement())
+  order         Order         @relation(fields: [orderId], references: [id])
+  orderId       Int
+  paymentMethod String // Méthode de paiement
+  status        PaymentStatus
+  amount        Float
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
 }
 
-
-model OrderItem {
-  id          Int     @id @default(autoincrement())
-  order_id    Int
-  menu_item_id Int
-  quantity    Int
-  price       Decimal @db.Decimal(10, 2)
-
-  order       Order    @relation(fields: [order_id], references: [id])
-  menuItem    MenuItem @relation(fields: [menu_item_id], references: [id])
+// Modèle Review : avis des utilisateurs sur les restaurants
+model Review {
+  id           Int         @id @default(autoincrement())
+  user         User        @relation(fields: [userId], references: [id])
+  userId       Int
+  restaurant   Restaurant? @relation(fields: [restaurantId], references: [id])
+  restaurantId Int?
+  rating       Int // Note (1 à 5 étoiles)
+  comment      String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 }
 
+// Modèle Notification : notifications envoyées
+model Notification {
+  id        Int      @id @default(autoincrement())
+  user      User?    @relation(fields: [userId], references: [id])
+  userId    Int?
+  order     Order?   @relation(fields: [orderId], references: [id])
+  orderId   Int?
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// Modèle Delivery : livraison des commandes
 model Delivery {
-  id            Int       @id @default(autoincrement())
-  order_id      Int
-  driver_id     Int
-  status        DeliveryStatus @default(assigned)
-  current_latitude  Float?
-  current_longitude Float?
+  id Int @id @default(autoincrement())
 
-  order         Order     @relation(fields: [order_id], references: [id])
-  driver        User      @relation(fields: [driver_id], references: [id])
+  orderId Int   @unique
+  order   Order @relation(fields: [orderId], references: [id])
+
+  driver   User @relation("DriverDeliveries", fields: [driverId], references: [id])
+  driverId Int
+
+  status       DeliveryStatus
+  pickupTime   DateTime?
+  deliveryTime DateTime?
+
+  // Appliquez @unique à locationId pour garantir une relation un-à-un
+  locationId Int       @unique
+  location   Location? @relation(fields: [locationId], references: [id])
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
-enum DeliveryStatus {
-  assigned
-  in_progress
-  completed
-}
+// Modèle Location : géolocalisation des utilisateurs, restaurants ou livraisons
+model Location {
+  id           Int         @id @default(autoincrement())
+  lat          Float
+  long         Float
+  locationName String?
+  user         User?       @relation(fields: [userId], references: [id])
+  userId       Int?
+  restaurant   Restaurant? @relation(fields: [restaurantId], references: [id])
+  restaurantId Int?
+  delivery     Delivery?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
 
-model Category {
-  id      Int      @id @default(autoincrement())
-  name    String   @db.VarChar(45)
-  imageUrl String   @db.VarChar(500)
-
-  menuItems MenuItem[]
+  // Relations
+  Address Address[]
 }

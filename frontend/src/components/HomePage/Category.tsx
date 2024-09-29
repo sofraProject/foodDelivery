@@ -83,6 +83,7 @@ const Foods: React.FC = () => {
     try {
       const response = await axios.get(`${serverDomain}/api/categories`);
       setCategories(response.data);
+      console.log(response.data);
     } catch (error) {
       console.error("Error fetching categories:", error);
     }

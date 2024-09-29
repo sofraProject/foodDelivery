@@ -4,6 +4,7 @@ import localFont from "next/font/local";
 import React from "react";
 import "../styles/globals.css";
 import ReduxProvider from "./providers/ReduxProvider";
+import Footer from "@/components/HomePage/Footer/Footer";
 // Charger les polices locales
 const geistSans = localFont({
   src: "../fonts/GeistVF.woff",
@@ -37,6 +38,7 @@ export default function RootLayout({
         <ReduxProvider>
           <Navbar />
           {children}
+          <Footer />
         </ReduxProvider>
       </body>
     </html>

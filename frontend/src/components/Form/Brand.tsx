@@ -1,6 +1,6 @@
 "use client";
 import Image from "next/image";
-import logo from "../../assets/logo2.png";
+import logo from "../../assets/logo.svg";
 import "../../styles/tailwind.css";
 const Brand: React.FC = () => {
   return (

@@ -1,5 +1,4 @@
-
-const { prismaConnection} = require("./prisma/prisma")
+const { prismaConnection } = require("../../prisma/prisma");
 const Categories = [
   {
     id: 1,
@@ -50,12 +49,13 @@ const Categories = [
       "https://www.fleurymichon.fr/sites/default/files/styles/information_card_desktop/public/telechargements/images/galerie/2024-03/30012024-9K2A6578-Modifier-Modifier.jpg.webp?itok=tpceW947",
   },
 ];
-prismaConnection.category.createMany({
-    data: Categories
-})
-.then(() => {
+prismaConnection.category
+  .createMany({
+    data: Categories,
+  })
+  .then(() => {
     console.log("Categories inserted successfully.");
-})
-.catch((error) => {
+  })
+  .catch((error) => {
     console.error("Error inserting categories:", error);
-});
+  });
