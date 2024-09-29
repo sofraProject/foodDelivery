@@ -1,13 +1,13 @@
-import { Request, Response } from "express";
+
 import { prismaConnection } from "../prisma/prisma"; // Ensure you have your Prisma client instance
 
 // Function to calculate the distance between two points
 const calculateDistance = (
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number
-): number => {
+  lat1
+  lon1
+  lat2
+  lon2
+) => {
   const R = 6371; // Radius of the Earth in km
   const dLat = (lat2 - lat1) * (Math.PI / 180);
   const dLon = (lon2 - lon1) * (Math.PI / 180);
@@ -22,7 +22,7 @@ const calculateDistance = (
 };
 
 // Get nearest restaurants based on user location
-export const getNearestRestaurants = async (req: Request, res: Response) => {
+export const getNearestRestaurants = async (req, res) => {
   const { userLat, userLon } = req.body;
 
   try {
