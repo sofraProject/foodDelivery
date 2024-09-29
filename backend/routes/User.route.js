@@ -3,6 +3,8 @@
 const express = require("express");
 const userController = require("../controllers/User.controller");
 
+const upload=require("../middleware/multer")
+
 const router = express.Router();
 
 router.get("/", userController.getAllUsers);
@@ -13,5 +15,6 @@ router.get("/owner/restaurants", userController.getAllUsersRestaurant);
 router.post("/findNearby", userController.findNearbyRestaurants);
 router.delete("/:id", userController.deleteUser);
 router.put("/location", userController.updateUserLocation);
+router.put("/:id/profile-picture", upload.single('profilePicture'), userController.updateUserProfilePicture);
 
 module.exports = router;

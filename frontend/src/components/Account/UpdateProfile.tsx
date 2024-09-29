@@ -1,4 +1,3 @@
-// src/components/Account/UpdateProfile.tsx
 import React, { useEffect, useState } from 'react';
 import { RootState, AppDispatch } from '@/redux/store';
 import { useDispatch } from 'react-redux';
@@ -15,6 +14,7 @@ const UpdateProfile = () => {
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
     const [newPassword, setNewPassword] = useState('');
+    const [profilePicture, setProfilePicture] = useState<File | null>(null);
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -36,19 +36,13 @@ const UpdateProfile = () => {
 
     const handleProfileSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
-        if (!userData) {
-            console.error("User not found.");
-            return; // Shouldn't happen, but safe to check
-        }
+        if (!userData) return; 
 
         try {
             const response = await axios.put(`${serverDomain}/api/users/${userData.id}`, {
                 name,
                 email,
             });
-
-            // Dispatch the updateUser action with the response data
             dispatch(updateUser(response.data));
         } catch (error) {
             console.error("Error updating user:", error);
@@ -57,11 +51,7 @@ const UpdateProfile = () => {
 
     const handlePasswordSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
-        if (!userData) {
-            console.error("User not found.");
-            return;
-        }
+        if (!userData) return;
 
         try {
             const response = await axios.put(`${serverDomain}/api/users/${userData.id}/password`, {
@@ -70,6 +60,25 @@ const UpdateProfile = () => {
             console.log("Password updated successfully:", response.data);
         } catch (error) {
             console.error("Error updating password:", error);
+        }
+    };
+
+    const handleProfilePictureSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        if (!userData || !profilePicture) return;
+
+        const formData = new FormData();
+        formData.append('profilePicture', profilePicture);
+
+        try {
+            const response = await axios.put(`${serverDomain}/api/users/${userData.id}/profile-picture`, formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            dispatch(updateUser(response.data));
+        } catch (error) {
+            console.error("Error updating profile picture:", error);
         }
     };
 
@@ -107,6 +116,20 @@ const UpdateProfile = () => {
                     </div>
                     <button type="submit" className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
                         Update
+                    </button>
+                </form>
+
+                <h2 className="text-xl font-bold mt-6 mb-4">Update Profile Picture</h2>
+                <form onSubmit={handleProfilePictureSubmit} className="space-y-4">
+                    <div>
+                        <input
+                            type="file"
+                            onChange={(e) => setProfilePicture(e.target.files?.[0] || null)}
+                            className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
+                        />
+                    </div>
+                    <button type="submit" className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
+                        Update Picture
                     </button>
                 </form>
             </div>

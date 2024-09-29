@@ -1,4 +1,3 @@
-// src/components/Account/YourProfile.tsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../hooks/useAuth';
@@ -33,7 +32,7 @@ const YourProfile = () => {
         <div className="flex justify-center items-center h-screen bg-gray-100">
             <div className="bg-white rounded-lg shadow-lg p-6 text-center w-80">
                 <img
-                    src={userData.imagesUrl || '/default-avatar.jpg'}
+                    src={`${serverDomain}/uploads/${userData.imagesUrl || 'default-avatar.jpg'}`}
                     alt="Profile"
                     className="w-24 h-24 rounded-full border-4 border-blue-500 mx-auto mb-4"
                 />

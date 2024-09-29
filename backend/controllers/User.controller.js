@@ -207,3 +207,21 @@ exports.updateUserLocation = async (req, res) => {
     res.status(500).json({ error: "Failed to update user location." });
   }
 };
+
+exports.updateUserProfilePicture = async (req, res) => {
+  try {
+      const userId = req.params.id;
+      const profilePicUrl = req.file.path; // Get the file path from Multer
+
+      // Update the user with the new profile picture URL
+      const updatedUser = await prismaConnection.user.update({
+          where: { id: Number(userId) },
+          data: { imageUrl: profilePicUrl }, // Assuming imagesUrl stores the profile picture
+      });
+
+      return res.status(200).json(updatedUser);
+  } catch (error) {
+      console.error(error);
+      return res.status(500).json({ message: 'Error updating profile picture' });
+  }
+};
