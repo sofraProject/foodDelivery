@@ -42,7 +42,7 @@ const UpdateProfile = () => {
         }
 
         try {
-            const response = await axios.patch(`${serverDomain}/api/users/${userData.id}`, {
+            const response = await axios.put(`${serverDomain}/api/users/${userData.id}`, {
                 name,
                 email,
             });
