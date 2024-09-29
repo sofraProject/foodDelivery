@@ -1,4 +1,3 @@
-// socketManager/index.js
 const { Server } = require("socket.io");
 
 let io;
