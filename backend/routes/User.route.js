@@ -14,13 +14,13 @@ router.post("/findNearby", userController.findNearbyRestaurants);
 router.delete("/:id", userController.deleteUser);
 router.put("/location", userController.updateUserLocation);
 // Fetch all customers
-router.get("/customers", customerController.getAllCustomers);
+router.get("/customers/get", userController.getAllCustomers); 
 
 // Create a new customer
-router.post("/customers", customerController.createUser);
+router.post("/customers", userController.createUser);
 
 // Delete a customer by ID
-router.delete("/customers/:id", customerController.deleteCustomer);
+router.delete("/customers/:id", userController.deleteCustomer);
 
 
 module.exports = router;
