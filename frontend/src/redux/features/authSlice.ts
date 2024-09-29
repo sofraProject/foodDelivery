@@ -100,6 +100,23 @@ export const updateUserLocation = createAsyncThunk<
     }
   }
 );
+export const fetchUser = createAsyncThunk<UserResponse, void>(
+  "auth/fetchUser",
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as { auth: AuthState };
+      const userId = state.auth.user?.id;
+      if (!userId) throw new Error("User not authenticated");
+
+      const response = await axios.get<UserResponse>(
+        `${serverDomain}/api/users/${userId}`
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue((error as Error).message);
+    }
+  }
+);
 
 const authSlice = createSlice({
   name: "auth",
@@ -162,7 +179,21 @@ const authSlice = createSlice({
       .addCase(updateUserLocation.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload as string;
-      });
+        
+      })
+         // Fetch User
+    .addCase(fetchUser.pending, (state) => {
+      state.status = "loading";
+    })
+    .addCase(fetchUser.fulfilled, (state, action) => {
+      state.status = "succeeded";
+      state.user = action.payload.user; // Assuming the user data is returned
+    })
+    .addCase(fetchUser.rejected, (state, action) => {
+      state.status = "failed";
+      state.error = action.payload as string;
+    });
+      
   },
 });
 

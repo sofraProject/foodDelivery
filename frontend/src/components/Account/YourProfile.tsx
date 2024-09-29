@@ -1,23 +1,49 @@
 // src/components/Account/YourProfile.tsx
-import React from 'react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../redux/store'; // Adjust the path based on your structure
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { useAuth } from '../../hooks/useAuth';
+
+const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
 
 const YourProfile = () => {
-    const user = useSelector((state: RootState) => state.users.user);
+    const { isAuthenticated, decodedUser } = useAuth();
+    const [userData, setUserData] = useState<any>(null);
 
-    if (!user) {
-        return <div>Loading...</div>; // Handle loading state
+    useEffect(() => {
+        const fetchUserData = async () => {
+            if (isAuthenticated && decodedUser?.id) {
+                try {
+                    const response = await axios.get(
+                        `${serverDomain}/api/users/${decodedUser.id}`
+                    );
+                    setUserData(response.data);
+                } catch (error) {
+                    console.error("Error retrieving user data", error);
+                }
+            }
+        };
+        fetchUserData();
+    }, [isAuthenticated, decodedUser]);
+
+    if (!userData) {
+        return <div className="mt-20 text-center">Loading...</div>;
     }
 
     return (
-        <div>
-            <h2>Your Profile</h2>
-            <img src={user.imagesUrl || '/default-avatar.jpg'} alt="Profile" />
-            <p>Name: {user.name}</p>
-            <p>Email: {user.email}</p>
-            <p>Role: {user.role}</p>
-            {/* Add more user fields as needed */}
+        <div className="flex justify-center items-center h-screen bg-gray-100">
+            <div className="bg-white rounded-lg shadow-lg p-6 text-center w-80">
+                <img
+                    src={userData.imagesUrl || '/default-avatar.jpg'}
+                    alt="Profile"
+                    className="w-24 h-24 rounded-full border-4 border-blue-500 mx-auto mb-4"
+                />
+                <h2 className="text-xl font-bold mb-1">{userData.name}</h2>
+                <p className="text-sm text-gray-600 mb-1">{userData.email}</p>
+                <p className="text-md text-blue-500 mb-2">{userData.role}</p>
+                <p className="text-xs text-gray-500">
+                    {`Member since: ${new Date(userData.createdAt).toLocaleDateString()}`}
+                </p>
+            </div>
         </div>
     );
 };
