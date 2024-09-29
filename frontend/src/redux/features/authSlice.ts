@@ -65,6 +65,21 @@ export const signUpUser = createAsyncThunk<UserResponse, FormData>(
   }
 );
 
+export const updateUserLocation = createAsyncThunk(
+  "auth/updateUserLocation",
+  async (location: [number, number], { rejectWithValue }) => {
+    try {
+      const response = await axios.put(
+        `${serverDomain}/api/users/location`, 
+        { location }
+      );
+      return response.data; // Retourne les données si la requête est réussie
+    } catch (error) {
+      return rejectWithValue((error as Error).message); // Gère l'erreur
+    }
+  }
+);
+
 const authSlice = createSlice({
   name: "auth",
   initialState,
@@ -95,6 +110,17 @@ const authSlice = createSlice({
       })
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
+      })
+      .addCase(updateUserLocation.pending, (state) => {
+        state.status = "loading"; // Commence à charger
+      })
+      .addCase(updateUserLocation.fulfilled, (state, action) => {
+        state.status = "succeeded"; // Succès de la mise à jour
+        state.user = { ...state.user, location: action.payload.location }; 
+      })
+      .addCase(updateUserLocation.rejected, (state, action) => {
+        state.status = "failed"; 
+        state.error = action.payload as string; 
       });
   },
 });

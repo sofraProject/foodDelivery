@@ -1,14 +1,14 @@
 // types/userTypes.ts
 
 export interface User {
-  id: number;
-  name: string;
-  email: string;
+  id?: number;
+  name?: string;
+  email?: string;
   password?: string; // Si vous n'en avez pas besoin côté client, laissez-le optionnel
   imagesUrl?: string;
   balance?: number;
   location?: { type: string; coordinates: number[] }; // Assurez-vous que cela correspond à votre structure de données
-  role: string; // Ex : "customer", "restaurant_owner", "driver"
+  role?: string; // Ex : "customer", "restaurant_owner", "driver"
 }
 
 export interface UserResponse {

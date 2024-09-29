@@ -63,21 +63,41 @@ module.exports = {
   // Récupérer une commande par ID
   getOrderById: async (req, res) => {
     try {
+      const { id } = req.params;
+  
       const order = await prismaConnection.order.findUnique({
-        where: { id: parseInt(req.params.id) },
-        include: { orderItems: true, delivery: true },
+        where: { id: Number(id) },  // Assurez-vous que l'ID est un nombre
+        include: {
+          orderItems: {
+            include: {
+              menuItem: true,
+            },
+          },
+          deliveries: {  // Vérifiez ici que "deliveries" est correct
+            include: {
+              driver: {
+                select: {
+                  name: true,
+                  email: true,
+                },
+              },
+            },
+          },
+          user: true,  // Inclure l'utilisateur si nécessaire
+        },
       });
+  
       if (!order) {
         return res.status(404).json({ message: "Order not found" });
       }
-      res.status(200).json(order);
+  
+      return res.status(200).json(order);
     } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Error fetching order", error: error.message });
+      console.error(error); // Ajoutez ce log pour voir l'erreur dans la console
+      return res.status(500).json({ message: "Error fetching order", error: error.message });
     }
   },
-
+  
   // Mettre à jour une commande
   updateOrder: async (req, res) => {
     try {
@@ -153,7 +173,7 @@ module.exports = {
               menuItem: true, // Inclure les détails des articles de menu
             },
           },
-          delivery: {
+          deliveries: {
             include: {
               driver: {
                 select: {
@@ -163,6 +183,7 @@ module.exports = {
               },
             },
           },
+          user: true
         },
       });
 
@@ -172,6 +193,42 @@ module.exports = {
       res
         .status(400)
         .json({ message: "Error fetching orders", error: error.message });
+    }
+  },
+  getOrdersByUserId: async (req, res) => {
+    try {
+      const { userId } = req.params; 
+      
+      const orders = await prismaConnection.order.findMany({
+        where: { user_id: parseInt(userId),status: 'pending' }, 
+        include: {
+          orderItems: {
+            include: {
+              menuItem: true, 
+            },
+          },
+          deliveries: {
+            include: {
+              driver: {
+                select: {
+                  name: true, 
+                  email: true, 
+                },
+              },
+            },
+          },
+          user: true, 
+        },
+      });
+
+      if (orders.length === 0) {
+        return res.status(404).json({ message: "No orders found for this user" });
+      }
+
+      return res.status(200).json(orders);
+    } catch (error) {
+      console.error("Error fetching orders for user:", error);
+      return res.status(500).json({ message: "Error fetching orders", error: error.message });
     }
   },
 };

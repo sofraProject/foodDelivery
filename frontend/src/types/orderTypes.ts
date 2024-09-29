@@ -1,4 +1,4 @@
-// types/orderTypes.ts
+
 
 import { User } from './userTypes'; // Adjust the import path based on your project structure
 import { CartItem } from './cartTypes'; // If OrderItem is similar to CartItem, otherwise define a separate interface
@@ -40,3 +40,4 @@ export interface Order {
     createdAt: Date; // Timestamp when the order was created
     updatedAt: Date; // Timestamp when the order was last updated
 }
+
