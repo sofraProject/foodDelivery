@@ -1,17 +1,16 @@
-// SideBar.tsx
-const SideBar = () => {
+// Sidebar.tsx
+import YourProfile from './YourProfile';
+import UpdateProfile from './UpdateProfile';
+
+const Sidebar = () => {
     return (
-        <div style={{ 
-            width: '200px', 
-            height: '100vh', 
-            padding: '20px', 
-            borderRight: '1px solid #ccc', 
-            boxSizing: 'border-box' 
-        }}>
-            <h2 style={{ marginTop: '100px' }}>Your Profile</h2>
-            <h2 style={{ marginTop: '35px' }}>Update Profile</h2>
+        <div style={{ width: '200px', height: '100vh', padding: '20px', borderRight: '1px solid #ccc', boxSizing: 'border-box' }}>
+            <h2 style={{ marginTop: '20px' }}>Your Profile</h2>
+            <YourProfile />
+            <h2 style={{ marginTop: '20px' }}>Update Profile</h2>
+            <UpdateProfile />
         </div>
     );
 };
 
-export default SideBar;
+export default Sidebar;

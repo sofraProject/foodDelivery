@@ -58,6 +58,26 @@ export const signUpUser = createAsyncThunk<UserResponse, SignUpCredentials>(
   }
 );
 
+// Update user action
+export const updateUser = createAsyncThunk<UserResponse, Partial<User>>(
+  "auth/updateUser",
+  async (userData, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as { auth: AuthState };
+      const userId = state.auth.user?.id;
+      if (!userId) throw new Error("User not authenticated");
+
+      const response = await axios.patch<UserResponse>(
+        `${serverDomain}/api/users/${userId}`,
+        userData
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue((error as Error).message);
+    }
+  }
+);
+
 // Update user location action
 export const updateUserLocation = createAsyncThunk<
   UserResponse,
@@ -114,6 +134,20 @@ const authSlice = createSlice({
       // Logout
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
+      })
+      // Update user
+      .addCase(updateUser.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        if (state.user) {
+          state.user = { ...state.user, ...action.payload.user }; // Merge updated user data
+        }
+      })
+      .addCase(updateUser.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload as string;
       })
       // Update user location
       .addCase(updateUserLocation.pending, (state) => {
