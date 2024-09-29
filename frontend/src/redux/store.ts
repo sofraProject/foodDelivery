@@ -5,12 +5,13 @@ import storage from "redux-persist/lib/storage"; // default to localStorage for 
 import usersReducer from "./features/authSlice";
 import cartReducer from "./features/cartSlice";
 import searchReducer from "./features/searchSlice";
-
+// import restaurantReducer from "./features/restaurantSlice"
 // Combine tous les reducers dans un seul rootReducer
 const rootReducer = combineReducers({
   users: usersReducer,
   cart: cartReducer,
   search: searchReducer,
+  // restaurants: restaurantReducer,
 });
 
 // Configuration redux-persist

@@ -20,7 +20,8 @@ const Navbar: React.FC = () => {
   const [userData, setUserData] = useState<any>(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-
+  const [searchQuery, setSearchQuery] = useState("");
+  const [userLocation, setUserLocation] = useState<{ lat: number; long: number } | null>(null);
   // Fetch user data based on decodedUser
   useEffect(() => {
     const fetchUserData = async () => {
@@ -51,6 +52,44 @@ const Navbar: React.FC = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // get user's geolocation
+  const handleGetLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            long: position.coords.longitude,
+          });
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+        }
+      );
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  };
+
+  const handleSearch = async () => {
+    if (userLocation) {
+      try {
+        const response = await axios.get(`${serverDomain}/api/restaurants/nearby`, {
+          params: {
+            lat: userLocation.lat,
+            long: userLocation.long,
+          },
+        });
+        // Handle search results (e.g., set state for nearby restaurants)
+      } catch (error) {
+        console.error("Error fetching nearby restaurants:", error);
+      }
+    } else {
+      alert("Please allow location access to search for nearby restaurants.");
+    }
+  };
+
 
   const handleLogout = () => {
     logout();
@@ -157,6 +196,23 @@ const Navbar: React.FC = () => {
     <header className="fixed top-0 left-0 z-50 w-full bg-gray-900 shadow-lg">
       <nav className="flex items-center justify-between max-w-screen-xl px-6 py-4 mx-auto">
         <div className="flex flex-grow">
+
+        <div className="flex-grow max-w-md mx-auto">
+          <input
+            type="text"
+            placeholder="Search for restaurants..."
+            className="w-full px-4 py-2 text-sm text-white bg-gray-800 border border-gray-700 rounded-full focus:outline-none focus:ring-2 focus:ring-primary"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+          <button onClick={handleGetLocation} className="ml-4 px-4 py-2 text-white bg-blue-500 rounded-lg">
+            Use My Location
+          </button>
+          <button onClick={handleSearch} className="ml-2 px-4 py-2 text-white bg-green-500 rounded-lg">
+            Search
+          </button>
+        </div>
+
           <Image
             className="cursor-pointer w-36"
             src={logo}
