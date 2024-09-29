@@ -37,6 +37,9 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("dev"));
 app.use('/uploads', express.static('uploads'));
+helmet({
+  crossOriginResourcePolicy: false,
+})
 
 // Define API routes
 app.use("/api/orders", orderRoutes);

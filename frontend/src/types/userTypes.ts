@@ -20,10 +20,10 @@ export interface LoginCredentials {
   email: string;
   password: string;
 }
-
 export interface SignUpCredentials {
   name: string;
   email: string;
   password: string;
   role: string;
+  profilePicture: string | null; // Allow null as a valid value
 }
