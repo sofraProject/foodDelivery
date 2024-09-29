@@ -38,4 +38,7 @@ router.put("/:id/ready", OrderController.updateOrderToReady);
 // Route pour assigner uniquement un chauffeur à une commande (sans changement de statut)
 router.put("/:id/assign-driver", OrderController.assignDriver);
 
+router.delete("/:id/cancel", OrderController.cancelOrder);
+
+
 module.exports = router;
