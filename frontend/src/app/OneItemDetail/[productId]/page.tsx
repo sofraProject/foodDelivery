@@ -35,6 +35,8 @@ const FoodDetailScreen: React.FC = () => {
   const dispatch: AppDispatch = useDispatch();
   const [quantity, setQuantity] = useState(1);
   const [food, setFood] = useState<Food | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const params = useParams();
   const { productId } = params;
@@ -45,14 +47,23 @@ const FoodDetailScreen: React.FC = () => {
   // Fetch the food details when the component mounts
   useEffect(() => {
     const fetchFood = async () => {
+      setLoading(true);
+      setError(null);
       try {
         const response = await axios.get(
           `${serverDomain}/api/menu-items/${productId}` // Ensure productId corresponds to menu_item_id in your backend
         );
 
-        setFood(response.data[0]);
+        if (response.data) {
+          setFood(response.data);
+        } else {
+          setError("Food item not found.");
+        }
       } catch (error) {
+        setError("Error fetching food item. Please try again later.");
         console.error("Error fetching food item:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -73,7 +84,7 @@ const FoodDetailScreen: React.FC = () => {
           name: food.name,
           price: parseFloat(food.price), // Convert price to float
           quantity: Math.max(1, quantity),
-          user_id: food.user.id, // Ensure this corresponds to restaurant_owner_id
+
           imageUrl: food.imageUrl,
           available: food.available,
           likes: food.likes,
@@ -89,19 +100,28 @@ const FoodDetailScreen: React.FC = () => {
     }
   };
 
-  if (!food)
+  if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
         Loading...
       </div>
     );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-red-500">{error}</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-gradient-to-br from-amber-100 to-orange-200">
       <main className="flex items-center justify-center flex-grow px-4 py-20 sm:px-6 lg:px-8">
         <div className="w-full max-w-4xl">
           <button
-            onClick={() => router.push("/")}
+            onClick={() => router.back()}
             className="inline-flex items-center mb-8 font-medium text-orange-600 hover:text-orange-800"
           >
             <svg
@@ -122,20 +142,20 @@ const FoodDetailScreen: React.FC = () => {
               <div className="md:flex-shrink-0 md:w-1/2">
                 <img
                   className="object-cover w-full h-96 md:h-full"
-                  src={food.imageUrl}
-                  alt={food.name}
+                  src={food?.imageUrl}
+                  alt={food?.name}
                 />
               </div>
               <div className="p-8 md:w-1/2">
                 <h1 className="mb-4 text-4xl font-extrabold text-gray-900">
-                  {food.name}
+                  {food?.name}
                 </h1>
                 <p className="mb-8 text-lg text-gray-600">
-                  {food.description || defaultDescription}
+                  {food?.description || defaultDescription}
                 </p>
                 <div className="flex items-center justify-between mb-8">
                   <span className="text-4xl font-bold text-orange-600">
-                    {(parseFloat(food.price) * quantity).toFixed(2)} TND
+                    {(parseFloat(food?.price || "0") * quantity).toFixed(2)} TND
                   </span>
                   <div className="flex items-center border-2 border-orange-200 rounded-full">
                     <button

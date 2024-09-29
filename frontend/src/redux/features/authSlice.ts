@@ -23,7 +23,9 @@ const initialState: AuthState = {
 };
 
 // Logout action
-export const logoutUser = createAsyncThunk("auth/logoutUser", async () => {});
+export const logoutUser = createAsyncThunk("auth/logoutUser", async () => {
+  // Optionally, add API logic for logout here
+});
 
 // Login action
 export const loginUser = createAsyncThunk<UserResponse, LoginCredentials>(
@@ -58,14 +60,20 @@ export const signUpUser = createAsyncThunk<UserResponse, SignUpCredentials>(
 );
 
 // Update user location action
-export const updateUserLocation = createAsyncThunk<UserResponse, { id: string; location: number[] }>(
+export const updateUserLocation = createAsyncThunk<
+  UserResponse,
+  [number, number] // [longitude, latitude]
+>(
   "auth/updateUserLocation",
-  async ({ id, location }, { rejectWithValue }) => {
+  async ([longitude, latitude], { getState, rejectWithValue }) => {
     try {
-      const response = await axios.put<UserResponse>(
-        `${serverDomain}/api/user/location`, // Adjust the endpoint as necessary
-        { location },
-        { headers: { Authorization: `Bearer ${id}` } } // Include token if needed
+      const state = getState() as { auth: AuthState };
+      const userId = state.auth.user?.id;
+      if (!userId) throw new Error("User not authenticated");
+
+      const response = await axios.patch<UserResponse>(
+        `${serverDomain}/api/users/${userId}/location`,
+        { longitude, latitude }
       );
       return response.data;
     } catch (error) {
@@ -80,6 +88,7 @@ const authSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder
+      // Login
       .addCase(loginUser.pending, (state) => {
         state.status = "loading";
       })
@@ -91,6 +100,7 @@ const authSlice = createSlice({
         state.status = "failed";
         state.error = action.payload as string;
       })
+      // Sign-up
       .addCase(signUpUser.pending, (state) => {
         state.status = "loading";
       })
@@ -102,18 +112,23 @@ const authSlice = createSlice({
         state.status = "failed";
         state.error = action.payload as string;
       })
+      // Logout
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
       })
+      // Update user location
+      .addCase(updateUserLocation.pending, (state) => {
+        state.status = "loading";
+      })
       .addCase(updateUserLocation.fulfilled, (state, action) => {
-        const payload = action.payload as UserResponse; // Type assertion for correct structure
-      
+        state.status = "succeeded";
         if (state.user) {
-          state.user = {
-            ...state.user, // Preserve other user properties
-            location: payload.user.location, // Assuming the updated location is inside `payload.user.location`
-          };
+          state.user.location = action.payload.user.location; // Assuming location is part of the user response
         }
+      })
+      .addCase(updateUserLocation.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload as string;
       });
   },
 });

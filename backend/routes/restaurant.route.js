@@ -1,7 +1,26 @@
-const express = require("express");
-const router = express.Router();
-const RestaurantController = require("../controllers/restaurant.controller");
+// const express = require("express");
+// const router = express.Router();
+// const RestaurantController = require("../controllers/Restaurant.controller");
 
-router.post("/nearest-restaurants", RestaurantController.getNearestRestaurants);
+// // Create a new restaurant
+// router.post("/", RestaurantController.createRestaurant);
 
-module.exports = router;
+// // Retrieve all restaurants
+// router.get("/", RestaurantController.getAllRestaurants);
+
+// // Retrieve a specific restaurant by ID
+// router.get("/:id", RestaurantController.getRestaurantById);
+
+// // Update a restaurant by ID
+// router.put("/:id", RestaurantController.updateRestaurant);
+
+// // Delete a restaurant by ID
+// router.delete("/:id", RestaurantController.deleteRestaurant);
+
+// // Retrieve the menu items of a specific restaurant by restaurant ID
+// router.get("/menu-items/:id", RestaurantController.getMenuItemsByRestaurant);
+
+// // Retrieve a specific restaurant by Name
+// router.get("/name/:restaurantName", RestaurantController.getRestaurantByName); // New Route
+
+// module.exports = router;

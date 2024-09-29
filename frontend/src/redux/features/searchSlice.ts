@@ -1,6 +1,8 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
+
 const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
+
 export const searchProductsAndRestaurants = createAsyncThunk(
   "search/productsAndRestaurants",
   async (searchTerm: string, { rejectWithValue }) => {

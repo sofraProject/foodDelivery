@@ -1,61 +1,71 @@
-const { prismaConnection } = require("../prisma/prisma");
+const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
-dotenv.config(); // Load environment variables from .env
 
+// Charger les variables d'environnement
+dotenv.config();
+
+const prisma = new PrismaClient();
 const saltRounds = 10;
 
 module.exports = {
+  // Contrôleur pour l'inscription d'un utilisateur
   signUp: async (req, res) => {
     try {
       const { email, password, role, name, location } = req.body;
 
-      // Validate required fields
+      // Validation des champs requis
       if (!email || !password || !role || !name) {
         return res
           .status(400)
           .json({ message: "Email, password, role, and name are required." });
       }
 
-      // Check for existing user
-      const existingUser = await prismaConnection.user.findUnique({
+      // Vérification de l'existence de l'utilisateur
+      const existingUser = await prisma.user.findUnique({
         where: { email },
       });
       if (existingUser) {
         return res.status(400).json({ message: "Email already in use." });
       }
 
-      // Hash the password
+      // Hachage du mot de passe
       const hashedPassword = await bcrypt.hash(password, saltRounds);
 
-      // Validate the role
-      if (!["customer", "restaurant_owner", "driver"].includes(role)) {
+      // Validation du rôle
+      if (!["CUSTOMER", "RESTAURANT_OWNER", "DRIVER", "ADMIN"].includes(role)) {
         return res.status(400).json({ message: "Invalid role specified." });
       }
 
-      // Create new user
-      const newUser = await prismaConnection.user.create({
+      // Création d'un nouvel utilisateur
+      const newUser = await prisma.user.create({
         data: {
           email,
           password: hashedPassword,
           role,
           name,
-          location,
+          locations: {
+            create: {
+              lat: location.lat,
+              long: location.lng,
+              locationName: location.name,
+            },
+          }, // Gère la relation avec l'entité Location
         },
       });
 
-      // Generate JWT token
+      // Génération du token JWT
       const token = jwt.sign(
         { id: newUser.id, role: newUser.role },
         process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN || "1h" } // Default to 1h if not specified
+        { expiresIn: process.env.JWT_EXPIRES_IN || "1h" }
       );
 
       res.status(201).json({
         message: "Account created successfully.",
         userId: newUser.id,
-        token, // Include the token in the response
+        token,
       });
     } catch (error) {
       console.error("Error creating account:", error);
@@ -65,37 +75,42 @@ module.exports = {
     }
   },
 
+  // Contrôleur pour la connexion de l'utilisateur
   signIn: async (req, res) => {
     const { email, password } = req.body;
 
     try {
-      // Validate user credentials
-      const user = await prismaConnection.user.findUnique({
+      // Recherche de l'utilisateur
+      const user = await prisma.user.findUnique({
         where: { email },
       });
       if (!user || !(await bcrypt.compare(password, user.password))) {
         return res.status(401).json({ message: "Invalid credentials." });
       }
 
-      // Create JWT token
+      // Génération du token JWT
       const token = jwt.sign(
-        { id: user.id, email: user.email },
+        { id: user.id, email: user.email, role: user.role },
         process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN || "1h" } // Default to 1h if not specified
+        { expiresIn: process.env.JWT_EXPIRES_IN || "1h" }
       );
 
       res.status(200).json({ token });
     } catch (error) {
       console.error("Error signing in user:", error);
-      res.status(500).json({ error: "Error signing in user." });
+      res
+        .status(500)
+        .json({ message: "Error signing in user.", error: error.message });
     }
   },
 
+  // Contrôleur pour récupérer les informations de l'utilisateur
   me: async (req, res) => {
     const { id } = req.user;
 
     try {
-      const user = await prismaConnection.user.findUnique({
+      // Recherche de l'utilisateur par ID
+      const user = await prisma.user.findUnique({
         where: { id },
       });
       if (!user) {
@@ -107,9 +122,9 @@ module.exports = {
           id: user.id,
           email: user.email,
           role: user.role,
-          location: user.location,
           name: user.name,
-          photoURL: user.imagesUrl,
+          location: user.locations, // Renvoie la localisation associée
+          photoURL: user.imageUrl,
         },
       });
     } catch (error) {
