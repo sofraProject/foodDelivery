@@ -5,6 +5,7 @@ import localFont from "next/font/local";
 import React from "react";
 import "../styles/globals.css";
 import ReduxProvider from "./providers/ReduxProvider";
+
 // Charger les polices locales
 const geistSans = localFont({
   src: "../fonts/GeistVF.woff",

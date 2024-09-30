@@ -183,3 +183,25 @@ exports.getAllRestaurantswithCat = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
+// Retrieve a restaurant by owner ID
+exports.getRestaurantByOwnerId = async (req, res) => {
+  try {
+    const { ownerId } = req.params;
+    const id = Number(ownerId);
+    const restaurant = await prismaConnection.restaurant.findUnique({
+      where: { id },
+    });
+
+    if (!restaurant) {
+      return res.status(404).json({ message: "Restaurant not found" });
+    }
+
+    res.status(200).json(restaurant);
+  } catch (error) {
+    console.error("Error fetching restaurant by owner ID:", error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while fetching the restaurant" });
+  }
+};

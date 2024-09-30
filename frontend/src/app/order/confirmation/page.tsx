@@ -171,6 +171,18 @@ const PaymentSuccess = () => {
                 </motion.li>
                 {renderSteps}
               </ul>
+
+              {/* Add the button to open the map */}
+              {orderStatus >= 3 && (
+                <div className="mt-6">
+                  <button
+                    onClick={() => router.push(`/map/${orderId}`)}
+                    className="px-6 py-3 text-lg font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+                  >
+                    Voir la carte de livraison
+                  </button>
+                </div>
+              )}
             </div>
           </section>
         </div>
