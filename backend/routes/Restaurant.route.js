@@ -29,4 +29,7 @@ router.get("/name/:restaurantName", restaurantController.getRestaurantByName); /
 // Retrieve a restaurant by owner ID
 router.get("/owner/:ownerId", restaurantController.getRestaurantByOwnerId); // New Route
 
+router.get("/:id/categories", restaurantController.getCategoriesByRestaurantId);
+
+
 module.exports = router;

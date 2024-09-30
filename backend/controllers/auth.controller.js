@@ -14,23 +14,18 @@ module.exports = {
   signUp: async (req, res) => {
     try {
       const { email, password, role, name, location } = req.body;
-      console.log("Request body:", req.body);
-      // Validation des champs requis
+
       if (!email || !password || !role || !name) {
-        return res
-          .status(400)
-          .json({ message: "Email, password, role, and name are required." });
+        return res.status(400).json({ message: "Email, password, role, and name are required" });
       }
 
-      // Vérification de l'existence de l'utilisateur
-      const existingUser = await prisma.user.findUnique({
-        where: { email },
-      });
+      // Check for existing user
+      const existingUser = await prismaConnection.user.findUnique({ where: { email } });
       if (existingUser) {
         return res.status(400).json({ message: "Email already in use." });
       }
 
-      // Hachage du mot de passe
+      // Hash the password
       const hashedPassword = await bcrypt.hash(password, saltRounds);
 
       // Validation du rôle
@@ -52,6 +47,7 @@ module.exports = {
           //     locationName: location.name,
           //   },
           // }, // Gère la relation avec l'entité Location
+            imagesUrl: req.file ? req.file.path : null, // Add image upload handling
         },
       });
 
@@ -61,6 +57,8 @@ module.exports = {
         process.env.JWT_SECRET,
         { expiresIn: process.env.JWT_EXPIRES_IN || "1h" }
       );
+
+      
 
       res.status(201).json({
         message: "Account created successfully.",
@@ -96,7 +94,18 @@ module.exports = {
         { expiresIn: process.env.JWT_EXPIRES_IN || "1h" }
       );
 
-      res.status(200).json({ token });
+      res.status(200).json({
+        message: "User signed in successfully",
+        token,
+        user: {
+          id: user.id,
+          email: user.email,
+          role: user.role,
+          location: user.location,
+          name: user.name,
+          photoURL: user.imagesUrl,
+        },
+      });
     } catch (error) {
       console.error("Error signing in user:", error);
       res
