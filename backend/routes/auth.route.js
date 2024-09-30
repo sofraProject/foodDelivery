@@ -5,7 +5,7 @@ const { signUp, signIn, me } = authController;
 const authenticate = require("../middleware/authMiddleware")
 const upload = require("../middleware/multer");
 
-router.post("/signup", upload.single("imagesUrl"), signUp);
+router.post("/signup", signUp);
 router.post("/signin", signIn);
 router.get("/me", authenticate, me);
 

@@ -13,7 +13,7 @@ module.exports = {
   // Contrôleur pour l'inscription d'un utilisateur
   signUp: async (req, res) => {
     try {
-      const { email, password, role, name, location } = req.body;
+      const { email, password, role, name} = req.body;
       console.log("Request body:", req.body);
       // Validation des champs requis
       if (!email || !password || !role || !name) {
@@ -59,7 +59,7 @@ module.exports = {
       const token = jwt.sign(
         { id: newUser.id, role: newUser.role },
         process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN || "1h" }
+        { expiresIn: process.env.JWT_EXPIRES_IN || "1h" },
         { expiresIn: process.env.JWT_EXPIRES_IN || "1h" }
       );
 
