@@ -26,6 +26,8 @@ const MapboxMap: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [locationError, setLocationError] = useState<string | null>(null);
   const [locationSaved, setLocationSaved] = useState(false);
+  const [locationName, setLocationName] = useState<string>("User Location"); // Add locationName for client
+  const [restaurantName, setRestaurantName] = useState<string>(""); // Add restaurant name for restaurant owner
   const router = useRouter();
 
   // Get current location based on user type
@@ -91,12 +93,10 @@ const MapboxMap: React.FC = () => {
         const { data } = await axios.get(
           `${process.env.NEXT_PUBLIC_SERVER_DOMAINE}/api/restaurants/owner/${decodedUser?.id}`
         );
-        restaurantId = data.id; // Assume restaurant data contains the restaurant ID
+        restaurantId = data.id;
+        setRestaurantName(data.name); // Set the restaurant name from the fetched data
       }
 
-      const locationName = isClient
-        ? "Customer Location"
-        : "Restaurant Location";
       const userId = decodedUser?.id;
 
       await axios.post(
@@ -104,13 +104,14 @@ const MapboxMap: React.FC = () => {
         {
           lat: latitude,
           long: longitude,
-          locationName,
+          locationName: isClient ? locationName : restaurantName, // Use locationName for client, restaurantName for restaurant owner
           userId: isClient ? userId : null,
           restaurantId: isRestaurantOwner ? restaurantId : null,
         }
       );
 
       setLocationSaved(true);
+      router.push("/");
     } catch (error) {
       console.error("Error saving location:", error);
     }
@@ -221,8 +222,20 @@ const MapboxMap: React.FC = () => {
 
               <div
                 ref={mapContainer}
-                className="w-full h-[500px] mt-10 rounded-lg shadow-lg"
+                className="w-full h-[1080px] mt-10 rounded-lg shadow-lg"
               />
+
+              {!loading && isClient && (
+                <div className="mt-6">
+                  <input
+                    type="text"
+                    placeholder="Enter Location Name"
+                    className="w-full px-4 py-2 mb-4 text-lg border rounded-md"
+                    value={locationName}
+                    onChange={(e) => setLocationName(e.target.value)}
+                  />
+                </div>
+              )}
 
               {!loading && (
                 <div className="mt-6">

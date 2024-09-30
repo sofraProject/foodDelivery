@@ -1,40 +1,138 @@
 "use client";
 
+import { authHelper } from "@/helpers/authHelper";
+import { Dialog } from "@headlessui/react";
 import axios from "axios";
-import { motion } from "framer-motion"; // Import framer-motion for animations
+import { motion } from "framer-motion";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AiOutlineCheckCircle,
   AiOutlineLoading3Quarters,
 } from "react-icons/ai";
 import { useDispatch } from "react-redux";
 import io from "socket.io-client";
+import swal from "sweetalert";
 import { removeItemsByRestaurantId } from "../../../redux/features/cartSlice";
+import DeliveryMap from "./DeliveryMap"; // Importez le composant de la carte
 
-// Define types for order data and socket data
-type OrderData = {
-  order: {
-    id: number;
-    restaurantId: number;
-  };
-};
-
-type SocketData = {
-  orderId: number;
-};
-
+const { getUserId } = authHelper;
+const userId = getUserId();
 const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
+
+type Location = {
+  id: number;
+  locationName: string;
+  lat: number;
+  long: number;
+};
 
 const PaymentSuccess = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const orderId = searchParams.get("orderId");
   const dispatch = useDispatch();
-  const [orderStatus, setOrderStatus] = useState(0); // 0: Pending, 1: Confirmed, 2: Preparing, 3: Awaiting Delivery, 4: Delivered
+  const [orderStatus, setOrderStatus] = useState(0);
+  const [locations, setLocations] = useState<Location[]>([]);
+  const [isMapOpen, setIsMapOpen] = useState(false);
+  const [driverPosition, setDriverPosition] = useState({ lat: 0, long: 0 });
+  const [userPosition, setUserPosition] = useState({ lat: 0, long: 0 });
+  const socketRef = useRef<any>(null);
 
-  // Function to handle order update
   const updateOrderStatus = (status: number) => setOrderStatus(status);
+
+  const openMapModal = () => setIsMapOpen(true);
+  const closeMapModal = () => setIsMapOpen(false);
+
+  const openLocationSelector = (availableLocations: Location[]) => {
+    const locationOptions = availableLocations.map(
+      (location) =>
+        `<option value="${location.id}">${
+          location.locationName || `Location ${location.id}`
+        }</option>`
+    );
+
+    swal({
+      title: "Choisissez votre emplacement",
+      content: {
+        element: "select",
+        attributes: {
+          innerHTML: locationOptions.join(""),
+          className: "swal-select",
+        },
+      },
+      buttons: {
+        confirm: {
+          text: "Sélectionner l'emplacement",
+          value: true,
+          visible: true,
+          className: "bg-primary text-dark rounded-xl px-6 py-4",
+          closeModal: true,
+        },
+      },
+    }).then((selectedValue) => {
+      const selectedLocation = availableLocations.find(
+        (loc) => loc.id === Number(selectedValue)
+      );
+      if (selectedLocation) {
+        setUserPosition({
+          lat: selectedLocation.lat,
+          long: selectedLocation.long,
+        });
+        sendLocationToDriver(selectedLocation);
+      }
+    });
+  };
+
+  const sendLocationToDriver = (location: Location) => {
+    if (!serverDomain) {
+      console.error("Server domain is not defined");
+      return;
+    }
+
+    if (!socketRef.current) {
+      socketRef.current = io(serverDomain);
+    }
+
+    socketRef.current.emit("sendLocationToDriver", {
+      locationId: location.id,
+      locationName: location.locationName,
+      orderId: orderId,
+      lat: location.lat,
+      long: location.long,
+    });
+
+    socketRef.current.on("locationReceived", (data: { orderId: number }) => {
+      if (data.orderId === Number(orderId)) {
+        swal("Succès", "Emplacement envoyé au chauffeur !", "success");
+      }
+    });
+  };
+
+  useEffect(() => {
+    const fetchUserLocations = async () => {
+      try {
+        const response = await axios.get(
+          `${serverDomain}/api/locations/user/${userId}`
+        );
+        const userLocations = response.data;
+        if (userLocations.length === 0) {
+          router.push("/saveLocation");
+        } else {
+          setLocations(userLocations);
+          openLocationSelector(userLocations);
+        }
+      } catch (error) {
+        console.error(
+          "Erreur lors de la récupération des emplacements :",
+          error
+        );
+        router.push("/saveLocation");
+      }
+    };
+
+    fetchUserLocations();
+  }, [router]);
 
   useEffect(() => {
     if (!serverDomain) {
@@ -42,68 +140,83 @@ const PaymentSuccess = () => {
       return;
     }
 
-    const socket = io(serverDomain);
-
     if (orderId) {
-      // Update order and remove items from cart
+      socketRef.current = io(serverDomain);
+
       axios
-        .put<OrderData>(`${serverDomain}/api/orders/${orderId}/success`)
+        .put(`${serverDomain}/api/orders/${orderId}/success`)
         .then((response) => {
           const restaurantId = response.data.order.restaurantId;
           dispatch(removeItemsByRestaurantId(restaurantId));
         })
         .catch((error) => {
-          console.error("Error updating the order status", error);
+          console.error("Erreur lors de la mise à jour de la commande", error);
         });
 
-      // Socket events for order status updates
-      socket.on("orderPaymentConfirmed", (data: SocketData) => {
-        if (data.orderId === Number(orderId)) updateOrderStatus(1);
-      });
+      socketRef.current.on(
+        "orderPaymentConfirmed",
+        (data: { orderId: number }) => {
+          if (data.orderId === Number(orderId)) updateOrderStatus(1);
+        }
+      );
 
-      socket.on("orderPreparationStarted", (data: SocketData) => {
-        if (data.orderId === Number(orderId)) updateOrderStatus(2);
-      });
+      socketRef.current.on(
+        "orderPreparationStarted",
+        (data: { orderId: number }) => {
+          if (data.orderId === Number(orderId)) updateOrderStatus(2);
+        }
+      );
 
-      socket.on("orderStatusUpdated", (data: SocketData) => {
-        if (data.orderId === Number(orderId)) updateOrderStatus(3);
-      });
+      socketRef.current.on(
+        "orderStatusUpdated",
+        (data: { orderId: number }) => {
+          if (data.orderId === Number(orderId)) updateOrderStatus(3);
+        }
+      );
 
-      socket.on("deliveryConfirmed", (data: SocketData) => {
+      socketRef.current.on("deliveryConfirmed", (data: { orderId: number }) => {
         if (data.orderId === Number(orderId)) updateOrderStatus(4);
       });
+
+      socketRef.current.on(
+        "driverLocationUpdate",
+        (data: { lat: number; long: number }) => {
+          setDriverPosition({ lat: data.lat, long: data.long });
+        }
+      );
     }
 
     return () => {
-      socket.disconnect();
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
     };
   }, [orderId, dispatch]);
 
-  // Order steps definition using useMemo to avoid recalculating on each render
   const steps = useMemo(
     () => [
       {
-        text: "Waiting for restaurant confirmation...",
+        text: "En attente de la confirmation du restaurant...",
         loading: orderStatus === 0,
         status: 0,
       },
       {
-        text: "Restaurant confirmed!",
+        text: "Restaurant confirmé !",
         loading: orderStatus === 1,
         status: 1,
       },
       {
-        text: "Restaurant is preparing your order...",
+        text: "Le restaurant prépare votre commande...",
         loading: orderStatus === 2,
         status: 2,
       },
       {
-        text: "Waiting for delivery confirmation...",
+        text: "En attente de la confirmation de livraison...",
         loading: orderStatus === 3,
         status: 3,
       },
       {
-        text: "Delivery confirmed!",
+        text: "Livraison confirmée !",
         loading: orderStatus === 4,
         status: 4,
       },
@@ -111,7 +224,6 @@ const PaymentSuccess = () => {
     [orderStatus]
   );
 
-  // Helper function to render step icons
   const renderIcon = (loading: boolean) =>
     loading ? (
       <AiOutlineLoading3Quarters className="w-5 h-5 animate-spin" />
@@ -119,17 +231,16 @@ const PaymentSuccess = () => {
       <AiOutlineCheckCircle className="w-5 h-5" />
     );
 
-  // JSX for each step
   const renderSteps = steps.map((step) => (
     <motion.li
       key={step.status}
       className={`flex items-center ${
         orderStatus >= step.status ? "text-green-600" : "text-gray-600"
       } mb-4`}
-      initial={{ opacity: 0, y: 20 }} // Fade-in animation
-      animate={{ opacity: 1, y: 0 }} // Appears in normal position
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
-      whileHover={{ scale: 1.05 }} // Hover effect
+      whileHover={{ scale: 1.05 }}
     >
       {renderIcon(step.loading)}
       <span className="ml-2 text-xl">{step.text}</span>
@@ -146,9 +257,11 @@ const PaymentSuccess = () => {
               className="inline-flex items-center px-4 py-1 mb-4 rounded-lg bg-primary text-dark hover:text-primary hover:bg-dark"
             >
               <AiOutlineCheckCircle className="w-5 h-5 mr-2" />
-              Go to Home
+              Accueil
             </button>
-            <h1 className="text-5xl font-bold text-gray-900">Order Status</h1>
+            <h1 className="text-5xl font-bold text-gray-900">
+              Statut de la commande
+            </h1>
           </div>
         </div>
       </header>
@@ -161,22 +274,21 @@ const PaymentSuccess = () => {
                 <motion.li
                   key="payment-success"
                   className="flex items-center mb-4 text-green-600"
-                  initial={{ opacity: 0, y: 20 }} // Fade-in animation
-                  animate={{ opacity: 1, y: 0 }} // Appears in normal position
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
-                  whileHover={{ scale: 1.05 }} // Hover effect
+                  whileHover={{ scale: 1.05 }}
                 >
                   <AiOutlineCheckCircle className="w-5 h-5" />
-                  <span className="ml-2 text-xl">Payment Successful</span>
+                  <span className="ml-2 text-xl">Paiement réussi</span>
                 </motion.li>
                 {renderSteps}
               </ul>
 
-              {/* Add the button to open the map */}
               {orderStatus >= 3 && (
                 <div className="mt-6">
                   <button
-                    onClick={() => router.push(`/map/${orderId}`)}
+                    onClick={openMapModal}
                     className="px-6 py-3 text-lg font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700"
                   >
                     Voir la carte de livraison
@@ -187,6 +299,47 @@ const PaymentSuccess = () => {
           </section>
         </div>
       </main>
+
+      {/* Utilisez le composant DeliveryMap dans la modale */}
+      <Dialog
+        open={isMapOpen}
+        onClose={closeMapModal}
+        className="relative z-10"
+      >
+        <div
+          className="fixed inset-0 bg-black bg-opacity-40"
+          aria-hidden="true"
+        />
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          {/* Dialog.Panel avec une largeur et hauteur maximales */}
+          <Dialog.Panel className="flex flex-col w-full max-w-4xl h-[85vh] bg-white rounded-lg shadow-lg overflow-hidden">
+            {/* Titre */}
+            <div className="p-6 border-b">
+              <Dialog.Title className="text-2xl font-bold text-center text-gray-800">
+                Carte de livraison
+              </Dialog.Title>
+            </div>
+
+            {/* La carte occupe tout l'espace disponible */}
+            <div className="flex-grow h-full">
+              <DeliveryMap
+                userPosition={userPosition}
+                driverPosition={driverPosition}
+              />
+            </div>
+
+            {/* Bouton centré */}
+            <div className="p-4 border-t">
+              <button
+                onClick={closeMapModal}
+                className="w-full px-4 py-2 text-lg font-semibold text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+              >
+                Fermer la carte
+              </button>
+            </div>
+          </Dialog.Panel>
+        </div>
+      </Dialog>
     </div>
   );
 };

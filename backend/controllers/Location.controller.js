@@ -113,3 +113,29 @@ exports.deleteLocation = async (req, res) => {
       .json({ message: "Erreur lors de la suppression de la localisation." });
   }
 };
+
+// Récupérer toutes les localisations par userId
+exports.getLocationsByUserId = async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const locations = await prismaConnection.location.findMany({
+      where: { userId: parseInt(userId) },
+    });
+
+    if (locations.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "Aucune localisation trouvée pour cet utilisateur." });
+    }
+
+    res.status(200).json(locations);
+  } catch (error) {
+    console.error(
+      "Erreur lors de la récupération des localisations par userId:",
+      error
+    );
+    res
+      .status(500)
+      .json({ message: "Erreur lors de la récupération des localisations." });
+  }
+};

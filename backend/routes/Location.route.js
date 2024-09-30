@@ -17,4 +17,7 @@ router.put("/:id", locationController.updateLocation);
 // Supprimer une localisation par ID
 router.delete("/:id", locationController.deleteLocation);
 
+// Récupérer toutes les localisations pour un utilisateur spécifique par userId
+router.get("/user/:userId", locationController.getLocationsByUserId);
+
 module.exports = router;
