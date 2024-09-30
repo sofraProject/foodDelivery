@@ -24,7 +24,7 @@ const dashboardCards = [
     title: "Manage Restaurant",
     description: "Edit and update restaurant details",
     icon: AiOutlineShop,
-    path: "/restaurants",
+    path: "./restaurant/restaurants",
     color: "text-yellow-500",
   },
   {
@@ -69,6 +69,8 @@ const dashboardCards = [
     path: "./restaurant/customers",
     color: "text-orange-500",
   },
+
+
 
 ];
 
