@@ -183,7 +183,7 @@ exports.getAllRestaurantswithCat = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
-};
+;
 
 // Retrieve a restaurant by owner ID
 exports.getRestaurantByOwnerId = async (req, res) => {

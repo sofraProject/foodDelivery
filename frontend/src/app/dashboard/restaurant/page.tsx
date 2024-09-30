@@ -52,7 +52,7 @@ const dashboardCards = [
     title: "Manage Staff",
     description: "Manage restaurant staff members",
     icon: AiOutlineUsergroupAdd,
-    path: "/staff",
+    path: "./restaurant/staff",
     color: "text-teal-500",
   },
   {
