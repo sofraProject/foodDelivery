@@ -91,10 +91,10 @@ export const useAuth = () => {
   };
 
   const roles = {
-    isAdmin: decodedUser?.role === "admin",
-    isClient: decodedUser?.role === "customer",
-    isDriver: decodedUser?.role === "driver",
-    isRestaurantOwner: decodedUser?.role === "restaurant_owner",
+    isAdmin: decodedUser?.role === "ADMIN",
+    isClient: decodedUser?.role === "CUSTOMER",
+    isDriver: decodedUser?.role === "DRIVER",
+    isRestaurantOwner: decodedUser?.role === "RESTAURANT_OWNER",
   };
 
   const memoizedDecodedUser = useMemo(() => decodedUser, [decodedUser]);

@@ -1,10 +1,11 @@
+import Footer from "@/components/HomePage/Footer";
 import Navbar from "@/components/Navbar"; // Assurez-vous que le chemin est correct
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import React from "react";
 import "../styles/globals.css";
 import ReduxProvider from "./providers/ReduxProvider";
-import Footer from "@/components/HomePage/Footer/Footer";
+
 // Charger les polices locales
 const geistSans = localFont({
   src: "../fonts/GeistVF.woff",

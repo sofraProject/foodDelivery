@@ -4,7 +4,6 @@ import React from "react";
 import { useSelector } from "react-redux";
 import Banner from "../components/HomePage/Banner";
 import Category from "../components/HomePage/Category";
-import Footer from "../components/HomePage/Footer/Footer";
 import HowItWorks from "../components/HomePage/HowItWorks";
 import Foods from "../components/HomePage/Restos";
 import Testimonials from "../components/HomePage/Testimonials";
