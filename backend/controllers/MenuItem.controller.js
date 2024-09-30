@@ -46,7 +46,7 @@ exports.createMenuItem = async (req, res) => {
 exports.getMenuItemById = async (req, res) => {
   console.log("okkkkk=", req.params);
 
-  const { id } = req.params;
+  const {id}   = req.params;
   try {
     const menuItem = await prismaConnection.menuItem.findUnique({
       where: { id: parseInt(id) },
@@ -108,7 +108,11 @@ exports.getMenuItemsByCategory = async (req, res) => {
     const categoryId = parseInt(req.params.category_id, 10);
     const menuItems = await prismaConnection.menuItem.findMany({
       where: { categoryId },
-      include: { user: true },
+      include: {
+        category: true,   // Including the category details
+        restaurant: true, // Including the restaurant details
+        orderItems: true, // Including related order items
+      },
     });
     res.status(200).json(menuItems);
   } catch (error) {

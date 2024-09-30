@@ -13,6 +13,7 @@ interface AuthState {
   user: User | null;
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
+  
 }
 
 const initialState: AuthState = {
@@ -47,9 +48,9 @@ export const signUpUser = createAsyncThunk<UserResponse, SignUpCredentials>(
   "auth/signUpUser",
   async (credentials, { rejectWithValue }) => {
     try {
-      const response = await axios.post<UserResponse>(
-        `${serverDomain}/api/auth/signup`,
-        credentials
+      const response = await axios.put(
+        `${serverDomain}/api/users/location`, 
+        { location }
       );
       return response.data;
     } catch (error) {
@@ -76,7 +77,7 @@ export const updateUserLocation = createAsyncThunk<
       );
       return response.data;
     } catch (error) {
-      return rejectWithValue((error as Error).message);
+      return rejectWithValue((error as Error).message); // Gère l'erreur
     }
   }
 );
