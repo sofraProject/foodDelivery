@@ -1,38 +1,31 @@
 const { prismaConnection } = require("../prisma/prisma");
 
-// Create a new Delivery
-exports.createDelivery = async (req, res) => {
-  // ... existing code ...
-  const newDelivery = await prismaConnection.delivery.create(req.body);
-  res.status(201).json(newDelivery);
+// Get delivery details and location
+const getDeliveryStatus = async (req, res) => {
+  const { orderId } = req.params;
+
+  try {
+    // Find the delivery by the order ID
+    const delivery = await prismaConnection.delivery.findUnique({
+      where: { orderId: parseInt(orderId) },
+      include: {
+        location: true,
+        driver: { select: { name: true, email: true } },
+        order: { select: { status: true } },
+      },
+    });
+    console.log(delivery, "ok");
+    if (!delivery) {
+      return res.status(400).json({ message: "Delivery not found" });
+    }
+
+    res.json(delivery);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
+  }
 };
 
-// Get all Deliveries
-exports.getAllDeliveries = async (req, res) => {
-  // ... existing code ...
-  const deliveries = await prismaConnection.delivery.findMany();
-  res.status(200).json(deliveries);
-};
-
-// Get a Delivery by ID
-exports.getDeliveryById = async (req, res) => {
-  // ... existing code ...
-  const delivery = await prismaConnection.delivery.findUnique(req.params.id);
-  res.status(200).json(delivery);
-};
-
-// Update a Delivery
-exports.updateDelivery = async (req, res) => {
-  // ... existing code ...
-  await prismaConnection.delivery.update(req.body, {
-    where: { id: req.params.id },
-  });
-  res.status(204).send();
-};
-
-// Delete a Delivery
-exports.deleteDelivery = async (req, res) => {
-  // ... existing code ...
-  await prismaConnection.delivery.delete({ where: { id: req.params.id } });
-  res.status(204).send();
+module.exports = {
+  getDeliveryStatus,
 };

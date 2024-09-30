@@ -29,6 +29,13 @@ const initSocket = (server) => {
     socket.on("disconnect", () => {
       console.log("User disconnected");
     });
+
+    // Listen for driver location updates
+    socket.on("driverLocationUpdate", (data) => {
+      const { orderId, latitude, longitude } = data;
+      updateDriverLocation(orderId, latitude, longitude);
+      io.emit(`deliveryUpdate-${orderId}`, { latitude, longitude });
+    });
   });
 };
 
