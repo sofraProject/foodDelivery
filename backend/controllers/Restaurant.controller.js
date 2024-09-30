@@ -45,14 +45,20 @@ exports.getAllRestaurants = async (req, res) => {
 };
 
 // Retrieve a restaurant by ID
+// Retrieve a restaurant by ID
+// Retrieve a restaurant by ID
 exports.getRestaurantById = async (req, res) => {
-  const { id } = req.params;
+  const { id } = req.params; // Extract id from request parameters
+
   try {
+    // Ensure id is a number by using Number() or parseInt()
     const restaurant = await prismaConnection.restaurant.findUnique({
-      where: { id: parseInt(id) },
+      where: {
+        id: Number(id), // Convert id to a number
+      },
       include: {
-        owner: true, // Include owner information
-        menuItems: true, // Include related menu items
+        owner: true,
+        menuItems: true,
       },
     });
 
@@ -66,6 +72,7 @@ exports.getRestaurantById = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 // Update a restaurant
 exports.updateRestaurant = async (req, res) => {
@@ -203,22 +210,20 @@ exports.getCategoriesByRestaurantId = async (req, res) => {
 
 // Retrieve a restaurant by owner ID
 exports.getRestaurantByOwnerId = async (req, res) => {
+  const { ownerId } = req.query;
+
   try {
-    const { ownerId } = req.params;
-    const id = Number(ownerId);
-    const restaurant = await prismaConnection.restaurant.findUnique({
-      where: { id },
+    const restaurants = await prismaConnection.restaurant.findMany({
+      where: { ownerId: Number(ownerId) },
     });
 
-    if (!restaurant) {
-      return res.status(404).json({ message: "Restaurant not found" });
+    if (!restaurants.length) {
+      return res.status(404).json({ message: "No restaurants found for this owner." });
     }
 
-    res.status(200).json(restaurant);
+    res.status(200).json(restaurants);
   } catch (error) {
-    console.error("Error fetching restaurant by owner ID:", error);
-    res
-      .status(500)
-      .json({ message: "An error occurred while fetching the restaurant" });
+    console.error("Error fetching restaurants by owner ID:", error);
+    res.status(500).json({ message: "Internal server error" });
   }
 };
