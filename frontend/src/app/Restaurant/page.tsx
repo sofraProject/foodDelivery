@@ -10,7 +10,7 @@ import image from "../../assets/preview.svg"; // Placeholder image
 
 const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
 
-interface Restaurant {
+export interface Restaurant {
   id: number;
   name: string;
   description: string | null;
@@ -20,7 +20,7 @@ interface Restaurant {
   menuItems: MenuItem[]; // Include menu items in restaurant interface
 }
 
-interface MenuItem {
+export interface MenuItem {
   id: number;
   name: string;
   price: number;
@@ -31,7 +31,7 @@ interface MenuItem {
   category: Category;
 }
 
-interface Category {
+export interface Category {
   id: number;
   name: string;
 }

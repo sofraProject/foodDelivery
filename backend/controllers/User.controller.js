@@ -208,20 +208,59 @@ exports.updateUserLocation = async (req, res) => {
   }
 };
 
-exports.updateUserProfilePicture = async (req, res) => {
+
+
+
+exports.getAllCustomers= async (req, res) => {
   try {
-      const userId = req.params.id;
-      const profilePicUrl = req.file.path; // Get the file path from Multer
-
-      // Update the user with the new profile picture URL
-      const updatedUser = await prismaConnection.user.update({
-          where: { id: Number(userId) },
-          data: { imageUrl: profilePicUrl }, // Assuming imagesUrl stores the profile picture
-      });
-
-      return res.status(200).json(updatedUser);
+    const customers = await prismaConnection.user.findMany({
+      where: { role: "CUSTOMER" }, // Ensure we fetch only customers
+    });
+    res.status(200).json(customers);
   } catch (error) {
-      console.error(error);
-      return res.status(500).json({ message: 'Error updating profile picture' });
+    console.error("Error fetching customers:", error);
+    res.status(500).json({ message: "Error fetching customers" });
   }
-};
+},
+
+// Create a new user (customer)
+exports.createUser = async (req, res) => {
+  const { name, email, password } = req.body;
+
+  if (!name || !email || !password) {
+    return res
+      .status(400)
+      .json({ error: "Name, email, and password are required." });
+  }
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = await prismaConnection.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        role: "CUSTOMER",  // Set role to CUSTOMER
+      },
+    });
+    res.status(201).json(newUser);
+  } catch (error) {
+    console.error("Error creating user:", error);
+    res.status(500).json({ error: "Failed to create user." });
+  }
+},
+
+// Delete a customer
+exports.deleteCustomer = async (req, res) => {
+  try {
+    const customerId = parseInt(req.params.id);
+    await prismaConnection.user.delete({
+      where: { id: customerId },
+    });
+    res.status(204).send();
+  } catch (error) {
+    console.error("Error deleting customer:", error);
+    res.status(500).json({ message: "Error deleting customer" });
+  }
+}
