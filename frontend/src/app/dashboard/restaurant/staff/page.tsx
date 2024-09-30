@@ -17,11 +17,11 @@ const DriverManagement = () => {
   useEffect(() => {
     const fetchDrivers = async () => {
       try {
-        const response = await axios.get(`${serverDomain}/api/drivers/`);
+        const response = await axios.get(`${serverDomain}/api/driver/`);
         setDrivers(response.data);
-        setLoading(false);
       } catch (error) {
         setError("Error fetching drivers.");
+      } finally {
         setLoading(false);
       }
     };
@@ -34,12 +34,13 @@ const DriverManagement = () => {
 
     setIsUpdating(true);
     try {
-      await axios.put(`${serverDomain}/api/drivers/location`, {
+      await axios.put(`${serverDomain}/api/driver/location`, {
         driverId: selectedDriver.id,
         lat,
         long,
       });
 
+      // Update the driver's location in local state
       setDrivers((prev) =>
         prev.map((driver) =>
           driver.id === selectedDriver.id
@@ -62,7 +63,7 @@ const DriverManagement = () => {
 
   const handleDeleteDriver = async (driverId) => {
     try {
-      await axios.delete(`${serverDomain}/api/drivers/${driverId}`);
+      await axios.delete(`${serverDomain}/api/driver/${driverId}`);
       setDrivers((prev) => prev.filter((driver) => driver.id !== driverId));
     } catch (error) {
       console.error("Error deleting driver", error);
@@ -107,22 +108,32 @@ const DriverManagement = () => {
             {drivers.map((driver) => (
               <div
                 key={driver.id}
-                className="flex items-center justify-between p-4 bg-white rounded-lg shadow-md cursor-pointer"
-                onClick={() => handleSelectDriver(driver)}
+                className="flex items-center justify-between p-4 bg-white rounded-lg shadow-md"
               >
-                <div className="flex-grow">
+                <div
+                  className="flex-grow cursor-pointer"
+                  onClick={() => handleSelectDriver(driver)}
+                >
                   <h3 className="text-lg font-semibold">{driver.name}</h3>
                   <p className="text-sm text-gray-500">ID: {driver.id}</p>
                 </div>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent the onClick of the parent div
-                    handleDeleteDriver(driver.id);
-                  }}
-                  className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700"
-                >
-                  Delete
-                </button>
+                <div className="flex space-x-2">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent the onClick of the parent div
+                      handleDeleteDriver(driver.id);
+                    }}
+                    className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700"
+                  >
+                    Delete
+                  </button>
+                  <button
+                    onClick={() => handleSelectDriver(driver)}
+                    className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+                  >
+                    Update
+                  </button>
+                </div>
               </div>
             ))}
           </div>
