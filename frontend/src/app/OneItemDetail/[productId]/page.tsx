@@ -9,7 +9,7 @@ import {
 } from "react-icons/ai";
 import { BsCart2 } from "react-icons/bs";
 import { useDispatch } from "react-redux";
-import Footer from "../../../components/HomePage/Footer/Footer";
+import Footer from "../../../components/HomePage/Footer";
 import { handleAddToCartHelper } from "../../../helpers/cartHelper"; // Assurez-vous que le chemin est correct
 import { AppDispatch } from "../../../redux/store";
 

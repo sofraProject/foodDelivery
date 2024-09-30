@@ -1,11 +1,9 @@
 const express = require("express");
-const router = express.Router();
-const DeliveryController = require("../controllers/Delivery.controller");
+const { getDeliveryStatus } = require("../controllers/Delivery.controller");
 
-router.post("/", DeliveryController.createDelivery);
-router.get("/", DeliveryController.getAllDeliveries);
-router.get("/:id", DeliveryController.getDeliveryById);
-router.put("/:id", DeliveryController.updateDelivery);
-router.delete("/:id", DeliveryController.deleteDelivery);
+const router = express.Router();
+
+// Route to get the delivery status by order ID
+router.get("/:orderId", getDeliveryStatus);
 
 module.exports = router;
