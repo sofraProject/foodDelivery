@@ -4,6 +4,7 @@ const OrderController = require("../controllers/Order.controller"); // Assurez-v
 
 // Créer une nouvelle commande
 router.post("/", OrderController.createOrder);
+<<<<<<< HEAD
 
 // Obtenir toutes les commandes (Admin seulement)
 router.get("/", OrderController.getAllOrders);
@@ -18,6 +19,12 @@ router.get("/:id", OrderController.getOrderById);
 router.put("/:id", OrderController.updateOrderStatus);
 
 // Supprimer une commande par ID
+=======
+router.get("/", OrderController.getAllOrders); // getAllOrders n'est pas défini dans votre contrôleur, assurez-vous qu'il est bien exporté
+router.get("/:id", OrderController.getOrderById);
+router.get("/byUser/:userId", OrderController.getOrdersByUserId);
+router.put("/:id", OrderController.updateOrder);
+>>>>>>> 321b63d3482b67f8b0c2a89e5cdd5fa1e0920f08
 router.delete("/:id", OrderController.deleteOrder);
 
 // Obtenir les données du tableau de bord de l'utilisateur

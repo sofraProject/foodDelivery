@@ -285,7 +285,7 @@ module.exports = {
               menuItem: true, // Include menu item details
             },
           },
-          delivery: {
+          deliveries: {
             include: {
               driver: { select: { name: true, email: true } },
             },

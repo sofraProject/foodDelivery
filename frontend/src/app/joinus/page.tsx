@@ -23,7 +23,8 @@ const AuthForm: React.FC = () => {
   // Additional state for sign up
   const [name, setName] = useState("");
   const [role, setRole] = useState("customer");
-  const [signupError, setSignupError] = useState<string | null>("null");
+  const [signupError, setSignupError] = useState<string | null>(null);
+
 
   // Reset errors when toggling between forms or when fields are modified
   useEffect(() => {
@@ -41,7 +42,7 @@ const AuthForm: React.FC = () => {
           role,
         })
       );
-      router.push("/signin");
+      router.push("/joinus");
     } catch (error) {
       console.error("Error signing up:", error);
       setSignupError("Sign up failed");
@@ -138,9 +139,9 @@ const AuthForm: React.FC = () => {
                   onChange={(e) => setRole(e.target.value)}
                   className="p-2 text-gray-900 border border-gray-300 rounded-md bg-gray-50 focus:ring-primary focus:border-primary"
                 >
-                  <option value="customer">Customer</option>
-                  <option value="restaurant_owner">Restaurant Owner</option>
-                  <option value="driver">Driver</option>
+                  <option value="CUSTOMER">Customer</option>
+                  <option value="RESTAURANT_OWNER">Restaurant Owner</option>
+                  <option value="DRIVER">Driver</option>
                 </select>
               </div>
               <Button text="Sign Up" className="mt-6" />
