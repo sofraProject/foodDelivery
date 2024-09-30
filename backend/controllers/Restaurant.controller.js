@@ -183,6 +183,7 @@ exports.getAllRestaurantswithCat = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+;
 
 
 // In Restaurant.controller.js

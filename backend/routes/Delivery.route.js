@@ -4,6 +4,6 @@ const { getDeliveryStatus } = require("../controllers/Delivery.controller");
 const router = express.Router();
 
 // Route to get the delivery status by order ID
-router.get("/:orderId", getDeliveryStatus);
+router.get("/status/:orderId", getDeliveryStatus);
 
 module.exports = router;

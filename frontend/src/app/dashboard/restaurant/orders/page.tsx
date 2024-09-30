@@ -75,6 +75,21 @@ const RestaurantOrdersPage = () => {
     }
   };
 
+  const handleCancelOrder = async (orderId: number) => {
+    try {
+      await axios.delete(`${serverDomain}/api/orders/${orderId}/cancel`); // Call the cancel endpoint
+
+      // Update local state to reflect the canceled order
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order.id === orderId ? { ...order, status: "CANCELED" } : order
+        )
+      );
+    } catch (error) {
+      console.error("Error canceling order", error);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -127,6 +142,14 @@ const RestaurantOrdersPage = () => {
                     className="px-4 py-2 ml-4 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
                   >
                     Make Ready
+                  </button>
+                )}
+                {(order.status === "PAID" || order.status === "CONFIRMED") && (
+                  <button
+                    onClick={() => handleCancelOrder(order.id)}
+                    className="px-4 py-2 ml-4 text-white bg-red-600 rounded-lg hover:bg-red-700"
+                  >
+                    Cancel Order
                   </button>
                 )}
               </div>
