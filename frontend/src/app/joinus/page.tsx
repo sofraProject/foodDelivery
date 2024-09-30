@@ -41,7 +41,7 @@ const AuthForm: React.FC = () => {
           role,
         })
       );
-      router.push("/signin");
+      router.push("/");
     } catch (error) {
       console.error("Error signing up:", error);
       setSignupError("Sign up failed");
