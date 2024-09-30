@@ -276,7 +276,7 @@ exports.updateProfilePicture = async (req, res) => {
       const updatedUser = await prismaConnection.user.update({
           where: { id: userId },
           data: {
-              imageUrl: req.file.path, // Adjust this according to your file handling logic
+              imageUrl: req.file.path, 
           },
       });
       res.json(updatedUser);
