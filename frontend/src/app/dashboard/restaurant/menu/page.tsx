@@ -1,47 +1,73 @@
 "use client";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { MenuItem, Category, Restaurant } from "@/app/Restaurant/page";
 
 const serverDomain =
   process.env.NEXT_PUBLIC_SERVER_DOMAINE || "http://localhost:3000"; // Provide a default value
 
 const MenuItemManagementPage = () => {
-  const [restaurants, setRestaurants] = useState<any[]>([]);
+  const [menuItems, setMenuItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [newMenuItem, setNewMenuItem] = useState({ name: "", description: "", price: "", categoryId: "", available: true });
+  const [editingMenuItem, setEditingMenuItem] = useState<any | null>(null);
 
   useEffect(() => {
-    const fetchRestaurants = async () => {
+    const fetchMenuItems = async () => {
       try {
-        const response = await axios.get(`${serverDomain}/api/restaurants/category`);
-        setRestaurants(response.data);
+        const response = await axios.get(`${serverDomain}/api/menu-items`);
+        setMenuItems(response.data);
         setLoading(false);
       } catch (error) {
-        setError("Error fetching data.");
+        setError("Error fetching menu items.");
         setLoading(false);
       }
     };
 
-    fetchRestaurants();
+    fetchMenuItems();
   }, []);
 
-  const [expandedRestaurantId, setExpandedRestaurantId] = useState<number | null>(null);
-  const [expandedCategoryId, setExpandedCategoryId] = useState<number | null>(null);
-
-  const toggleRestaurant = (id: number) => {
-    setExpandedRestaurantId(expandedRestaurantId === id ? null : id);
-    setExpandedCategoryId(null); // Reset category when changing restaurants
+  const handleAddMenuItem = async () => {
+    try {
+      const response = await axios.post(`${serverDomain}/api/menu-items`, newMenuItem);
+      setMenuItems([...menuItems, response.data]);
+      setNewMenuItem({ name: "", description: "", price: "", categoryId: "", available: true });
+    } catch (error) {
+      console.error("Error adding menu item", error);
+    }
   };
 
-  const toggleCategory = (categoryId: number) => {
-    setExpandedCategoryId(expandedCategoryId === categoryId ? null : categoryId);
+  const handleEditMenuItem = (menuItem: any) => {
+    setEditingMenuItem(menuItem);
+    setNewMenuItem({ name: menuItem.name, description: menuItem.description, price: menuItem.price, categoryId: menuItem.categoryId, available: menuItem.available });
+  };
+
+  const handleUpdateMenuItem = async () => {
+    if (!editingMenuItem) return;
+
+    try {
+      const response = await axios.put(`${serverDomain}/api/menu-items/${editingMenuItem.id}`, newMenuItem);
+      setMenuItems(menuItems.map(item => (item.id === editingMenuItem.id ? response.data : item)));
+      setNewMenuItem({ name: "", description: "", price: "", categoryId: "", available: true });
+      setEditingMenuItem(null);
+    } catch (error) {
+      console.error("Error updating menu item", error);
+    }
+  };
+
+  const handleDeleteMenuItem = async (menuItemId: number) => {
+    try {
+      await axios.delete(`${serverDomain}/api/menu-items/${menuItemId}`);
+      setMenuItems(menuItems.filter(item => item.id !== menuItemId));
+    } catch (error) {
+      console.error("Error deleting menu item", error);
+    }
   };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p className="text-lg font-semibold">Loading restaurants...</p>
+        <p className="text-lg font-semibold">Loading menu items...</p>
       </div>
     );
   }
@@ -58,45 +84,75 @@ const MenuItemManagementPage = () => {
     <div className="min-h-screen mt-20 bg-gray-100">
       <header className="w-full bg-white">
         <div className="flex justify-between px-6 py-8 mx-auto max-w-7xl">
-          <h1 className="text-5xl font-bold text-gray-900">Manage Restaurants</h1>
+          <h1 className="text-5xl font-bold text-gray-900">Manage Menu Items</h1>
         </div>
       </header>
 
       <main className="flex flex-col flex-grow mx-auto max-w-7xl">
         <section className="p-6">
-          <h2 className="mb-6 text-3xl font-bold">Restaurant List</h2>
+          <h2 className="mb-6 text-3xl font-bold">Menu Item List</h2>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {restaurants.map((restaurant) => (
-              <div key={restaurant.id} className="p-4 bg-white rounded-lg shadow-md">
-                <h3 className="text-lg font-semibold cursor-pointer" onClick={() => toggleRestaurant(restaurant.id)}>
-                  {restaurant.name}
-                </h3>
-                {expandedRestaurantId === restaurant.id && (
-                  <div className="mt-2">
-                    {restaurant.menuItems.length === 0 ? (
-                      <p className="text-sm text-gray-500">No categories available.</p>
-                    ) : (
-                      restaurant.menuItems.map((category) => (
-                        <div key={category.id}>
-                          <h4 className="mt-2 font-semibold cursor-pointer" onClick={() => toggleCategory(category.id)}>
-                            {category.name}
-                          </h4>
-                          {expandedCategoryId === category.id && (
-                            <div className="ml-4">
-                              {category.items.map((item) => (
-                                <div key={item.id} className="p-2 border-b border-gray-200">
-                                  <p className="text-sm">{item.name} - ${item.price}</p>
-                                  <p className="text-xs text-gray-500">{item.description}</p>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      ))
-                    )}
-                  </div>
-                )}
+          <div className="mb-6">
+            <h3 className="text-xl font-semibold">Add New Menu Item</h3>
+            <input
+              type="text"
+              placeholder="Name"
+              value={newMenuItem.name}
+              onChange={(e) => setNewMenuItem({ ...newMenuItem, name: e.target.value })}
+              className="block w-full p-2 mb-2 border rounded"
+            />
+            <input
+              type="text"
+              placeholder="Description"
+              value={newMenuItem.description}
+              onChange={(e) => setNewMenuItem({ ...newMenuItem, description: e.target.value })}
+              className="block w-full p-2 mb-2 border rounded"
+            />
+            <input
+              type="number"
+              placeholder="Price"
+              value={newMenuItem.price}
+              onChange={(e) => setNewMenuItem({ ...newMenuItem, price: e.target.value })}
+              className="block w-full p-2 mb-2 border rounded"
+            />
+            <input
+              type="text"
+              placeholder="Category ID"
+              value={newMenuItem.categoryId}
+              onChange={(e) => setNewMenuItem({ ...newMenuItem, categoryId: e.target.value })}
+              className="block w-full p-2 mb-2 border rounded"
+            />
+            <button
+              onClick={editingMenuItem ? handleUpdateMenuItem : handleAddMenuItem}
+              className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+            >
+              {editingMenuItem ? "Update Menu Item" : "Add Menu Item"}
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            {menuItems.map((item) => (
+              <div
+                key={item.id}
+                className="flex items-center p-4 bg-white rounded-lg shadow-md"
+              >
+                <div className="flex-grow">
+                  <h3 className="text-lg font-semibold">{item.name}</h3>
+                  <p className="text-sm text-gray-500">{item.description}</p>
+                  <p className="text-sm text-gray-500">Price: ${item.price}</p>
+                </div>
+                <button
+                  onClick={() => handleEditMenuItem(item)}
+                  className="px-4 py-2 text-white bg-green-600 rounded-lg hover:bg-green-700 mr-2"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDeleteMenuItem(item.id)}
+                  className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700"
+                >
+                  Delete
+                </button>
               </div>
             ))}
           </div>

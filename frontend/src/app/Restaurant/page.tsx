@@ -17,6 +17,7 @@ export interface Restaurant {
   ownerId: number;
   createdAt: string;
   updatedAt: string;
+  categories: Category[]
   menuItems: MenuItem[]; // Include menu items in restaurant interface
 }
 
@@ -34,6 +35,7 @@ export interface MenuItem {
 export interface Category {
   id: number;
   name: string;
+  items: MenuItem[];
 }
 
 const RestaurantsPage: React.FC = () => {

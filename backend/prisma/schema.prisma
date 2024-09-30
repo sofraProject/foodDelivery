@@ -154,7 +154,7 @@ model OrderItem {
   id         Int      @id @default(autoincrement())
   order      Order    @relation(fields: [orderId], references: [id])
   orderId    Int
-  menuItem   MenuItem @relation(fields: [menuItemId], references: [id])
+  menuItem   MenuItem @relation(fields: [menuItemId], references: [id], onDelete: Cascade)
   menuItemId Int
   quantity   Int
   price      Float

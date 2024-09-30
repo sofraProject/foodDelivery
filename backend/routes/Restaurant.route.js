@@ -26,4 +26,7 @@ router.get("/menu-items/:id", restaurantController.getMenuItemsByRestaurant);
 // Retrieve a specific restaurant by Name
 router.get("/name/:restaurantName", restaurantController.getRestaurantByName); // New Route
 
+router.get("/:id/categories", restaurantController.getCategoriesByRestaurantId);
+
+
 module.exports = router;
