@@ -13,7 +13,7 @@ const CustomerManagementPage = () => {
   useEffect(() => {
     const fetchCustomers = async () => {
       try {
-        const response = await axios.get(`${serverDomain}/api/customers/get`);
+        const response = await axios.get(`${serverDomain}/api/users/customers/get`);
         setCustomers(response.data);
         setLoading(false);
       } catch (error) {
@@ -27,7 +27,7 @@ const CustomerManagementPage = () => {
 
   const handleDeleteCustomer = async (customerId: number) => {
     try {
-      await axios.delete(`${serverDomain}/api/customers/${customerId}`);
+      await axios.delete(`${serverDomain}/api/users/customers/${customerId}`);
       setCustomers((prevCustomers) =>
         prevCustomers.filter((customer) => customer.id !== customerId)
       );

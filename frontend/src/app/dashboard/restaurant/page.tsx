@@ -9,6 +9,7 @@ import {
   AiOutlineCalendar,
   AiOutlineUsergroupAdd,
   AiOutlineStar,
+  AiOutlineUser,
 } from "react-icons/ai";
 
 const dashboardCards = [
@@ -61,6 +62,14 @@ const dashboardCards = [
     path: "/reviews",
     color: "text-orange-500",
   },
+  {
+    title: "Manage Customers",
+    description: "View and manage all customers.",
+    icon: AiOutlineUser,
+    path: "./restaurant/customers",
+    color: "text-orange-500",
+  },
+
 ];
 
 const Dashboard = () => {
