@@ -37,7 +37,7 @@ const dashboardCards = [
     title: "Manage Menu",
     description: "Edit and update the restaurant menu",
     icon: AiOutlineMenu,
-    path: "/menu",
+    path: "./restaurant/menu",
     color: "text-blue-500",
   },
   {
