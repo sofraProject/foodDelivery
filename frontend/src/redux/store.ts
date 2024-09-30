@@ -6,6 +6,7 @@ import createWebStorage from "redux-persist/lib/storage/createWebStorage";
 import usersReducer from "./features/authSlice";
 import cartReducer from "./features/cartSlice";
 import searchReducer from "./features/searchSlice";
+import orderReducer from './features/orderSlice'; 
 
 // Fallback to noopStorage when localStorage is not available
 const createNoopStorage = () => {
