@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { RootState, AppDispatch } from '@/redux/store';
 import { useDispatch } from 'react-redux';
-import { updateUser } from '../../redux/features/authSlice'; // Adjust the import as needed
+import { updateUser } from '../../redux/features/authSlice';
 import axios from 'axios';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -124,6 +124,7 @@ const UpdateProfile = () => {
                     <div>
                         <input
                             type="file"
+                            accept="image/*"
                             onChange={(e) => setProfilePicture(e.target.files?.[0] || null)}
                             className="mt-1 block w-full p-2 border border-gray-300 rounded-md"
                         />

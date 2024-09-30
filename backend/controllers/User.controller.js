@@ -264,3 +264,24 @@ exports.deleteCustomer = async (req, res) => {
     res.status(500).json({ message: "Error deleting customer" });
   }
 }
+exports.updateProfilePicture = async (req, res) => {
+  const userId = parseInt(req.params.id); // Ensure user ID is an integer
+
+  if (!req.file) {
+      return res.status(400).send("No file uploaded.");
+  }
+
+  try {
+      // Update the user profile with the new picture path
+      const updatedUser = await prismaConnection.user.update({
+          where: { id: userId },
+          data: {
+              imageUrl: req.file.path, // Adjust this according to your file handling logic
+          },
+      });
+      res.json(updatedUser);
+  } catch (error) {
+      console.error("Error updating profile picture:", error);
+      res.status(500).send("Error updating profile picture.");
+  }
+};
