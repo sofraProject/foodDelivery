@@ -1,11 +1,11 @@
 const express = require("express");
-const upload = require("../middleware/multer"); // Adjust path if necessary
 const userController = require("../controllers/User.controller");
+const upload = require("../middleware/multer")
 
 const router = express.Router();
 router.get("/", userController.getAllUsers);
 router.get("/:id", userController.getUserById);
-router.post("/", userController.createUser);
+router.post("/", upload.single("profilePicture"), userController.createUser); 
 router.put("/:id", userController.updateUser);
 router.get("/owner/restaurants", userController.getAllUsersRestaurant);
 router.post("/findNearby", userController.findNearbyRestaurants);

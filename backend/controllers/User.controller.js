@@ -1,4 +1,5 @@
 const { prismaConnection } = require("../prisma/prisma");
+const upload = require("../middleware/multer");
 const bcrypt = require("bcrypt");
 
 // Récupère tous les utilisateurs
@@ -32,8 +33,11 @@ exports.getUserById = async (req, res) => {
 
 // Crée un nouvel utilisateur
 exports.createUser = async (req, res) => {
-  const { name, email, password, imagesUrl, balance, location, role } =
-    req.body;
+  const { name, email, password, balance, location, role } = req.body;
+  
+  // Access the uploaded file
+  const profilePicturePath = req.file ? req.file.path : null; // Get the path of the uploaded file
+
 
   if (!name || !email || !password) {
     return res
@@ -44,17 +48,19 @@ exports.createUser = async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
+
     const newUser = await prismaConnection.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
-        imagesUrl,
+        imagesUrl: profilePicturePath, // Store the profile picture path
         balance,
         location,
         role,
       },
     });
+
     res.status(201).json(newUser);
   } catch (error) {
     console.error("Error creating user:", error);
