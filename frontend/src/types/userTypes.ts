@@ -35,4 +35,5 @@ export interface SignUpCredentials {
   email: string;
   password: string;
   role: string;
+  profilePicture: string | null; // Allow null as a valid value
 }

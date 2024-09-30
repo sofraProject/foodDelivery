@@ -184,6 +184,22 @@ exports.getAllRestaurantswithCat = async (req, res) => {
   }
 };
 
+
+// In Restaurant.controller.js
+exports.getCategoriesByRestaurantId = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const categories = await prismaConnection.category.findMany({
+      where: { restaurantId: Number(id) },
+      include: { menuItems: true }, // Ensure this includes the items
+    });
+    res.status(200).json(categories);
+  } catch (error) {
+    console.error("Error fetching categories:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 // Retrieve a restaurant by owner ID
 exports.getRestaurantByOwnerId = async (req, res) => {
   try {

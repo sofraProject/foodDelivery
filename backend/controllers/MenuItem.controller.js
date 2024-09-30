@@ -235,10 +235,15 @@ exports.getUnavailableMenuItemsByUser = async (req, res) => {
 
 // Récupère les éléments de menu par restaurant
 exports.getMenuItemsByRestaurant = async (req, res) => {
-  const { id } = req.params; // ID du restaurant
+  const { id } = req.params;
+
   try {
     const menuItems = await prismaConnection.menuItem.findMany({
-      where: { restaurantId: parseInt(id) }, // Assurez-vous que restaurantId est un champ dans votre modèle MenuItem
+      where: { restaurantId: parseInt(id) },
+      include: {
+        category: true, // Include the category for each menu item
+        restaurant: true, // Include the restaurant for each menu item
+      },
     });
 
     if (!menuItems.length) {
