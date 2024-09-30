@@ -14,7 +14,7 @@ module.exports = {
   signUp: async (req, res) => {
     try {
       const { email, password, role, name, location } = req.body;
-
+      console.log("Request body:", req.body);
       // Validation des champs requis
       if (!email || !password || !role || !name) {
         return res
@@ -45,13 +45,13 @@ module.exports = {
           password: hashedPassword,
           role,
           name,
-          locations: {
-            create: {
-              lat: location.lat,
-              long: location.lng,
-              locationName: location.name,
-            },
-          }, // Gère la relation avec l'entité Location
+          // locations: {
+          //   create: {
+          //     lat: location.lat,
+          //     long: location.lng,
+          //     locationName: location.name,
+          //   },
+          // }, // Gère la relation avec l'entité Location
         },
       });
 
