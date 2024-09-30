@@ -280,19 +280,19 @@ module.exports = {
     try {
       const orders = await prismaConnection.order.findMany({
         include: {
-          orderItems: {
-            include: {
-              menuItem: true, // Include menu item details
+            orderItems: {
+                include: {
+                    menuItem: true
+                }
             },
-          },
-          deliveries: {
-            include: {
-              driver: { select: { name: true, email: true } },
-            },
-          },
-          payments: true,
-        },
-      });
+            payments: true,
+            customer: true,   // Assuming these exist in your model
+            restaurant: true,  // Assuming these exist in your model
+            driver: true,      // Assuming these exist in your model
+            notifications: true // Assuming these exist in your model
+        }
+    });
+    
 
       res.status(200).json(orders);
     } catch (error) {
@@ -482,6 +482,35 @@ module.exports = {
     } catch (error) {
       console.error("Error fetching confirmed orders:", error);
       res.status(500).json({ message: "Error fetching confirmed orders" });
+    }
+  },
+  getOrdersByUserId: async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      
+      // Fetch orders for the given userId
+      const orders = await prismaConnection.order.findMany({
+        where: { customerId: userId }, // Adjust this based on your schema
+        include: {
+          orderItems: {
+            include: {
+              menuItem: true,
+            },
+          },
+          payments: true,
+          restaurant: true,
+          // Include any other necessary relations
+        },
+      });
+  
+      if (!orders.length) {
+        return res.status(404).json({ message: "No orders found for this user" });
+      }
+  
+      res.status(200).json(orders);
+    } catch (error) {
+      console.error("Error fetching orders by user ID:", error);
+      res.status(500).json({ message: "Error fetching orders", error: error.message });
     }
   },
 };

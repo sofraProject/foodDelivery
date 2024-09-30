@@ -15,7 +15,7 @@ router.get("/status/confirmed", OrderController.getConfirmedOrders);
 router.get("/:id", OrderController.getOrderById);
 
 // Get orders by user ID
-// router.get("/byUser/:userId", OrderController.getOrdersByUserId);
+router.get("/byUser/:userId", OrderController.getOrdersByUserId);
 
 // Update an order status by ID (may include status update)
 router.put("/:id", OrderController.updateOrderStatus);
