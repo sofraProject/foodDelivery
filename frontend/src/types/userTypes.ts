@@ -20,20 +20,18 @@ export interface LoginCredentials {
   password: string;
 }
 
-
-
-// export interface UserResponse {
-//   id: string;
-//   name: string;
-//   email: string;
-//   role: string;
-//   imageUrl?: string; // Assuming this exists in your response
-// }
+export interface UserResponse {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  imageUrl?: string; // Assuming this exists in your response
+}
 
 export interface SignUpCredentials {
   name: string;
   email: string;
   password: string;
   role: string;
-  imageUrl: string | null; // Allow null as a valid value
+  imageUrl: string | null;
 }

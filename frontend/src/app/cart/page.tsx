@@ -151,8 +151,42 @@ const Cart: React.FC = () => {
 
   if (!cartItems.length) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <h1 className="text-4xl font-bold text-primary">Your cart is empty!</h1>
+      <div className="min-h-screen pb-20 mt-24 bg-gray-100">
+        <header className="w-full bg-white">
+          <div className="flex justify-between px-6 py-8 mx-auto max-w-7xl">
+            <div>
+              <button
+                onClick={() => router.back()}
+                className="inline-flex items-center px-4 py-1 mb-4 rounded-lg bg-primary text-dark hover:text-primary hover:bg-dark"
+              >
+                <AiOutlineArrowLeft className="w-5 h-5 mr-2" />
+                Back
+              </button>
+
+              <h1 className="text-5xl font-bold text-gray-900">Your Cart</h1>
+              <p className="text-xl text-gray-500">
+                You haven't added any items yet.
+              </p>
+            </div>
+          </div>
+        </header>
+
+        <main className="flex flex-col items-center justify-center flex-grow mx-auto mt-6 max-w-7xl">
+          <div className="w-full p-6 bg-white border border-gray-200 rounded-lg shadow-md">
+            <h2 className="mb-4 text-3xl font-semibold text-gray-800">
+              Your cart is empty!
+            </h2>
+            <p className="mb-6 text-lg text-gray-500">
+              It looks like you haven't added anything to your cart yet.
+            </p>
+            <button
+              onClick={() => router.push("/Restaurant")}
+              className="px-6 py-2 text-lg font-semibold rounded-lg text-DARK bg-primary hover:bg-accent"
+            >
+              Browse Products
+            </button>
+          </div>
+        </main>
       </div>
     );
   }
