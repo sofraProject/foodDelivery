@@ -2,13 +2,15 @@
 
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation"; // Use this for accessing params in Next.js
+import { useParams } from "next/navigation"; // For accessing URL parameters
 
+// Server domain for API requests
 const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE || "http://localhost:3000";
 
 const MenuItemManagementPage = () => {
-  const { restaurantId } = useParams(); // Accessing restaurantId from params
+  const { restaurantId } = useParams(); // Accessing restaurantId from URL parameters
 
+  // State variables
   const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -17,6 +19,7 @@ const MenuItemManagementPage = () => {
   const [successMessage, setSuccessMessage] = useState(null);
   const [updateError, setUpdateError] = useState(null);
 
+  // Fetch menu items when component mounts or restaurantId changes
   useEffect(() => {
     const fetchMenuItems = async () => {
       // Validate restaurantId
@@ -28,7 +31,7 @@ const MenuItemManagementPage = () => {
 
       try {
         const response = await axios.get(`${serverDomain}/api/menu-items/restaurant/${restaurantId}`);
-        setMenuItems(response.data);
+        setMenuItems(response.data); // Set fetched menu items to state
       } catch (err) {
         setError(err.response ? err.response.data : "Error fetching menu items.");
       } finally {
@@ -39,12 +42,13 @@ const MenuItemManagementPage = () => {
     fetchMenuItems();
   }, [restaurantId]);
 
+  // Handle adding a new menu item
   const handleAddMenuItem = async (e) => {
     e.preventDefault();
     try {
       const response = await axios.post(`${serverDomain}/api/menu-items`, { ...newMenuItem, restaurantId });
-      setMenuItems([...menuItems, response.data]);
-      setNewMenuItem({ name: "", description: "", price: "", categoryId: "", available: true });
+      setMenuItems([...menuItems, response.data]); // Update state with new menu item
+      setNewMenuItem({ name: "", description: "", price: "", categoryId: "", available: true }); // Reset input fields
       setSuccessMessage("Menu item added successfully!");
       setUpdateError(null);
     } catch (err) {
@@ -53,20 +57,22 @@ const MenuItemManagementPage = () => {
     }
   };
 
+  // Prepare to edit a menu item
   const handleEditMenuItem = (menuItem) => {
     setEditingMenuItem(menuItem);
     setNewMenuItem({ name: menuItem.name, description: menuItem.description, price: menuItem.price, categoryId: menuItem.categoryId, available: menuItem.available });
   };
 
+  // Handle updating an existing menu item
   const handleUpdateMenuItem = async (e) => {
     e.preventDefault();
     if (!editingMenuItem) return;
 
     try {
       const response = await axios.put(`${serverDomain}/api/menu-items/${editingMenuItem.id}`, { ...newMenuItem, restaurantId });
-      setMenuItems(menuItems.map(item => (item.id === editingMenuItem.id ? response.data : item)));
-      setNewMenuItem({ name: "", description: "", price: "", categoryId: "", available: true });
-      setEditingMenuItem(null);
+      setMenuItems(menuItems.map(item => (item.id === editingMenuItem.id ? response.data : item))); // Update state with edited item
+      setNewMenuItem({ name: "", description: "", price: "", categoryId: "", available: true }); // Reset input fields
+      setEditingMenuItem(null); // Clear editing state
       setSuccessMessage("Menu item updated successfully!");
       setUpdateError(null);
     } catch (err) {
@@ -75,10 +81,11 @@ const MenuItemManagementPage = () => {
     }
   };
 
+  // Handle deleting a menu item
   const handleDeleteMenuItem = async (menuItemId) => {
     try {
       await axios.delete(`${serverDomain}/api/menu-items/${menuItemId}`);
-      setMenuItems(menuItems.filter(item => item.id !== menuItemId));
+      setMenuItems(menuItems.filter(item => item.id !== menuItemId)); // Remove deleted item from state
       setSuccessMessage("Menu item deleted successfully!");
     } catch (err) {
       setUpdateError("Error deleting menu item. Please try again.");
@@ -86,6 +93,7 @@ const MenuItemManagementPage = () => {
     }
   };
 
+  // Loading state
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -94,6 +102,7 @@ const MenuItemManagementPage = () => {
     );
   }
 
+  // Error state
   if (error) {
     return (
       <div className="flex items-center justify-center h-screen">
