@@ -67,7 +67,6 @@ module.exports = {
         // Calcul du montant total
         totalAmount += menuItem.price * item.quantity;
       }
-
       console.log(`Total amount calculated: ${totalAmount}`);
 
       // Mise à jour du prix total de la commande
@@ -114,7 +113,6 @@ module.exports = {
         });
         console.log(`Notification sent to user ${customerId}`);
       }
-
       // Répondre avec la commande créée et le paiement
       return res.status(201).json({
         message: "Order created successfully",

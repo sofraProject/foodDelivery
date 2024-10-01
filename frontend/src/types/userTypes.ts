@@ -5,7 +5,7 @@ export interface User {
   name?: string;
   email?: string;
   password?: string; // Si vous n'en avez pas besoin côté client, laissez-le optionnel
-  imagesUrl?: string;
+  imageUrl?: string;
   balance?: number;
   location?: { type: string; coordinates: number[] }; // Assurez-vous que cela correspond à votre structure de données
   role?: string; // Ex : "customer", "restaurant_owner", "driver"
@@ -35,5 +35,5 @@ export interface SignUpCredentials {
   email: string;
   password: string;
   role: string;
-  profilePicture: string | null; // Allow null as a valid value
+  imageUrl: string | null; // Allow null as a valid value
 }

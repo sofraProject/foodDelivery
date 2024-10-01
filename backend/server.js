@@ -6,6 +6,7 @@ const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const http = require("http");
 require("dotenv").config();
+const bodyParser = require("body-parser");
 
 // Import routes
 const orderRoutes = require("./routes/Order.route");
@@ -19,6 +20,7 @@ const cartRoutes = require("./routes/cart.route");
 const categoryRoutes = require("./routes/category.route");
 const restaurantRoutes = require("./routes/Restaurant.route");
 const LocationRoutes = require("./routes/Location.route");
+const adminRoutes = require("./routes/admin.route");
 
 // Import utility functions
 const { connectToDatabase } = require("./prisma/prisma");
@@ -35,6 +37,9 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("dev"));
 app.use("/uploads", express.static("uploads"));
+helmet({
+  crossOriginResourcePolicy: false,
+});
 
 // Define API routes
 app.use("/api/orders", orderRoutes);
@@ -48,6 +53,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/carts", cartRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/locations", LocationRoutes);
+app.use("/api/admin", adminRoutes);
 
 // Create HTTP server
 const server = http.createServer(app);

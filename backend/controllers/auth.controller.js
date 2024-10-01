@@ -1,4 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
+const { prismaConnection } = require("../prisma/prisma");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
@@ -13,8 +14,9 @@ module.exports = {
   // Contrôleur pour l'inscription d'un utilisateur
   signUp: async (req, res) => {
     try {
-      const { email, password, role, name, location } = req.body;
-
+      const { email, password, role, name } = req.body;
+      console.log("Request body:", req.body);
+      // Validation des champs requis
       if (!email || !password || !role || !name) {
         return res
           .status(400)
@@ -37,8 +39,11 @@ module.exports = {
         return res.status(400).json({ message: "Invalid role specified." });
       }
 
+      const domain = process.env.DOMAIN || "http://localhost:3100/uploads/";
+      const profilePicture = req.file ? `${domain}${req.file.filename}` : null;
+
       // Création d'un nouvel utilisateur
-      const newUser = await prisma.user.create({
+      const newUser = await prismaConnection.user.create({
         data: {
           email,
           password: hashedPassword,
@@ -52,13 +57,16 @@ module.exports = {
           //   },
           // }, // Gère la relation avec l'entité Location
           imagesUrl: req.file ? req.file.path : null, // Add image upload handling
+          imageUrl: profilePicture,
         },
       });
+      console.log("User created:", newUser);
 
       // Génération du token JWT
       const token = jwt.sign(
         { id: newUser.id, role: newUser.role },
         process.env.JWT_SECRET,
+        { expiresIn: process.env.JWT_EXPIRES_IN || "1h" },
         { expiresIn: process.env.JWT_EXPIRES_IN || "1h" }
       );
 
