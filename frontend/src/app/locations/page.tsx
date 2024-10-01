@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useAuth } from '../../hooks/useAuth';
 
+// Interface to define the structure of a location object
 interface Location {
   id: number;
   locationName?: string;
@@ -24,6 +25,7 @@ const MyLocations: React.FC = () => {
   const [newLong, setNewLong] = useState<number | undefined>();
   const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
 
+  // Fetch user locations when the component mounts or user changes
   useEffect(() => {
     const fetchLocations = async () => {
       if (!user) {
@@ -46,6 +48,7 @@ const MyLocations: React.FC = () => {
     fetchLocations();
   }, [user, serverDomain]);
 
+  // Handle adding a new location
   const handleAddLocation = async () => {
     try {
       const newLocation = {
@@ -57,6 +60,7 @@ const MyLocations: React.FC = () => {
       const response = await axios.post(`${serverDomain}/api/locations`, newLocation);
       setLocations([...locations, response.data]);
       setShowModal(false);
+      // Reset input fields
       setNewLocationName("");
       setNewLat(undefined);
       setNewLong(undefined);
@@ -66,6 +70,7 @@ const MyLocations: React.FC = () => {
     }
   };
 
+  // Handle deleting a location
   const handleDeleteLocation = async () => {
     if (deleteLocationId === null) return;
 
@@ -118,6 +123,7 @@ const MyLocations: React.FC = () => {
         <p className="text-center">No locations found.</p>
       )}
 
+      {/* Modal for adding a new location */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-800 bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg">
@@ -159,6 +165,7 @@ const MyLocations: React.FC = () => {
         </div>
       )}
 
+      {/* Modal for confirming deletion */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-800 bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg">

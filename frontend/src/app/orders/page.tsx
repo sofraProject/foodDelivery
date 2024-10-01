@@ -12,11 +12,12 @@ const Orders: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
 
+  // Fetch orders when the component mounts or authentication status changes
   useEffect(() => {
     const fetchOrders = async () => {
       if (!isAuthenticated || !user) {
         setLoading(false);
-        return;
+        return; // Exit if not authenticated
       }
 
       const url = `${serverDomain}/api/orders/byUser/${user.id}`;
@@ -24,7 +25,7 @@ const Orders: React.FC = () => {
       try {
         const response = await axios.get(url);
         console.log("API Response:", response.data);
-        setOrders(response.data);
+        setOrders(response.data); // Set fetched orders to state
       } catch (err: any) {
         console.error("Error fetching orders:", err);
         setError(err.response ? err.response.data.message : "Failed to fetch orders");
@@ -36,16 +37,18 @@ const Orders: React.FC = () => {
     fetchOrders();
   }, [isAuthenticated, user, serverDomain]);
 
+  // Handle order cancellation
   const handleCancelOrder = async (orderId: number) => {
     try {
-      await axios.delete(`${serverDomain}/api/orders/${orderId}`); // DELETE request to API
-      setOrders(orders.filter(order => order.id !== orderId)); // Update state to remove the order
+      await axios.delete(`${serverDomain}/api/orders/${orderId}`); // DELETE request to cancel order
+      setOrders(orders.filter(order => order.id !== orderId)); // Update state to remove canceled order
     } catch (err) {
       console.error("Error cancelling order:", err);
       setError("Failed to cancel order");
     }
   };
 
+  // Loading and error states
   if (loading) return <div className="text-center text-xl">Loading...</div>;
   if (error) return <div className="text-red-600 text-center text-lg">{error}</div>;
 
