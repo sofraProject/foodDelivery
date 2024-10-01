@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const restaurantController = require("../controllers/Restaurant.controller");
+const upload = require("../middleware/multer")
 
 // Create a new restaurant
 router.post("/", restaurantController.createRestaurant);
@@ -15,7 +16,7 @@ router.get("/", restaurantController.getAllRestaurants);
 router.get("/:id", restaurantController.getRestaurantById);
 
 // Update a restaurant by ID
-router.put("/:id", restaurantController.updateRestaurant);
+router.put("/:id", upload.single('image'), restaurantController.updateRestaurant);
 
 // Delete a restaurant by ID
 router.delete("/:id", restaurantController.deleteRestaurant);
@@ -31,5 +32,7 @@ router.get("/owner/:ownerId", restaurantController.getRestaurantByOwnerId); // N
 
 router.get("/:id/categories", restaurantController.getCategoriesByRestaurantId);
 
+
+// New route for updating profile picture
 
 module.exports = router;

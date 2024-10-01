@@ -14,8 +14,9 @@ const RestaurantManagementPage = () => {
   const [error, setError] = useState(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [imageUrl, setImageUrl] = useState(""); // State for image URL
+  const [imageFile, setImageFile] = useState(null); // State for image file
   const [updateError, setUpdateError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
 
   useEffect(() => {
     const fetchRestaurant = async () => {
@@ -32,7 +33,6 @@ const RestaurantManagementPage = () => {
           setRestaurant(response.data);
           setName(response.data.name);
           setDescription(response.data.description);
-          setImageUrl(response.data.imageUrl); // Set initial image URL
         } else {
           throw new Error("Restaurant not found.");
         }
@@ -46,16 +46,25 @@ const RestaurantManagementPage = () => {
     fetchRestaurant();
   }, [ownerId]);
 
-  const handleUpdateRestaurant = async () => {
+  const handleUpdateRestaurant = async (e) => {
+    e.preventDefault(); // Prevent default form submission
     if (!restaurant) return;
 
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('description', description);
+    if (imageFile) {
+      formData.append('image', imageFile); // Append the image file if it exists
+    }
+
     try {
-      await axios.put(`${serverDomain}/api/restaurants/${ownerId}`, {
-        name,
-        description,
-        imageUrl: `${serverDomain}/api/restaurants/image/${ownerId}`, // Construct image URL using ownerId
+      const response = await axios.put(`${serverDomain}/api/restaurants/${ownerId}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
       });
-      setRestaurant({ ...restaurant, name, description, imageUrl });
+      setRestaurant({ ...restaurant, name, description, imageUrl: response.data.restaurant.imageUrl });
+      setSuccessMessage("Restaurant updated successfully!");
       setUpdateError(null);
     } catch (err) {
       setUpdateError("Error updating restaurant. Please try again.");
@@ -93,34 +102,36 @@ const RestaurantManagementPage = () => {
             <>
               <h2 className="mb-6 text-3xl font-bold">{restaurant.name}</h2>
               {updateError && <p className="text-red-500">{updateError}</p>}
-              <input
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                placeholder="Restaurant Name"
-                className="mt-2 p-2 border rounded w-full"
-              />
-              <textarea
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder="Restaurant Description"
-                className="mt-2 p-2 border rounded w-full"
-              />
-              <input
-                type="text"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)} // Handle image URL changes
-                placeholder="Image URL"
-                className="mt-2 p-2 border rounded w-full"
-              />
-              <div className="flex justify-end mt-4">
-                <button
-                  onClick={handleUpdateRestaurant}
-                  className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
-                >
-                  Update
-                </button>
-              </div>
+              {successMessage && <p className="text-green-500">{successMessage}</p>}
+              <form onSubmit={handleUpdateRestaurant}>
+                <input
+                  type="text"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  placeholder="Restaurant Name"
+                  className="mt-2 p-2 border rounded w-full"
+                />
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Restaurant Description"
+                  className="mt-2 p-2 border rounded w-full"
+                />
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+                  className="mt-2 p-2 border rounded w-full"
+                />
+                <div className="flex justify-end mt-4">
+                  <button
+                    type="submit"
+                    className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+                  >
+                    Update
+                  </button>
+                </div>
+              </form>
             </>
           ) : (
             <p>No restaurant found.</p>

@@ -77,22 +77,21 @@ exports.getRestaurantById = async (req, res) => {
 // Update a restaurant
 exports.updateRestaurant = async (req, res) => {
   const { id } = req.params;
-  const { name, description, imageUrl, ownerId } = req.body;
+  const { name, description, ownerId } = req.body;
+  const imageUrl = req.file ? req.file.path : undefined; // Get the image URL from the uploaded file
 
   try {
-    const restaurant = await prismaConnection.restaurant.update({
+    const updatedRestaurant = await prismaConnection.restaurant.update({
       where: { id: parseInt(id) },
       data: {
         name,
         description,
-        imageUrl,
+        imageUrl, // Only update imageUrl if it exists
         ownerId,
       },
     });
 
-    res
-      .status(200)
-      .json({ message: "Restaurant updated successfully", restaurant });
+    res.status(200).json({ message: "Restaurant updated successfully", restaurant: updatedRestaurant });
   } catch (error) {
     if (error.code === "P2025") {
       res.status(404).json({ message: "Restaurant not found" });
