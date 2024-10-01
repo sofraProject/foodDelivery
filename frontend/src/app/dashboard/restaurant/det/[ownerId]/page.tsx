@@ -1,4 +1,3 @@
-// src/app/dashboard/restaurant/[ownerId]/page.tsx
 "use client";
 
 import axios from "axios";
@@ -20,18 +19,23 @@ const RestaurantManagementPage = ({ params }) => {
     const fetchRestaurant = async () => {
       if (!ownerId) {
         console.error("Owner ID is not defined.");
+        setError("Owner ID is not defined.");
         setLoading(false);
         return;
       }
 
       try {
         const response = await axios.get(`${serverDomain}/api/restaurants/${ownerId}`);
-        setRestaurant(response.data);
-        setName(response.data.name);
-        setDescription(response.data.description);
-        setLoading(false);
+        if (response.status === 200) {
+          setRestaurant(response.data);
+          setName(response.data.name);
+          setDescription(response.data.description);
+        } else {
+          throw new Error("Restaurant not found.");
+        }
       } catch (err) {
-        setError("Error fetching restaurant.");
+        setError(err.response ? err.response.data : "Error fetching restaurant.");
+      } finally {
         setLoading(false);
       }
     };
