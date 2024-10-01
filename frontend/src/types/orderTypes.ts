@@ -42,4 +42,9 @@ export interface Order {
     updatedAt: Date; // Timestamp when the order was last updated
     restaurant: Restaurant[]
 }
+export interface OrderState {
+    orders: Order[];
+    loading: boolean;
+    error: string | null;
+  }
 
