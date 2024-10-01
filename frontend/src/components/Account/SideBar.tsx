@@ -7,11 +7,35 @@ interface SidebarProps {
 
 const Sidebar: React.FC<SidebarProps> = ({ onSelect }) => {
     return (
-        <div style={{ width: '200px', height: '100vh', padding: '20px', borderRight: '1px solid #ccc', boxSizing: 'border-box' }}>
-            <h2 style={{ marginTop: '100px', cursor: 'pointer' }} onClick={() => onSelect('profile')}>Your Profile</h2>
-            <h2 style={{ marginTop: '20px', cursor: 'pointer' }} onClick={() => onSelect('update')}>Update Profile</h2>
+        <div style={{ display: 'flex' }}>
+            <div style={{ 
+                width: '200px', 
+                padding: '20px', 
+                backgroundColor: '#101827', // Dark background
+                borderRight: '1px solid #ccc', 
+                boxSizing: 'border-box', 
+                marginTop: '105px', // Align with the "Your Profile" heading
+                height: '745px'
+            }}>
+                <h2 style={{ 
+                    cursor: 'pointer', 
+                    color: '#BFF38A' // Glovo yellow for accent
+                }} onClick={() => onSelect('profile')}>
+                    Your Profile
+                </h2>
+                <h2 style={{ 
+                    marginTop: '20px', 
+                    cursor: 'pointer', 
+                    color: '#BFF38A' // Glovo yellow for accent
+                }} onClick={() => onSelect('update')}>
+                    Update Profile
+                </h2>
+            </div>
+            
         </div>
     );
+    
+    
 };
 
 export default Sidebar;
