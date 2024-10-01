@@ -34,10 +34,9 @@ exports.getUserById = async (req, res) => {
 // Crée un nouvel utilisateur
 exports.createUser = async (req, res) => {
   const { name, email, password, balance, location, role } = req.body;
-  
+
   // Access the uploaded file
   const profilePicturePath = req.file ? req.file.path : null; // Get the path of the uploaded file
-
 
   if (!name || !email || !password) {
     return res
@@ -48,15 +47,12 @@ exports.createUser = async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
 
-
     const newUser = await prismaConnection.user.create({
       data: {
         name,
         email,
         password: hashedPassword,
         imagesUrl: profilePicturePath, // Store the profile picture path
-        balance,
-        location,
         role,
       },
     });
@@ -214,10 +210,7 @@ exports.updateUserLocation = async (req, res) => {
   }
 };
 
-
-
-
-exports.getAllCustomers= async (req, res) => {
+(exports.getAllCustomers = async (req, res) => {
   try {
     const customers = await prismaConnection.user.findMany({
       where: { role: "CUSTOMER" }, // Ensure we fetch only customers
@@ -227,35 +220,47 @@ exports.getAllCustomers= async (req, res) => {
     console.error("Error fetching customers:", error);
     res.status(500).json({ message: "Error fetching customers" });
   }
-},
+}),
+  // Create a new user (customer)
+  (exports.createUser = async (req, res) => {
+    const { name, email, password } = req.body;
 
-// Create a new user (customer)
-exports.createUser = async (req, res) => {
-  const { name, email, password } = req.body;
+    if (!name || !email || !password) {
+      return res
+        .status(400)
+        .json({ error: "Name, email, and password are required." });
+    }
 
-  if (!name || !email || !password) {
-    return res
-      .status(400)
-      .json({ error: "Name, email, and password are required." });
-  }
+    try {
+      const hashedPassword = await bcrypt.hash(password, 10);
 
-  try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const newUser = await prismaConnection.user.create({
-      data: {
-        name,
-        email,
-        password: hashedPassword,
-        role: "CUSTOMER",  // Set role to CUSTOMER
-      },
-    });
-    res.status(201).json(newUser);
-  } catch (error) {
-    console.error("Error creating user:", error);
-    res.status(500).json({ error: "Failed to create user." });
-  }
-},
+      const newUser = await prismaConnection.user.create({
+        data: {
+          name,
+          email,
+          password: hashedPassword,
+          role: "CUSTOMER", // Set role to CUSTOMER
+        },
+      });
+      res.status(201).json(newUser);
+    } catch (error) {
+      console.error("Error creating user:", error);
+      res.status(500).json({ error: "Failed to create user." });
+    }
+  }),
+  // Delete a customer
+  (exports.deleteCustomer = async (req, res) => {
+    try {
+      const customerId = parseInt(req.params.id);
+      await prismaConnection.user.delete({
+        where: { id: customerId },
+      });
+      res.status(204).send();
+    } catch (error) {
+      console.error("Error deleting customer:", error);
+      res.status(500).json({ message: "Error deleting customer" });
+    }
+  });
 
 // Delete a customer
 exports.deleteCustomer = async (req, res) => {
@@ -269,25 +274,26 @@ exports.deleteCustomer = async (req, res) => {
     console.error("Error deleting customer:", error);
     res.status(500).json({ message: "Error deleting customer" });
   }
-}
+};
+
 exports.updateProfilePicture = async (req, res) => {
   const userId = parseInt(req.params.id); // Ensure user ID is an integer
 
   if (!req.file) {
-      return res.status(400).send("No file uploaded.");
+    return res.status(400).send("No file uploaded.");
   }
 
   try {
-      // Update the user profile with the new picture path
-      const updatedUser = await prismaConnection.user.update({
-          where: { id: userId },
-          data: {
-              imageUrl: req.file.path, 
-          },
-      });
-      res.json(updatedUser);
+    // Update the user profile with the new picture path
+    const updatedUser = await prismaConnection.user.update({
+      where: { id: userId },
+      data: {
+        imageUrl: req.file.path,
+      },
+    });
+    res.json(updatedUser);
   } catch (error) {
-      console.error("Error updating profile picture:", error);
-      res.status(500).send("Error updating profile picture.");
+    console.error("Error updating profile picture:", error);
+    res.status(500).send("Error updating profile picture.");
   }
 };

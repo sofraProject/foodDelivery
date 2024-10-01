@@ -6,7 +6,7 @@ import createWebStorage from "redux-persist/lib/storage/createWebStorage";
 import usersReducer from "./features/authSlice";
 import cartReducer from "./features/cartSlice";
 import searchReducer from "./features/searchSlice";
-import orderReducer from './features/orderSlice'; 
+import ordersReducer from './features/orderSlice'; 
 
 // Fallback to noopStorage when localStorage is not available
 const createNoopStorage = () => {
@@ -30,7 +30,7 @@ const rootReducer = combineReducers({
   users: usersReducer,
   cart: cartReducer,
   search: searchReducer,
-  // restaurants: restaurantReducer,
+  orders: ordersReducer,
 });
 
 // redux-persist configuration

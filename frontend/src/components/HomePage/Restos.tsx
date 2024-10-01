@@ -83,7 +83,7 @@ const Foods: React.FC = () => {
   // Fetch restaurants
   const fetchRestaurants = async () => {
     try {
-      const response = await axios.get(`${serverDomain}/api/restaurants`);
+      const response = await axios.get(`${serverDomain}/api/restaurant`);
       setRestaurants(response.data);
     } catch (error) {
       console.error("Error fetching restaurants:", error);

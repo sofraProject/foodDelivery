@@ -140,7 +140,7 @@ const Navbar: React.FC = () => {
     const roleLinks: { [key: string]: string } = {
       DRIVER: "/dashboard/driver",
       RESTAURANT_OWNER: "/dashboard/restaurant",
-      ADMIN: "/admin",
+      ADMIN: "/dashboard/admin",
     };
 
     return roleLinks[userData.role] ? (

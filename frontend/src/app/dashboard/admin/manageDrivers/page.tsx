@@ -1,38 +1,35 @@
 "use client";
+
 import axios from "axios";
 import { useEffect, useState } from "react";
 
-const serverDomain =
-  process.env.NEXT_PUBLIC_SERVER_DOMAINE || "http://localhost:3000";
-
-// Define types for Driver and Location
-interface Location {
-  lat: string;
-  long: string;
-}
+const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE || "http://localhost:3000";
 
 interface Driver {
-  id: number;
+  id: string;
   name: string;
-  location?: Location;
+  email: string;
+  location?: {
+    lat?: string;
+    long?: string;
+  };
+  // autres propriétés du conducteur
 }
 
 const DriverManagement = () => {
-  const [drivers, setDrivers] = useState<Driver[]>([]); // Typing for an array of Driver objects
-  const [loading, setLoading] = useState<boolean>(true);
+  const [drivers, setDrivers] = useState<Driver[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null); // Typing for selected driver
-  const [lat, setLat] = useState<string>("");
-  const [long, setLong] = useState<string>("");
+  const [selectedDriver, setSelectedDriver] = useState<Driver | null>(null);
+  const [lat, setLat] = useState("");
+  const [long, setLong] = useState("");
   const [updateError, setUpdateError] = useState<string | null>(null);
-  const [isUpdating, setIsUpdating] = useState<boolean>(false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   useEffect(() => {
     const fetchDrivers = async () => {
       try {
-        const response = await axios.get<Driver[]>(
-          `${serverDomain}/api/driver/`
-        ); // Typing the response
+        const response = await axios.get(`${serverDomain}/api/driver/`);
         setDrivers(response.data);
       } catch (error) {
         setError("Error fetching drivers.");
@@ -56,8 +53,8 @@ const DriverManagement = () => {
       });
 
       // Update the driver's location in local state
-      setDrivers((prevDrivers) =>
-        prevDrivers.map((driver) =>
+      setDrivers((prev) =>
+        prev.map((driver) =>
           driver.id === selectedDriver.id
             ? { ...driver, location: { lat, long } }
             : driver
@@ -76,20 +73,16 @@ const DriverManagement = () => {
     }
   };
 
-  const handleDeleteDriver = async (driverId: number) => {
-    // Typing for driverId
+  const handleDeleteDriver = async (driverId: string) => {
     try {
       await axios.delete(`${serverDomain}/api/driver/${driverId}`);
-      setDrivers((prevDrivers) =>
-        prevDrivers.filter((driver) => driver.id !== driverId)
-      );
+      setDrivers((prev) => prev.filter((driver) => driver.id !== driverId));
     } catch (error) {
       console.error("Error deleting driver", error);
     }
   };
 
   const handleSelectDriver = (driver: Driver) => {
-    // Typing for driver parameter
     setSelectedDriver(driver);
     setLat(driver.location?.lat || "");
     setLong(driver.location?.long || "");
@@ -134,7 +127,7 @@ const DriverManagement = () => {
                   onClick={() => handleSelectDriver(driver)}
                 >
                   <h3 className="text-lg font-semibold">{driver.name}</h3>
-                  <p className="text-sm text-gray-500">ID: {driver.id}</p>
+                  <p className="text-sm text-gray-500">{driver.email}</p>
                 </div>
                 <div className="flex space-x-2">
                   <button
@@ -146,18 +139,12 @@ const DriverManagement = () => {
                   >
                     Delete
                   </button>
-                  <button
-                    onClick={() => handleSelectDriver(driver)}
-                    className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
-                  >
-                    Update
-                  </button>
                 </div>
               </div>
             ))}
           </div>
           {selectedDriver && (
-            <div className="p-4 mb-6 bg-white rounded-lg shadow-md">
+            <div className="p-4 bg-white rounded-lg shadow-md mb-6">
               <h3 className="text-lg font-semibold">Update Driver Location</h3>
               {updateError && <p className="text-red-500">{updateError}</p>}
               <input
@@ -165,21 +152,19 @@ const DriverManagement = () => {
                 value={lat}
                 onChange={(e) => setLat(e.target.value)}
                 placeholder="Latitude"
-                className="w-full p-2 mt-2 border rounded"
+                className="mt-2 p-2 border rounded w-full"
               />
               <input
                 type="text"
                 value={long}
                 onChange={(e) => setLong(e.target.value)}
                 placeholder="Longitude"
-                className="w-full p-2 mt-2 border rounded"
+                className="mt-2 p-2 border rounded w-full"
               />
               <button
                 onClick={handleUpdateDriverLocation}
                 disabled={isUpdating}
-                className={`mt-4 px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 ${
-                  isUpdating ? "opacity-50 cursor-not-allowed" : ""
-                }`}
+                className={`mt-4 px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 ${isUpdating ? "opacity-50 cursor-not-allowed" : ""}`}
               >
                 {isUpdating ? "Updating..." : "Update Location"}
               </button>
