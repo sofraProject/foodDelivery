@@ -46,41 +46,41 @@ const Orders: React.FC = () => {
     }
   };
 
-  if (loading) return <div className="text-center">Loading...</div>;
-  if (error) return <div className="text-red-600 text-center">{error}</div>;
+  if (loading) return <div className="text-center text-xl">Loading...</div>;
+  if (error) return <div className="text-red-600 text-center text-lg">{error}</div>;
 
   return (
     <div className="container mx-auto px-4 py-6 mt-24">
-      <h1 className="text-3xl font-bold mb-6 text-center">Your Orders</h1>
+      <h1 className="text-4xl font-bold mb-8 text-center text-blue-700">Your Orders</h1>
       {orders.length > 0 ? (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {orders.map((order) => (
             <div key={order.id} className="border rounded-lg p-4 bg-white shadow-lg hover:shadow-xl transition transform hover:scale-105 relative">
-              <span className="absolute top-2 right-2 text-sm text-gray-500">#{order.id}</span>
-              <h3 className="text-md font-semibold mb-2">Items:</h3>
-              <ul className="list-disc pl-5 mb-2">
+              <span className="absolute top-2 right-2 text-sm text-gray-500">Order ID: #{order.id}</span>
+              <h3 className="text-lg font-semibold mb-3">Items:</h3>
+              <ul className="list-disc pl-5 mb-3">
                 {order.orderItems.map(item => (
                   <li key={item.id} className="text-gray-700">
-                    {item.menuItem.name}
+                    <span className="font-medium">{item.menuItem.name}</span>
                     <span className="text-gray-500 ml-2 font-medium">({item.quantity})</span>
                   </li>
                 ))}
               </ul>
-              <p className="font-medium">Status: <span className={`text-${order.status === 'canceled' ? 'red' : 'green'}-600`}>{order.status}</span></p>
+              <p className="font-medium mb-1">Status: <span className={`font-semibold text-${order.status === 'canceled' ? 'red' : 'green'}-600`}>{order.status}</span></p>
               <p className="font-medium">Total Price: <span className="text-lg font-bold">${order.totalPrice !== undefined ? order.totalPrice.toFixed(2) : 'N/A'}</span></p>
               {order.status === 'PENDING' && ( // Only show cancel button for pending orders
                 <button 
                   onClick={() => handleCancelOrder(order.id)} 
-                  className="absolute bottom-2 right-2 px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition"
+                  className="absolute bottom-2 right-2 px-4 py-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition transform hover:scale-105"
                 >
-                  Cancel
+                  Cancel Order
                 </button>
               )}
             </div>
           ))}
         </div>
       ) : (
-        <p className="text-center">No orders found.</p>
+        <p className="text-center text-lg">No orders found.</p>
       )}
     </div>
   );
