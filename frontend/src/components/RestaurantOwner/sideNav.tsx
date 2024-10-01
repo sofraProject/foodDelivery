@@ -77,7 +77,7 @@ const SideNav: React.FC = () => {
             <div className="flex flex-col flex-wrap items-center pt-12 mt-8">
               <div className="">
                 <img
-                  src={user?.imagesUrl} // Updated to imagesUrl based on the error
+                  src={user?.imageUrl} // Updated to imagesUrl based on the error
                   className="w-20 h-20 mx-auto border-2 border-gray-300 rounded-full"
                   alt={user?.email}
                 />
