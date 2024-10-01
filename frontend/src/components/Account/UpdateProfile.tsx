@@ -7,111 +7,120 @@ import Image from 'next/image';
 const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
 
 const UpdateProfile = () => {
-    const { isAuthenticated, decodedUser } = useAuth();
-    const [userData, setUserData] = useState<any>(null);
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [newPassword, setNewPassword] = useState('');
-    const [profilePicture, setProfilePicture] = useState<File | null>(null);
-    const [isEditingName, setIsEditingName] = useState(false);
-    const [isEditingEmail, setIsEditingEmail] = useState(false);
-    const [isEditingPassword, setIsEditingPassword] = useState(false);
+    const { isAuthenticated, decodedUser } = useAuth(); // Authentication context
+    const [userData, setUserData] = useState<any>(null); // User data state
+    const [name, setName] = useState(''); // State for user's name
+    const [email, setEmail] = useState(''); // State for user's email
+    const [newPassword, setNewPassword] = useState(''); // State for new password
+    const [profilePicture, setProfilePicture] = useState<File | null>(null); // State for profile picture
+    const [isEditingName, setIsEditingName] = useState(false); // Edit name modal state
+    const [isEditingEmail, setIsEditingEmail] = useState(false); // Edit email modal state
+    const [isEditingPassword, setIsEditingPassword] = useState(false); // Edit password modal state
 
+    // Fetch user data on mount and when authentication state changes
     const fetchUserData = async () => {
         if (isAuthenticated && decodedUser?.id) {
             try {
                 const response = await axios.get(`${serverDomain}/api/users/${decodedUser.id}`);
-                setUserData(response.data);
-                setName(response.data.name);
-                setEmail(response.data.email);
+                setUserData(response.data); // Set user data from API
+                setName(response.data.name); // Set name state
+                setEmail(response.data.email); // Set email state
             } catch (error) {
-                console.error("Error retrieving user data", error);
+                console.error("Error retrieving user data", error); // Log error
             }
         }
     };
 
     useEffect(() => {
-        fetchUserData();
+        fetchUserData(); // Fetch user data on mount
     }, [isAuthenticated, decodedUser]);
 
+    // Update user name
     const handleUpdateName = async () => {
         try {
             await axios.put(`${serverDomain}/api/users/${userData.id}`, { name });
-            setIsEditingName(false);
+            setIsEditingName(false); // Close modal after update
             fetchUserData(); // Refresh data after update
         } catch (error) {
-            console.error("Error updating name:", error);
+            console.error("Error updating name:", error); // Log error
         }
     };
 
+    // Update user email
     const handleUpdateEmail = async () => {
         try {
             await axios.put(`${serverDomain}/api/users/${userData.id}`, { email });
-            setIsEditingEmail(false);
+            setIsEditingEmail(false); // Close modal after update
             fetchUserData(); // Refresh data after update
         } catch (error) {
-            console.error("Error updating email:", error);
+            console.error("Error updating email:", error); // Log error
         }
     };
 
+    // Update user password
     const handleUpdatePassword = async () => {
         try {
             await axios.put(`${serverDomain}/api/users/${userData.id}/password`, { password: newPassword });
-            setIsEditingPassword(false);
+            setIsEditingPassword(false); // Close modal after update
             fetchUserData(); // Refresh data after update
         } catch (error) {
-            console.error("Error updating password:", error);
+            console.error("Error updating password:", error); // Log error
         }
     };
 
+    // Handle profile picture submission
     const handleProfilePictureSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
-        if (!userData || !profilePicture) return;
+        e.preventDefault(); // Prevent default form submission
+        if (!userData || !profilePicture) return; // Validate state
 
         const formData = new FormData();
-        formData.append('profilePicture', profilePicture);
+        formData.append('profilePicture', profilePicture); // Append file to FormData
 
         try {
             await axios.put(`${serverDomain}/api/users/${userData.id}/profile-picture`, formData, {
                 headers: {
-                    'Content-Type': 'multipart/form-data',
+                    'Content-Type': 'multipart/form-data', // Set header for file upload
                 },
             });
             fetchUserData(); // Refresh data after update
-            setProfilePicture(null); // Reset the profile picture state
+            setProfilePicture(null); // Reset profile picture state
         } catch (error) {
-            console.error("Error updating profile picture:", error);
+            console.error("Error updating profile picture:", error); // Log error
         }
     };
 
-    if (!userData) return <div>Loading...</div>;
+    if (!userData) return <div>Loading...</div>; // Loading state
 
     return (
         <div className="flex items-start justify-start min-h-screen bg-gradient-to-r from-[#BFF38A] to-[#F2F2F2] p-4">
             <div className="w-full max-w-md mt-24">
                 <h2 className="text-2xl font-bold mb-6 text-left text-[#101827]">Update Profile</h2>
 
+                {/* Display user name with edit option */}
                 <div className="flex justify-between mb-4">
                     <span className="block text-lg font-semibold text-[#101827]">{name}</span>
                     <span className="text-[#34C759] cursor-pointer ml-auto" onClick={() => setIsEditingName(true)}>Edit</span>
                 </div>
 
+                {/* Display user email with edit option */}
                 <div className="flex justify-between mb-4">
                     <span className="block text-lg font-semibold text-[#101827]">{email}</span>
                     <span className="text-[#34C759] cursor-pointer ml-auto" onClick={() => setIsEditingEmail(true)}>Edit</span>
                 </div>
 
+                {/* Display change password option */}
                 <div className="flex justify-between mb-4">
                     <span className="block text-lg font-semibold text-[#101827]">Change Password:</span>
                     <span className="text-[#34C759] cursor-pointer ml-auto" onClick={() => setIsEditingPassword(true)}>Edit</span>
                 </div>
 
+                {/* Modals for editing name, email, and password */}
                 {isEditingName && (
                     <Modal title="Edit your name" onClose={() => setIsEditingName(false)} onSave={handleUpdateName}>
                         <input
                             type="text"
                             value={name}
-                            onChange={(e) => setName(e.target.value)}
+                            onChange={(e) => setName(e.target.value)} // Update name state
                             className="block w-full p-2 border border-[#e0ffbc] rounded-md"
                         />
                     </Modal>
@@ -122,7 +131,7 @@ const UpdateProfile = () => {
                         <input
                             type="email"
                             value={email}
-                            onChange={(e) => setEmail(e.target.value)}
+                            onChange={(e) => setEmail(e.target.value)} // Update email state
                             className="block w-full p-2 border border-[#e0ffbc] rounded-md"
                         />
                     </Modal>
@@ -134,17 +143,18 @@ const UpdateProfile = () => {
                             type="password"
                             placeholder="Enter new password"
                             value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
+                            onChange={(e) => setNewPassword(e.target.value)} // Update password state
                             className="block w-full p-2 border border-[#e0ffbc] rounded-md"
                         />
                     </Modal>
                 )}
 
+                {/* Profile picture update section */}
                 <h2 className="text-xl font-bold mt-6 mb-4 text-left text-[#101827]">Update Profile Picture</h2>
                 <form onSubmit={handleProfilePictureSubmit} className="space-y-4">
                     <div>
                         <Image
-                            src={`${serverDomain}/${userData.imageUrl}`}
+                            src={`${serverDomain}/${userData.imageUrl}`} // Display current profile picture
                             alt="Profile"
                             width={160}
                             height={160}
@@ -154,8 +164,8 @@ const UpdateProfile = () => {
                     <label className="flex items-center mt-1">
                         <input
                             type="file"
-                            accept="image/*"
-                            onChange={(e) => setProfilePicture(e.target.files?.[0] || null)}
+                            accept="image/*" // Accept image files
+                            onChange={(e) => setProfilePicture(e.target.files?.[0] || null)} // Update profile picture state
                             className="hidden"
                         />
                         <span className="inline-block p-2 bg-[#34C759] text-white rounded-md cursor-pointer hover:bg-[#2b9c43]">
