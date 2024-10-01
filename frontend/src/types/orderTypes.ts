@@ -33,11 +33,16 @@ export interface Order {
     id: number;
     user_id: number; // Reference to the user
     status: OrderStatus; // The current status of the order
-    total_amount: number; // Total amount for the order
+    totalPrice: number; // Total amount for the order
     orderItems: OrderItem[]; // Array of order items
     deliveries: Delivery[]; // Array of deliveries associated with the order
     user: User; // User who placed the order
     createdAt: Date; // Timestamp when the order was created
     updatedAt: Date; // Timestamp when the order was last updated
 }
+export interface OrderState {
+    orders: Order[];
+    loading: boolean;
+    error: string | null;
+  }
 

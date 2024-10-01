@@ -67,7 +67,6 @@ module.exports = {
         // Calcul du montant total
         totalAmount += menuItem.price * item.quantity;
       }
-
       console.log(`Total amount calculated: ${totalAmount}`);
 
       // Mise à jour du prix total de la commande
@@ -114,7 +113,6 @@ module.exports = {
         });
         console.log(`Notification sent to user ${customerId}`);
       }
-
       // Répondre avec la commande créée et le paiement
       return res.status(201).json({
         message: "Order created successfully",
@@ -285,7 +283,7 @@ module.exports = {
               menuItem: true, // Include menu item details
             },
           },
-          deliveries: {
+          delivery: {
             include: {
               driver: { select: { name: true, email: true } },
             },
@@ -484,4 +482,93 @@ module.exports = {
       res.status(500).json({ message: "Error fetching confirmed orders" });
     }
   },
+
+// Inside your Order.controller.js
+
+// Cancel an order
+cancelOrder: async (req, res) => {
+  try {
+    const orderId = parseInt(req.params.id);
+
+    // Check if the order exists
+    const order = await prismaConnection.order.findUnique({
+      where: { id: orderId },
+    });
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    // Update the order status to "CANCELED"
+    const updatedOrder = await prismaConnection.order.update({
+      where: { id: orderId },
+      data: { status: "CANCELED" },
+    });
+
+    // Optionally, send a notification when the order is canceled
+    await prismaConnection.notification.create({
+      data: {
+        userId: updatedOrder.customerId,
+        orderId: updatedOrder.id,
+        message: `Your order #${updatedOrder.id} has been canceled.`,
+      },
+    });
+
+    return res.status(200).json({
+      message: "Order successfully canceled",
+      order: updatedOrder,
+    });
+  } catch (error) {
+    console.error("Error canceling order:", error);
+    return res
+      .status(500)
+      .json({ message: "Error canceling order", error: error.message });
+  }
+},
+
+
+};
+
+
+
+
+
+
+// Create a new Order
+exports.createOrder = async (req, res) => {
+  const { total_amount, user_id, orderItems } = req.body; // Ensure you get these from the request body
+
+  // Validate required fields
+  if (!total_amount || !user_id || !orderItems) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  try {
+    const newOrder = await prismaConnection.order.create({
+      data: {
+        total_amount: parseFloat(total_amount), // Use parseFloat to convert to a number
+        user_id: parseInt(user_id), // Ensure user_id is an integer
+        orderItems: {
+          create: orderItems, // Assuming orderItems is an array of items
+        },
+        // You can add other fields as necessary
+      },
+    });
+    res.status(201).json(newOrder);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to create order" });
+  }
+};
+
+// Get all Orders
+exports.getAllOrders = async (req, res) => {
+  const orders = await prismaConnection.order.findMany();
+  res.status(200).json(orders);
+};
+
+// Get an Order by ID
+exports.getOrderById = async (req, res) => {
+  const order = await prismaConnection.order.findUnique({ where: { id: parseInt(req.params.id) } });
+  res.status(200).json(order);
 };

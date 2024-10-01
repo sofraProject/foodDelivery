@@ -1,6 +1,6 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import axios from 'axios';
-import { Order } from '../../types/orderTypes'; // Import the correct Order type
+import { Order, OrderStatus } from '../../types/orderTypes';
 
 interface OrderState {
   orders: Order[];
@@ -14,13 +14,22 @@ const initialState: OrderState = {
   error: null,
 };
 
-const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAIN; // Correct the typo in variable name
+const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAIN || "http://localhost:3100";
 
 // Async thunk to fetch orders
 export const fetchOrders = createAsyncThunk<Order[]>('orders/fetchOrders', async () => {
-  const response = await axios.get(`${serverDomain}/api/orders/`);
-  console.log("orders=================>",response.data)
-  return response.data; // Ensure the API returns data that matches the Order type
+  const response = await axios.get(`${serverDomain}/api/orders`);
+  console.log("orders=================>", response.data);
+  return response.data;
+});
+
+// Async thunk to update order status
+export const updateOrderStatus = createAsyncThunk<
+  Order,
+  { orderId: number; status: OrderStatus }
+>('orders/updateOrderStatus', async ({ orderId, status }) => {
+  const response = await axios.put(`${serverDomain}/api/admin/orders/${orderId}/status`, { status });
+  return response.data;
 });
 
 const orderSlice = createSlice({
@@ -34,11 +43,18 @@ const orderSlice = createSlice({
       })
       .addCase(fetchOrders.fulfilled, (state, action) => {
         state.loading = false;
-        state.orders = action.payload; // Ensure payload matches Order[]
+        state.orders = action.payload;
       })
       .addCase(fetchOrders.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to fetch orders';
+      })
+      .addCase(updateOrderStatus.fulfilled, (state, action: PayloadAction<Order>) => {
+        const updatedOrder = action.payload;
+        const index = state.orders.findIndex(order => order.id === updatedOrder.id);
+        if (index !== -1) {
+          state.orders[index] = updatedOrder;
+        }
       });
   },
 });
