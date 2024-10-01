@@ -54,7 +54,7 @@ const RestaurantsPage: React.FC = () => {
 
         // Fetch all restaurants with their menu items and categories
         const restaurantsRes = await axios.get(
-          `${serverDomain}/api/restaurants/category`
+          `${serverDomain}/api/restaurant/category`
         );
         setRestaurants(restaurantsRes.data);
 
