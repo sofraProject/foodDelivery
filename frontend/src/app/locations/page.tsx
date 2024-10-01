@@ -86,23 +86,23 @@ const MyLocations: React.FC = () => {
   };
 
   if (loading) return <div className="text-center">Loading...</div>;
-  if (error) return <div className="text-red-600 text-center">{error}</div>;
+  if (error) return <div className="text-warning text-center">{error}</div>;
 
   return (
     <div className="container mx-auto px-4 py-6 mt-24">
-      <h1 className="text-3xl font-bold mb-6 text-left">My Locations</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center text-primary">My Locations</h1>
       <button
         onClick={() => setShowModal(true)}
-        className="mb-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition"
+        className="mb-4 px-4 py-2 bg-success text-white rounded hover:bg-green-700 transition"
       >
         Add Location
       </button>
       {locations.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {locations.map((location) => (
-            <div key={location.id} className="bg-white border rounded-lg p-4 shadow-md transition-transform transform hover:scale-105 relative flex flex-col justify-between mb-4">
-              <h2 className="text-lg font-semibold">{location.locationName || "Unnamed"}</h2>
-              <p className="text-sm text-gray-500 mt-1">
+            <div key={location.id} className="bg-secondary border rounded-lg p-4 shadow-md transition-transform transform hover:scale-105 relative flex flex-col justify-between mb-4">
+              <h2 className="text-lg font-semibold text-dark">{location.locationName || "Unnamed"}</h2>
+              <p className="text-sm text-lightText mt-1">
                 {location.lat ? `Lat: ${location.lat.toFixed(4)}` : 'Lat: N/A'} &nbsp; 
                 {location.long ? `Long: ${location.long.toFixed(4)}` : 'Long: N/A'}
               </p>
@@ -111,7 +111,7 @@ const MyLocations: React.FC = () => {
                   setDeleteLocationId(location.id);
                   setShowDeleteConfirm(true);
                 }}
-                className="absolute top-2 right-2 text-red-600 hover:bg-red-100 rounded-full p-1 ml-2"
+                className="absolute top-2 right-2 text-warning hover:bg-warning-light rounded-full p-1 ml-2"
                 title="Delete Location"
               >
                 🗑️
@@ -120,14 +120,14 @@ const MyLocations: React.FC = () => {
           ))}
         </div>
       ) : (
-        <p className="text-center">No locations found.</p>
+        <p className="text-center text-lightText">No locations found.</p>
       )}
 
       {/* Modal for adding a new location */}
       {showModal && (
         <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-800 bg-opacity-50">
           <div className="bg-white p-6 rounded-lg shadow-lg">
-            <h2 className="text-xl font-semibold mb-4">Add New Location</h2>
+            <h2 className="text-xl font-semibold mb-4 text-primary">Add New Location</h2>
             <input
               type="text"
               placeholder="Location Name"
@@ -151,13 +151,13 @@ const MyLocations: React.FC = () => {
             />
             <button
               onClick={handleAddLocation}
-              className="mb-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+              className="mb-2 px-4 py-2 bg-success text-white rounded hover:bg-green-700 transition"
             >
               Add Location
             </button>
             <button
               onClick={() => setShowModal(false)}
-              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+              className="px-4 py-2 bg-warning text-white rounded hover:bg-red-700 transition"
             >
               Cancel
             </button>
@@ -174,13 +174,13 @@ const MyLocations: React.FC = () => {
             <div className="flex justify-end mt-4">
               <button
                 onClick={handleDeleteLocation}
-                className="mr-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+                className="mr-2 px-4 py-2 bg-success text-white rounded hover:bg-green-700 transition"
               >
                 Yes
               </button>
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+                className="px-4 py-2 bg-warning text-white rounded hover:bg-red-700 transition"
               >
                 No
               </button>
