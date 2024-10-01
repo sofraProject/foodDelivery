@@ -23,7 +23,8 @@ const dashboardCards = [
     title: "Manage Restaurant",
     description: "Edit and update restaurant details",
     icon: AiOutlineShop,
-    path: "./restaurant/detail/[ownerId]",
+    path: "./pages/dashboard/restaurant/detail/[ownerId]/page.tsx",
+   
     color: "text-yellow-500",
   },
   {

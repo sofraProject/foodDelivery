@@ -2,17 +2,19 @@
 
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { useParams } from "next/navigation"; // Use this for accessing params in Next.js
 
-const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAIN || "http://localhost:3000";
+const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE || "http://localhost:3000";
 
-const RestaurantManagementPage = ({ params }) => {
-  const { ownerId } = params; // Accessing ownerId from params
+const RestaurantManagementPage = () => {
+  const { ownerId } = useParams(); // Accessing ownerId from params
 
   const [restaurant, setRestaurant] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
+  const [imageUrl, setImageUrl] = useState(""); // State for image URL
   const [updateError, setUpdateError] = useState(null);
 
   useEffect(() => {
@@ -30,6 +32,7 @@ const RestaurantManagementPage = ({ params }) => {
           setRestaurant(response.data);
           setName(response.data.name);
           setDescription(response.data.description);
+          setImageUrl(response.data.imageUrl); // Set initial image URL
         } else {
           throw new Error("Restaurant not found.");
         }
@@ -50,25 +53,13 @@ const RestaurantManagementPage = ({ params }) => {
       await axios.put(`${serverDomain}/api/restaurants/${ownerId}`, {
         name,
         description,
+        imageUrl: `${serverDomain}/api/restaurants/image/${ownerId}`, // Construct image URL using ownerId
       });
-      setRestaurant({ ...restaurant, name, description });
+      setRestaurant({ ...restaurant, name, description, imageUrl });
       setUpdateError(null);
     } catch (err) {
       setUpdateError("Error updating restaurant. Please try again.");
       console.error("Error updating restaurant", err);
-    }
-  };
-
-  const handleDeleteRestaurant = async () => {
-    if (!restaurant) return;
-
-    try {
-      await axios.delete(`${serverDomain}/api/restaurants/${ownerId}`);
-      setRestaurant(null);
-      setName("");
-      setDescription("");
-    } catch (err) {
-      console.error("Error deleting restaurant", err);
     }
   };
 
@@ -115,18 +106,19 @@ const RestaurantManagementPage = ({ params }) => {
                 placeholder="Restaurant Description"
                 className="mt-2 p-2 border rounded w-full"
               />
-              <div className="flex justify-between mt-4">
+              <input
+                type="text"
+                value={imageUrl}
+                onChange={(e) => setImageUrl(e.target.value)} // Handle image URL changes
+                placeholder="Image URL"
+                className="mt-2 p-2 border rounded w-full"
+              />
+              <div className="flex justify-end mt-4">
                 <button
                   onClick={handleUpdateRestaurant}
                   className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
                 >
                   Update
-                </button>
-                <button
-                  onClick={handleDeleteRestaurant}
-                  className="px-4 py-2 text-white bg-red-600 rounded-lg hover:bg-red-700"
-                >
-                  Delete
                 </button>
               </div>
             </>
