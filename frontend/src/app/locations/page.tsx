@@ -5,7 +5,7 @@ import axios from 'axios';
 import { useAuth } from '../../hooks/useAuth';
 
 interface Location {
-  id: number; // Assuming an ID for deletion
+  id: number;
   locationName?: string;
   lat?: number;
   long?: number;
@@ -46,7 +46,12 @@ const MyLocations: React.FC = () => {
 
   const handleAddLocation = async () => {
     try {
-      const newLocation = { locationName: newLocationName, lat: newLat, long: newLong };
+      const newLocation = {
+        locationName: newLocationName,
+        lat: newLat,
+        long: newLong,
+        userId: user.id // Include user's ID here
+      };
       const response = await axios.post(`${serverDomain}/api/locations`, newLocation);
       setLocations([...locations, response.data]);
       setShowModal(false);
@@ -84,17 +89,18 @@ const MyLocations: React.FC = () => {
       {locations.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {locations.map((location) => (
-            <div key={location.id} className="bg-white border rounded-lg p-4 shadow-md transition-transform transform hover:scale-105 relative flex flex-col justify-between">
+            <div key={location.id} className="bg-white border rounded-lg p-4 shadow-md transition-transform transform hover:scale-105 relative flex flex-col justify-between mb-4">
               <h2 className="text-lg font-semibold">{location.locationName || "Unnamed"}</h2>
-              <p className="text-sm text-gray-500 absolute bottom-2 right-2 opacity-70">
+              <p className="text-sm text-gray-500 mt-1">
                 {location.lat ? `Lat: ${location.lat.toFixed(4)}` : 'Lat: N/A'} &nbsp; 
                 {location.long ? `Long: ${location.long.toFixed(4)}` : 'Long: N/A'}
               </p>
               <button
                 onClick={() => handleDeleteLocation(location.id)}
-                className="mt-2 px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition"
+                className="absolute top-2 right-2 text-red-600 hover:bg-red-100 rounded-full p-1 ml-2"
+                title="Delete Location"
               >
-                Delete
+                🗑️
               </button>
             </div>
           ))}
