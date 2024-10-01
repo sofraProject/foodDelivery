@@ -20,6 +20,7 @@ const cartRoutes = require("./routes/cart.route");
 const categoryRoutes = require("./routes/category.route");
 const restaurantRoutes = require("./routes/Restaurant.route");
 const LocationRoutes = require("./routes/Location.route");
+const orderItemRoutes = require("./routes/Orderitem.route")
 const adminRoutes = require("./routes/admin.route");
 
 // Import utility functions
@@ -53,6 +54,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/carts", cartRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/locations", LocationRoutes);
+app.use("/api/orderitem  " ,  orderItemRoutes)
 app.use("/api/admin", adminRoutes);
 
 // Create HTTP server

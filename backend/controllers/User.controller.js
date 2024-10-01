@@ -2,7 +2,7 @@ const { prismaConnection } = require("../prisma/prisma");
 const upload = require("../middleware/multer");
 const bcrypt = require("bcrypt");
 
-// Récupère tous les utilisateurs
+// Retrieve all users
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await prismaConnection.user.findMany();
@@ -13,7 +13,7 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
-// Récupère un utilisateur par son ID
+// Retrieve a user by ID
 exports.getUserById = async (req, res) => {
   const { id } = req.params;
   try {
@@ -31,22 +31,17 @@ exports.getUserById = async (req, res) => {
   }
 };
 
-// Crée un nouvel utilisateur
+// Create a new user
 exports.createUser = async (req, res) => {
   const { name, email, password, balance, location, role } = req.body;
-
-  // Access the uploaded file
   const profilePicturePath = req.file ? req.file.path : null; // Get the path of the uploaded file
 
   if (!name || !email || !password) {
-    return res
-      .status(400)
-      .json({ error: "Name, email, and password are required." });
+    return res.status(400).json({ error: "Name, email, and password are required." });
   }
 
   try {
     const hashedPassword = await bcrypt.hash(password, 10);
-
     const newUser = await prismaConnection.user.create({
       data: {
         name,
@@ -56,7 +51,6 @@ exports.createUser = async (req, res) => {
         role,
       },
     });
-
     res.status(201).json(newUser);
   } catch (error) {
     console.error("Error creating user:", error);
@@ -64,24 +58,13 @@ exports.createUser = async (req, res) => {
   }
 };
 
-// Met à jour un utilisateur
+// Update a user
 exports.updateUser = async (req, res) => {
   const { id } = req.params;
-  const { name, email, password, imagesUrl, balance, location, role } =
-    req.body;
+  const { name, email, password, imagesUrl, balance, location, role } = req.body;
 
-  if (
-    !name &&
-    !email &&
-    !password &&
-    !imagesUrl &&
-    !balance &&
-    !location &&
-    !role
-  ) {
-    return res
-      .status(400)
-      .json({ error: "At least one field must be provided for update." });
+  if (!name && !email && !password && !imagesUrl && !balance && !location && !role) {
+    return res.status(400).json({ error: "At least one field must be provided for update." });
   }
 
   try {
@@ -95,9 +78,7 @@ exports.updateUser = async (req, res) => {
       where: { id: Number(id) },
       data: updatedData,
     });
-    res
-      .status(200)
-      .json({ message: "User updated successfully.", updatedUser });
+    res.status(200).json({ message: "User updated successfully.", updatedUser });
   } catch (error) {
     if (error.code === "P2025") {
       res.status(404).json({ message: "User not found." });
@@ -108,7 +89,7 @@ exports.updateUser = async (req, res) => {
   }
 };
 
-// Récupère tous les propriétaires de restaurant
+// Retrieve all restaurant owners
 exports.getAllUsersRestaurant = async (req, res) => {
   try {
     const users = await prismaConnection.user.findMany({
@@ -121,7 +102,7 @@ exports.getAllUsersRestaurant = async (req, res) => {
   }
 };
 
-// Recherche les restaurants à proximité (logiciel à implémenter)
+// Find nearby restaurants (logic to be implemented)
 exports.findNearbyRestaurants = async (req, res) => {
   const { userId, radius = 1000 } = req.body;
 
@@ -142,7 +123,7 @@ exports.findNearbyRestaurants = async (req, res) => {
       return res.status(404).json({ error: "Customer location not found." });
     }
 
-    // Implémentez votre propre logique de calcul de distance ici
+    // Implement your own logic for calculating distance here
     const nearbyRestaurants = await prismaConnection.user.findMany({
       where: {
         role: "RESTAURANT_OWNER",
@@ -152,20 +133,18 @@ exports.findNearbyRestaurants = async (req, res) => {
     res.status(200).json(nearbyRestaurants);
   } catch (error) {
     console.error("Error finding nearby restaurants:", error);
-    res
-      .status(500)
-      .json({ error: "An error occurred while finding nearby restaurants." });
+    res.status(500).json({ error: "An error occurred while finding nearby restaurants." });
   }
 };
 
-// Supprime un utilisateur
+// Delete a user
 exports.deleteUser = async (req, res) => {
   const { id } = req.params;
   try {
     await prismaConnection.user.delete({
       where: { id: Number(id) },
     });
-    res.status(200).json({ message: "User deleted successfully." });
+    res.status(204).json({ message: "User deleted successfully." });
   } catch (error) {
     if (error.code === "P2025") {
       res.status(404).json({ message: "User not found." });
@@ -176,7 +155,7 @@ exports.deleteUser = async (req, res) => {
   }
 };
 
-// Met à jour la localisation de l'utilisateur
+// Update user location
 exports.updateUserLocation = async (req, res) => {
   const { id } = req.user;
   const { location } = req.body;
@@ -199,7 +178,7 @@ exports.updateUserLocation = async (req, res) => {
       data: {
         location: {
           type: "Point",
-          coordinates: location, // Assurez-vous que cela correspond à votre structure de données de localisation
+          coordinates: location, // Ensure this matches your location data structure
         },
       },
     });
@@ -210,7 +189,8 @@ exports.updateUserLocation = async (req, res) => {
   }
 };
 
-(exports.getAllCustomers = async (req, res) => {
+// Retrieve all customers
+exports.getAllCustomers = async (req, res) => {
   try {
     const customers = await prismaConnection.user.findMany({
       where: { role: "CUSTOMER" }, // Ensure we fetch only customers
@@ -218,64 +198,50 @@ exports.updateUserLocation = async (req, res) => {
     res.status(200).json(customers);
   } catch (error) {
     console.error("Error fetching customers:", error);
-    res.status(500).json({ message: "Error fetching customers" });
+    res.status(500).json({ message: "Error fetching customers." });
   }
-}),
-  // Create a new user (customer)
-  (exports.createUser = async (req, res) => {
-    const { name, email, password } = req.body;
+};
 
-    if (!name || !email || !password) {
-      return res
-        .status(400)
-        .json({ error: "Name, email, and password are required." });
-    }
+// Create a new customer
+exports.createCustomer = async (req, res) => {
+  const { name, email, password } = req.body;
 
-    try {
-      const hashedPassword = await bcrypt.hash(password, 10);
+  if (!name || !email || !password) {
+    return res.status(400).json({ error: "Name, email, and password are required." });
+  }
 
-      const newUser = await prismaConnection.user.create({
-        data: {
-          name,
-          email,
-          password: hashedPassword,
-          role: "CUSTOMER", // Set role to CUSTOMER
-        },
-      });
-      res.status(201).json(newUser);
-    } catch (error) {
-      console.error("Error creating user:", error);
-      res.status(500).json({ error: "Failed to create user." });
-    }
-  }),
-  // Delete a customer
-  (exports.deleteCustomer = async (req, res) => {
-    try {
-      const customerId = parseInt(req.params.id);
-      await prismaConnection.user.delete({
-        where: { id: customerId },
-      });
-      res.status(204).send();
-    } catch (error) {
-      console.error("Error deleting customer:", error);
-      res.status(500).json({ message: "Error deleting customer" });
-    }
-  });
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newCustomer = await prismaConnection.user.create({
+      data: {
+        name,
+        email,
+        password: hashedPassword,
+        role: "CUSTOMER", // Set role to CUSTOMER
+      },
+    });
+    res.status(201).json(newCustomer);
+  } catch (error) {
+    console.error("Error creating user:", error);
+    res.status(500).json({ error: "Failed to create user." });
+  }
+};
 
 // Delete a customer
 exports.deleteCustomer = async (req, res) => {
+  const { id } = req.params;
   try {
-    const customerId = parseInt(req.params.id);
     await prismaConnection.user.delete({
-      where: { id: customerId },
+      where: { id: Number(id) },
     });
     res.status(204).send();
   } catch (error) {
     console.error("Error deleting customer:", error);
-    res.status(500).json({ message: "Error deleting customer" });
+    res.status(500).json({ message: "Error deleting customer." });
   }
 };
 
+// Update profile picture
 exports.updateProfilePicture = async (req, res) => {
   const userId = parseInt(req.params.id); // Ensure user ID is an integer
 
