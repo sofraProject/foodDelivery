@@ -17,7 +17,7 @@ const userRoutes = require("./routes/User.route");
 const authRoutes = require("./routes/auth.route");
 const cartRoutes = require("./routes/cart.route");
 const categoryRoutes = require("./routes/category.route");
-const restaurantRoutes = require("./routes/Restaurant.route");
+// const restaurantRoutes = require("./routes/Restaurant.route");
 const LocationRoutes = require("./routes/Location.route");
 
 // Import utility functions
@@ -29,19 +29,21 @@ const app = express();
 const PORT = process.env.SERVER_PORT || 3000;
 
 // Middleware configuration
-app.use(cors({
-  origin: 'http://localhost:3000',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("dev"));
-app.use('/uploads', express.static('uploads'));
+app.use("/uploads", express.static("uploads"));
 helmet({
   crossOriginResourcePolicy: false,
-})
+});
 
 // Define API routes
 app.use("/api/orders", orderRoutes);
@@ -50,7 +52,6 @@ app.use("/api/delivery", deliveryRoutes);
 app.use("/api/driver", driverRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/carts", cartRoutes);
 app.use("/api/categories", categoryRoutes);

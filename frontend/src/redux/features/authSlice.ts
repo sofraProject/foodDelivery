@@ -20,6 +20,7 @@ const initialState: AuthState = {
   user: null,
   status: "idle",
   error: null,
+
 };
 
 // Logout action
