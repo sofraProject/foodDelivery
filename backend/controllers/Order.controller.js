@@ -402,7 +402,7 @@ module.exports = {
       // Émettre un événement de confirmation de commande
       const io = getIoInstance(); // Récupération de l'instance de socket.io
       io.emit("orderPaymentConfirmed", { orderId: updatedOrder.id });
-
+      console.log("ok socket");
       return res.status(200).json({
         message: "Order successfully confirmed",
         order: updatedOrder,

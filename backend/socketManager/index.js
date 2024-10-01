@@ -12,9 +12,10 @@ const initSocket = (server) => {
   // Handle Socket.IO connections
   io.on("connection", (socket) => {
     console.log("A user connected via Socket.IO");
-
+    console.log(socket.id);
     // Event for handling order confirmation
     socket.on("orderConfirmed", (data) => {
+      console.log(data);
       console.log(`Order ${data.orderId} confirmed by the restaurant`);
       io.emit(`orderConfirmation-${data.orderId}`, { status: "confirmed" });
     });

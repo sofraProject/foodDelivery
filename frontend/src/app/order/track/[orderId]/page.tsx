@@ -1,70 +1,74 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { Dialog } from "@headlessui/react";
+import { motion } from "framer-motion";
+import { useParams, useRouter } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AiOutlineCheckCircle,
   AiOutlineLoading3Quarters,
 } from "react-icons/ai";
-import { motion } from "framer-motion";
-import { useRouter, useParams } from "next/navigation";
-import useSocket from "@/hooks/useSocket";
+import io from "socket.io-client";
 import DeliveryMap from "../DeliveryMap"; // Import map component
-import { Dialog } from "@headlessui/react";
-import { Socket } from "socket.io-client"; // Import du type Socket
-
-interface Position {
-  lat: number;
-  long: number;
-}
-
 const OrderTracking = () => {
   const router = useRouter();
-  const { orderId } = useParams(); // Extraction de l'orderId
+  const { orderId } = useParams(); // Extract the orderId from the dynamic route
   const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
 
-  // Utilisation du hook personnalisé `useSocket` avec typage
-  const socket: typeof Socket | null = useSocket(serverDomain || ""); // Ajout du fallback pour éviter une erreur sur serverDomain
-
-  const [orderStatus, setOrderStatus] = useState<number>(0);
-  const [isMapOpen, setIsMapOpen] = useState<boolean>(false);
-  const [driverPosition, setDriverPosition] = useState<Position>({
-    lat: 0,
-    long: 0,
-  });
-  const [userPosition, setUserPosition] = useState<Position>({
-    lat: 0,
-    long: 0,
-  });
+  const [orderStatus, setOrderStatus] = useState(0);
+  const [isMapOpen, setIsMapOpen] = useState(false);
+  const [driverPosition, setDriverPosition] = useState({ lat: 0, long: 0 });
+  const [userPosition, setUserPosition] = useState({ lat: 0, long: 0 });
+  const socketRef = useRef<any>(null);
 
   useEffect(() => {
-    if (!socket || !orderId) return;
+    if (!serverDomain) {
+      console.error("Server domain is not defined");
+      return;
+    }
 
-    // Écoute des événements de socket avec typage
-    socket.on("orderPaymentConfirmed", (data: { orderId: number }) => {
-      if (data.orderId === Number(orderId)) setOrderStatus(1);
-    });
+    if (orderId) {
+      socketRef.current = io(serverDomain);
 
-    socket.on("orderPreparationStarted", (data: { orderId: number }) => {
-      if (data.orderId === Number(orderId)) setOrderStatus(2);
-    });
+      socketRef.current.on(
+        "orderPaymentConfirmed",
+        (data: { orderId: number }) => {
+          if (data.orderId === Number(orderId)) setOrderStatus(1);
+        }
+      );
 
-    socket.on("orderStatusUpdated", (data: { orderId: number }) => {
-      if (data.orderId === Number(orderId)) setOrderStatus(3);
-    });
+      socketRef.current.on(
+        "orderPreparationStarted",
+        (data: { orderId: number }) => {
+          if (data.orderId === Number(orderId)) setOrderStatus(2);
+        }
+      );
 
-    socket.on("deliveryConfirmed", (data: { orderId: number }) => {
-      if (data.orderId === Number(orderId)) setOrderStatus(4);
-    });
+      socketRef.current.on(
+        "orderStatusUpdated",
+        (data: { orderId: number }) => {
+          if (data.orderId === Number(orderId)) setOrderStatus(3);
+        }
+      );
 
-    socket.on("driverLocationUpdate", (data: Position) => {
-      setDriverPosition({ lat: data.lat, long: data.long });
-    });
+      socketRef.current.on("deliveryConfirmed", (data: { orderId: number }) => {
+        if (data.orderId === Number(orderId)) setOrderStatus(4);
+      });
 
-    // Déconnexion propre lors du démontage du composant
+      socketRef.current.on(
+        "driverLocationUpdate",
+        (data: { lat: number; long: number }) => {
+          setDriverPosition({ lat: data.lat, long: data.long });
+        }
+      );
+    }
+
     return () => {
-      socket.disconnect();
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+      }
     };
-  }, [socket, orderId]);
+  }, [orderId, serverDomain]);
 
   const openMapModal = () => setIsMapOpen(true);
   const closeMapModal = () => setIsMapOpen(false);
@@ -140,14 +144,14 @@ const OrderTracking = () => {
               <ul>
                 <motion.li
                   key={"x"}
-                  className={`flex items-center text-green-600 mb-4`}
+                  className={`flex items-center text-green-600  mb-4`}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3 }}
                   whileHover={{ scale: 1.05 }}
                 >
                   {renderIcon(false)}
-                  <span className="ml-2 text-xl">Payment Successful</span>
+                  <span className="ml-2 text-xl"> Payment Successful</span>
                 </motion.li>
                 {renderSteps}
               </ul>
