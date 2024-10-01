@@ -110,7 +110,7 @@ const Navbar: React.FC = () => {
             href="/promocodes"
             className="block px-4 py-2 text-sm text-white hover:bg-gray-700 hover:rounded-lg"
           >
-            Promo Codes
+            My Locations
           </Link>
           <button
             onClick={handleLogout}

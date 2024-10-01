@@ -19,11 +19,12 @@ const Orders: React.FC = () => {
         return;
       }
 
-      const url = `${serverDomain}/api/orders/byUser/${user.id}`; // Adjust API endpoint as needed
+      const url = `${serverDomain}/api/orders/byUser/${user.id}`;
       console.log(`Fetching orders from: ${url}`);
       try {
         const response = await axios.get(url);
-        setOrders(response.data); // Set fetched orders
+        console.log("API Response:", response.data);
+        setOrders(response.data);
       } catch (err: any) {
         console.error("Error fetching orders:", err);
         setError(err.response ? err.response.data.message : "Failed to fetch orders");
@@ -35,35 +36,51 @@ const Orders: React.FC = () => {
     fetchOrders();
   }, [isAuthenticated, user, serverDomain]);
 
-  const handleCancelOrder = (orderId: number) => {
-    // Here you can implement the cancellation logic
-    console.log(`Order ${orderId} cancelled`);
-    setOrders(orders.filter(order => order.id !== orderId));
+  const handleCancelOrder = async (orderId: number) => {
+    try {
+      await axios.delete(`${serverDomain}/api/orders/${orderId}`); // DELETE request to API
+      setOrders(orders.filter(order => order.id !== orderId)); // Update state to remove the order
+    } catch (err) {
+      console.error("Error cancelling order:", err);
+      setError("Failed to cancel order");
+    }
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>{error}</div>;
+  if (loading) return <div className="text-center">Loading...</div>;
+  if (error) return <div className="text-red-600 text-center">{error}</div>;
 
   return (
     <div className="container mx-auto px-4 py-6 mt-24">
-      <h1 className="text-2xl font-bold mb-4">Your Orders</h1>
+      <h1 className="text-3xl font-bold mb-6 text-center">Your Orders</h1>
       {orders.length > 0 ? (
-        <ul>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {orders.map((order) => (
-            <li key={order.id} className="border p-4 mb-2">
-              <h2>Order ID: {order.id}</h2>
-              <p>Status: {order.status}</p>
-              <p>Total Price: ${order.total_amount}</p>
-              <button 
-                onClick={() => handleCancelOrder(order.id)} 
-                className="mt-2 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
-              >
-                Cancel Order
-              </button>            </li>
+            <div key={order.id} className="border rounded-lg p-4 bg-white shadow-lg hover:shadow-xl transition transform hover:scale-105 relative">
+              <span className="absolute top-2 right-2 text-sm text-gray-500">#{order.id}</span>
+              <h3 className="text-md font-semibold mb-2">Items:</h3>
+              <ul className="list-disc pl-5 mb-2">
+                {order.orderItems.map(item => (
+                  <li key={item.id} className="text-gray-700">
+                    {item.menuItem.name}
+                    <span className="text-gray-500 ml-2 font-medium">({item.quantity})</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="font-medium">Status: <span className={`text-${order.status === 'canceled' ? 'red' : 'green'}-600`}>{order.status}</span></p>
+              <p className="font-medium">Total Price: <span className="text-lg font-bold">${order.totalPrice !== undefined ? order.totalPrice.toFixed(2) : 'N/A'}</span></p>
+              {order.status === 'PENDING' && ( // Only show cancel button for pending orders
+                <button 
+                  onClick={() => handleCancelOrder(order.id)} 
+                  className="absolute bottom-2 right-2 px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 transition"
+                >
+                  Cancel
+                </button>
+              )}
+            </div>
           ))}
-        </ul>
+        </div>
       ) : (
-        <p>No orders found.</p>
+        <p className="text-center">No orders found.</p>
       )}
     </div>
   );

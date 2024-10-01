@@ -207,21 +207,47 @@ module.exports = {
   deleteOrder: async (req, res) => {
     try {
       const orderId = parseInt(req.params.id);
-
+  
       // Check if the order exists before deleting
       const order = await prismaConnection.order.findUnique({
         where: { id: orderId },
+        include: {
+          orderItems: true, // Include order items
+          payments: true, // Include payments
+          delivery: true, // Include delivery details
+          notifications: true // Include notifications
+        },
       });
-
+  
       if (!order) {
         return res.status(404).json({ message: "Order not found" });
       }
-
+  
+      // Delete related order items
+      await prismaConnection.orderItem.deleteMany({
+        where: { orderId: orderId },
+      });
+  
+      // Delete related payments, if any
+      await prismaConnection.payment.deleteMany({
+        where: { orderId: orderId },
+      });
+  
+      // Delete related delivery details, if any
+      await prismaConnection.delivery.deleteMany({
+        where: { orderId: orderId },
+      });
+  
+      // Delete related notifications, if any
+      await prismaConnection.notification.deleteMany({
+        where: { orderId: orderId },
+      });
+  
       // Delete the order
       await prismaConnection.order.delete({
         where: { id: orderId },
       });
-
+  
       // Optionally, send a notification when the order is deleted
       await prismaConnection.notification.create({
         data: {
@@ -229,13 +255,11 @@ module.exports = {
           message: `Your order #${order.id} has been deleted.`,
         },
       });
-
+  
       res.status(204).send();
     } catch (error) {
       console.error("Error deleting order:", error);
-      res
-        .status(500)
-        .json({ message: "Error deleting order", error: error.message });
+      res.status(500).json({ message: "Error deleting order", error: error.message });
     }
   },
 
