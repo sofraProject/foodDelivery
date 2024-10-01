@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   AiOutlineShoppingCart,
@@ -9,8 +10,9 @@ import {
   AiOutlineCalendar,
   AiOutlineUsergroupAdd,
   AiOutlineStar,
-  AiOutlineUser,
 } from "react-icons/ai";
+
+const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE || "http://localhost:3000"
 
 const dashboardCards = [
   {
@@ -24,21 +26,21 @@ const dashboardCards = [
     title: "Manage Restaurant",
     description: "Edit and update restaurant details",
     icon: AiOutlineShop,
-    path: "./restaurant/restaurants",
+    path: "./restaurant/detail/[ownerId]",
     color: "text-yellow-500",
   },
   {
     title: "Sales",
     description: "View sales performance",
     icon: AiOutlineDollar,
-    path: "/sales",
+    path: "./restaurant/sales",
     color: "text-green-500",
   },
   {
     title: "Manage Menu",
     description: "Edit and update the restaurant menu",
     icon: AiOutlineMenu,
-    path: "./restaurant/menu",
+    path: "./restaurant/menu/[ownerId]",
     color: "text-blue-500",
   },
   {
@@ -52,7 +54,7 @@ const dashboardCards = [
     title: "Manage Staff",
     description: "Manage restaurant staff members",
     icon: AiOutlineUsergroupAdd,
-    path: "./restaurant/staff",
+    path: "/staff",
     color: "text-teal-500",
   },
   {
@@ -62,33 +64,45 @@ const dashboardCards = [
     path: "/reviews",
     color: "text-orange-500",
   },
-  {
-    title: "Manage Customers",
-    description: "View and manage all customers.",
-    icon: AiOutlineUser,
-    path: "./restaurant/customers",
-    color: "text-orange-500",
-  },
-
-
-
 ];
 
 const Dashboard = () => {
   const router = useRouter();
+  const [ownerId, setOwnerId] = useState<string | null>(null); // State to hold ownerId
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Function to handle navigation
+  useEffect(() => {
+    const fetchOwnerId = async () => {
+      try {
+        const response = await fetch('/api/user'); // Replace with your actual endpoint
+        if (!response.ok) throw new Error('Failed to fetch owner ID');
+        const data = await response.json();
+        setOwnerId(data.ownerId); // Assuming the API returns { ownerId: 'someOwnerId' }
+      } catch (err) {
+        setError(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOwnerId();
+  }, []);
+
   const navigateTo = (path: string) => {
-    router.push(path);
+    if (ownerId) {
+      const actualPath = path.replace("[ownerId]", ownerId);
+      router.push(actualPath);
+    }
   };
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
 
   return (
     <div className="min-h-screen py-10 mt-24 bg-gray-100">
       <div className="mx-auto max-w-7xl">
-        <h1 className="mb-6 text-4xl font-bold text-gray-900">
-          Restaurant Owner Dashboard
-        </h1>
-
+        <h1 className="mb-6 text-4xl font-bold text-gray-900">Restaurant Owner Dashboard</h1>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           {dashboardCards.map((card, index) => (
             <div
@@ -99,9 +113,7 @@ const Dashboard = () => {
               <div className="flex items-center">
                 <card.icon className={`w-10 h-10 ${card.color} mr-4`} />
                 <div>
-                  <h2 className="text-2xl font-semibold text-gray-800">
-                    {card.title}
-                  </h2>
+                  <h2 className="text-2xl font-semibold text-gray-800">{card.title}</h2>
                   <p className="text-sm text-gray-500">{card.description}</p>
                 </div>
               </div>
