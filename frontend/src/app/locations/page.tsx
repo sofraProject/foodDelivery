@@ -17,6 +17,8 @@ const MyLocations: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [deleteLocationId, setDeleteLocationId] = useState<number | null>(null);
   const [newLocationName, setNewLocationName] = useState("");
   const [newLat, setNewLat] = useState<number | undefined>();
   const [newLong, setNewLong] = useState<number | undefined>();
@@ -50,7 +52,7 @@ const MyLocations: React.FC = () => {
         locationName: newLocationName,
         lat: newLat,
         long: newLong,
-        userId: user.id // Include user's ID here
+        userId: user?.id,
       };
       const response = await axios.post(`${serverDomain}/api/locations`, newLocation);
       setLocations([...locations, response.data]);
@@ -64,10 +66,14 @@ const MyLocations: React.FC = () => {
     }
   };
 
-  const handleDeleteLocation = async (id: number) => {
+  const handleDeleteLocation = async () => {
+    if (deleteLocationId === null) return;
+
     try {
-      await axios.delete(`${serverDomain}/api/locations/${id}`);
-      setLocations(locations.filter(location => location.id !== id));
+      await axios.delete(`${serverDomain}/api/locations/${deleteLocationId}`);
+      setLocations(locations.filter(location => location.id !== deleteLocationId));
+      setShowDeleteConfirm(false);
+      setDeleteLocationId(null);
     } catch (err) {
       console.error("Error deleting location:", err);
       setError("Failed to delete location.");
@@ -96,7 +102,10 @@ const MyLocations: React.FC = () => {
                 {location.long ? `Long: ${location.long.toFixed(4)}` : 'Long: N/A'}
               </p>
               <button
-                onClick={() => handleDeleteLocation(location.id)}
+                onClick={() => {
+                  setDeleteLocationId(location.id);
+                  setShowDeleteConfirm(true);
+                }}
                 className="absolute top-2 right-2 text-red-600 hover:bg-red-100 rounded-full p-1 ml-2"
                 title="Delete Location"
               >
@@ -146,6 +155,29 @@ const MyLocations: React.FC = () => {
             >
               Cancel
             </button>
+          </div>
+        </div>
+      )}
+
+      {showDeleteConfirm && (
+        <div className="fixed inset-0 flex items-center justify-center z-50 bg-gray-800 bg-opacity-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h2 className="text-xl font-semibold mb-4">Confirm Deletion</h2>
+            <p>Are you sure you want to delete this location?</p>
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={handleDeleteLocation}
+                className="mr-2 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition"
+              >
+                Yes
+              </button>
+              <button
+                onClick={() => setShowDeleteConfirm(false)}
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition"
+              >
+                No
+              </button>
+            </div>
           </div>
         </div>
       )}
