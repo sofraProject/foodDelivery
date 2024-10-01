@@ -2,7 +2,7 @@
 
 import { User } from './userTypes'; // Adjust the import path based on your project structure
 import { CartItem } from './cartTypes'; // If OrderItem is similar to CartItem, otherwise define a separate interface
-
+import { Category, MenuItem, Restaurant } from '@/app/Restaurant/page';
 // Enum for order status
 export enum OrderStatus {
     pending = "pending",
@@ -18,6 +18,7 @@ export interface OrderItem {
     productId: number; // Assuming there is a Product model
     quantity: number;
     price: number;     // Price per item
+    menuItem: MenuItem;
 }
 
 // Interface for the Delivery model
@@ -33,11 +34,12 @@ export interface Order {
     id: number;
     user_id: number; // Reference to the user
     status: OrderStatus; // The current status of the order
-    total_amount: number; // Total amount for the order
+    totalPrice: number; // Total amount for the order
     orderItems: OrderItem[]; // Array of order items
     deliveries: Delivery[]; // Array of deliveries associated with the order
     user: User; // User who placed the order
     createdAt: Date; // Timestamp when the order was created
     updatedAt: Date; // Timestamp when the order was last updated
+    restaurant: Restaurant[]
 }
 
