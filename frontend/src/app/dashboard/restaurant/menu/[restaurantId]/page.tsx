@@ -1,29 +1,41 @@
 "use client";
 
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation"; // For accessing URL parameters
 
 // Server domain for API requests
 const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE || "http://localhost:3000";
 
+interface MenuItem {
+  id: number;
+  name: string;
+  description: string;
+  price: number;
+  categoryId: string;
+  available: boolean;
+}
+
+interface ApiErrorResponse {
+  message: string;
+}
+
 const MenuItemManagementPage = () => {
-  const { restaurantId } = useParams(); // Accessing restaurantId from URL parameters
+  const { restaurantId } = useParams<{ restaurantId: string }>(); // Accessing restaurantId from URL parameters
 
   // State variables
-  const [menuItems, setMenuItems] = useState([]);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [newMenuItem, setNewMenuItem] = useState({ name: "", description: "", price: "", categoryId: "", available: true });
-  const [editingMenuItem, setEditingMenuItem] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(null);
-  const [updateError, setUpdateError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
+  const [newMenuItem, setNewMenuItem] = useState({ name: "", description: "", price: 0, categoryId: "", available: true });
+  const [editingMenuItem, setEditingMenuItem] = useState<MenuItem | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [updateError, setUpdateError] = useState<string | null>(null);
 
   // Fetch menu items when component mounts or restaurantId changes
   useEffect(() => {
     const fetchMenuItems = async () => {
-      // Validate restaurantId
-      if (!restaurantId || isNaN(restaurantId)) {
+      if (!restaurantId || isNaN(Number(restaurantId))) {
         setError("Invalid restaurant ID.");
         setLoading(false);
         return;
@@ -31,9 +43,10 @@ const MenuItemManagementPage = () => {
 
       try {
         const response = await axios.get(`${serverDomain}/api/menu-items/restaurant/${restaurantId}`);
-        setMenuItems(response.data); // Set fetched menu items to state
+        setMenuItems(response.data);
       } catch (err) {
-        setError(err.response ? err.response.data : "Error fetching menu items.");
+        const error = err as AxiosError<ApiErrorResponse>; // Specify the error type
+        setError(error.response?.data?.message || "Error fetching menu items.");
       } finally {
         setLoading(false);
       }
@@ -43,53 +56,56 @@ const MenuItemManagementPage = () => {
   }, [restaurantId]);
 
   // Handle adding a new menu item
-  const handleAddMenuItem = async (e) => {
+  const handleAddMenuItem = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       const response = await axios.post(`${serverDomain}/api/menu-items`, { ...newMenuItem, restaurantId });
-      setMenuItems([...menuItems, response.data]); // Update state with new menu item
-      setNewMenuItem({ name: "", description: "", price: "", categoryId: "", available: true }); // Reset input fields
+      setMenuItems([...menuItems, response.data]);
+      setNewMenuItem({ name: "", description: "", price: 0, categoryId: "", available: true });
       setSuccessMessage("Menu item added successfully!");
       setUpdateError(null);
+      setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
-      setUpdateError("Error adding menu item. Please try again.");
-      console.error("Error adding menu item", err);
+      const error = err as AxiosError<ApiErrorResponse>;
+      setUpdateError(error.response?.data?.message || "Error adding menu item. Please try again.");
     }
   };
 
   // Prepare to edit a menu item
-  const handleEditMenuItem = (menuItem) => {
+  const handleEditMenuItem = (menuItem: MenuItem) => {
     setEditingMenuItem(menuItem);
     setNewMenuItem({ name: menuItem.name, description: menuItem.description, price: menuItem.price, categoryId: menuItem.categoryId, available: menuItem.available });
   };
 
   // Handle updating an existing menu item
-  const handleUpdateMenuItem = async (e) => {
+  const handleUpdateMenuItem = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!editingMenuItem) return;
 
     try {
       const response = await axios.put(`${serverDomain}/api/menu-items/${editingMenuItem.id}`, { ...newMenuItem, restaurantId });
-      setMenuItems(menuItems.map(item => (item.id === editingMenuItem.id ? response.data : item))); // Update state with edited item
-      setNewMenuItem({ name: "", description: "", price: "", categoryId: "", available: true }); // Reset input fields
-      setEditingMenuItem(null); // Clear editing state
+      setMenuItems(menuItems.map(item => (item.id === editingMenuItem.id ? response.data : item)));
+      setNewMenuItem({ name: "", description: "", price: 0, categoryId: "", available: true });
+      setEditingMenuItem(null);
       setSuccessMessage("Menu item updated successfully!");
       setUpdateError(null);
+      setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
-      setUpdateError("Error updating menu item. Please try again.");
-      console.error("Error updating menu item", err);
+      const error = err as AxiosError<ApiErrorResponse>;
+      setUpdateError(error.response?.data?.message || "Error updating menu item. Please try again.");
     }
   };
 
   // Handle deleting a menu item
-  const handleDeleteMenuItem = async (menuItemId) => {
+  const handleDeleteMenuItem = async (menuItemId: number) => {
     try {
       await axios.delete(`${serverDomain}/api/menu-items/${menuItemId}`);
-      setMenuItems(menuItems.filter(item => item.id !== menuItemId)); // Remove deleted item from state
+      setMenuItems(menuItems.filter(item => item.id !== menuItemId));
       setSuccessMessage("Menu item deleted successfully!");
+      setTimeout(() => setSuccessMessage(null), 3000);
     } catch (err) {
-      setUpdateError("Error deleting menu item. Please try again.");
-      console.error("Error deleting menu item", err);
+      const error = err as AxiosError<ApiErrorResponse>;
+      setUpdateError(error.response?.data?.message || "Error deleting menu item. Please try again.");
     }
   };
 
@@ -106,7 +122,7 @@ const MenuItemManagementPage = () => {
   if (error) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p className="text-red-500">{error.message ? error.message : "Error fetching menu items."}</p>
+        <p className="text-red-500">{error}</p>
       </div>
     );
   }
@@ -145,7 +161,7 @@ const MenuItemManagementPage = () => {
             <input
               type="number"
               value={newMenuItem.price}
-              onChange={(e) => setNewMenuItem({ ...newMenuItem, price: e.target.value })}
+              onChange={(e) => setNewMenuItem({ ...newMenuItem, price: Number(e.target.value) })}
               placeholder="Price"
               className="mt-2 p-2 border rounded w-full"
               required

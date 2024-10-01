@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   AiOutlineShoppingCart,
@@ -10,6 +11,8 @@ import {
   AiOutlineUsergroupAdd,
   AiOutlineStar,
 } from "react-icons/ai";
+
+const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE || "http://localhost:3000"
 
 const dashboardCards = [
   {
@@ -31,7 +34,7 @@ const dashboardCards = [
     description: "View sales performance",
     icon: AiOutlineDollar,
     path: "./restaurant/sales",
-    color: "text-green-500", 
+    color: "text-green-500",
   },
   {
     title: "Manage Menu",
@@ -65,12 +68,36 @@ const dashboardCards = [
 
 const Dashboard = () => {
   const router = useRouter();
-  const ownerId = "someOwnerId"; // Replace with actual ownerId from your state/context
+  const [ownerId, setOwnerId] = useState<string | null>(null); // State to hold ownerId
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const navigateTo = (path) => {
-    const actualPath = path.replace("[ownerId]", ownerId);
-    router.push(actualPath);
+  useEffect(() => {
+    const fetchOwnerId = async () => {
+      try {
+        const response = await fetch('/api/user'); // Replace with your actual endpoint
+        if (!response.ok) throw new Error('Failed to fetch owner ID');
+        const data = await response.json();
+        setOwnerId(data.ownerId); // Assuming the API returns { ownerId: 'someOwnerId' }
+      } catch (err) {
+        setError(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOwnerId();
+  }, []);
+
+  const navigateTo = (path: string) => {
+    if (ownerId) {
+      const actualPath = path.replace("[ownerId]", ownerId);
+      router.push(actualPath);
+    }
   };
+
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
 
   return (
     <div className="min-h-screen py-10 mt-24 bg-gray-100">

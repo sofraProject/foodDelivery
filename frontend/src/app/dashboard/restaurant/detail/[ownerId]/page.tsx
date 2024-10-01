@@ -3,32 +3,41 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation"; // Use this for accessing params in Next.js
+import { getUserId } from "@/helpers/authHelper";
 
 const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE || "http://localhost:3000";
 
-const RestaurantManagementPage = () => {
-  const { ownerId } = useParams(); // Accessing ownerId from params
+interface Restaurant {
+  id: number;
+  name: string;
+  description: string;
+  imageUrl?: string;
+}
 
-  const [restaurant, setRestaurant] = useState(null);
+const RestaurantManagementPage = () => {
+  const { ownerId } = useParams<{ ownerId: string }>(); // Accessing ownerId from params
+  const [restaurant, setRestaurant] = useState<Restaurant | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<string | null>(null);
   const [name, setName] = useState("");
   const [description, setDescription] = useState("");
-  const [imageFile, setImageFile] = useState(null); // State for image file
-  const [updateError, setUpdateError] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(null);
+  const [imageFile, setImageFile] = useState<File | null>(null); // State for image file
+  const [updateError, setUpdateError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
+  // Get current user's ID
+  const userId = getUserId(); // Get user ID using the helper function
 
   useEffect(() => {
     const fetchRestaurant = async () => {
       if (!ownerId) {
-        console.error("Owner ID is not defined.");
         setError("Owner ID is not defined.");
         setLoading(false);
         return;
       }
 
       try {
-        const response = await axios.get(`${serverDomain}/api/restaurants/${ownerId}`);
+        const response = await axios.get(`${serverDomain}/api/restaurants/owner/${ownerId}`);
         if (response.status === 200) {
           setRestaurant(response.data);
           setName(response.data.name);
@@ -37,7 +46,10 @@ const RestaurantManagementPage = () => {
           throw new Error("Restaurant not found.");
         }
       } catch (err) {
-        setError(err.response ? err.response.data : "Error fetching restaurant.");
+        const errorMessage = axios.isAxiosError(err) && err.response?.data?.message
+          ? err.response.data.message
+          : "Error fetching restaurant.";
+        setError(errorMessage);
       } finally {
         setLoading(false);
       }
@@ -46,7 +58,7 @@ const RestaurantManagementPage = () => {
     fetchRestaurant();
   }, [ownerId]);
 
-  const handleUpdateRestaurant = async (e) => {
+  const handleUpdateRestaurant = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault(); // Prevent default form submission
     if (!restaurant) return;
 
@@ -58,12 +70,12 @@ const RestaurantManagementPage = () => {
     }
 
     try {
-      const response = await axios.put(`${serverDomain}/api/restaurants/${ownerId}`, formData, {
+      const response = await axios.put(`${serverDomain}/api/restaurants/${restaurant.id}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
       });
-      setRestaurant({ ...restaurant, name, description, imageUrl: response.data.restaurant.imageUrl });
+      setRestaurant({ ...restaurant, name, description, imageUrl: response.data.imageUrl });
       setSuccessMessage("Restaurant updated successfully!");
       setUpdateError(null);
     } catch (err) {

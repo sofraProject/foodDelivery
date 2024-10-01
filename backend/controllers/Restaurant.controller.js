@@ -6,7 +6,9 @@ exports.createRestaurant = async (req, res) => {
     const { name, description, ownerId, imageUrl } = req.body;
 
     if (!name || !ownerId) {
-      return res.status(400).json({ message: "Name and owner ID are required" });
+      return res
+        .status(400)
+        .json({ message: "Name and owner ID are required" });
     }
 
     const restaurant = await prismaConnection.restaurant.create({
@@ -21,7 +23,9 @@ exports.createRestaurant = async (req, res) => {
     res.status(201).json(restaurant);
   } catch (error) {
     console.error("Error creating restaurant:", error);
-    res.status(500).json({ message: "Internal server error", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 };
 
@@ -43,12 +47,15 @@ exports.getAllRestaurants = async (req, res) => {
 // Retrieve a restaurant by ID
 exports.getRestaurantById = async (req, res) => {
   const { id } = req.params; // Extract id from request parameters
+  console.log("ID received:", id); // Log the received ID for debugging
+
+  if (!id) {
+    return res.status(400).json({ message: "Restaurant ID is required." });
+  }
 
   try {
     const restaurant = await prismaConnection.restaurant.findUnique({
-      where: {
-        id: Number(id), // Convert id to a number
-      },
+      where: { id: parseInt(id) }, // Ensure the ID is converted to an integer
       include: {
         owner: true,
         menuItems: true,
@@ -56,7 +63,7 @@ exports.getRestaurantById = async (req, res) => {
     });
 
     if (!restaurant) {
-      return res.status(404).json({ message: "Restaurant not found" });
+      return res.status(404).json({ message: "Restaurant not found." });
     }
 
     res.status(200).json(restaurant);
@@ -66,24 +73,26 @@ exports.getRestaurantById = async (req, res) => {
   }
 };
 
+
 // Update a restaurant
 exports.updateRestaurant = async (req, res) => {
   const { id } = req.params;
-  const { name, description, ownerId } = req.body;
-  const imageUrl = req.file ? req.file.path : undefined; // Get the image URL from the uploaded file
+  const { name, description, imageUrl, ownerId } = req.body;
 
   try {
-    const updatedRestaurant = await prismaConnection.restaurant.update({
+    const restaurant = await prismaConnection.restaurant.update({
       where: { id: parseInt(id) },
       data: {
         name,
         description,
-        imageUrl, // Only update imageUrl if it exists
+        imageUrl,
         ownerId,
       },
     });
 
-    res.status(200).json({ message: "Restaurant updated successfully", restaurant: updatedRestaurant });
+    res
+      .status(200)
+      .json({ message: "Restaurant updated successfully", restaurant });
   } catch (error) {
     if (error.code === "P2025") {
       res.status(404).json({ message: "Restaurant not found" });
@@ -126,7 +135,9 @@ exports.getMenuItemsByRestaurant = async (req, res) => {
     });
 
     if (!menuItems.length) {
-      return res.status(404).json({ message: "No menu items found for this restaurant" });
+      return res
+        .status(404)
+        .json({ message: "No menu items found for this restaurant" });
     }
 
     res.status(200).json(menuItems);
@@ -154,12 +165,14 @@ exports.getRestaurantByName = async (req, res) => {
     res.status(200).json(restaurant);
   } catch (error) {
     console.error("Error fetching restaurant by name:", error);
-    res.status(500).json({ message: "Internal server error", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Internal server error", error: error.message });
   }
 };
 
 // Retrieve all restaurants with menu items and their categories
-exports.getAllRestaurantsWithCategories = async (req, res) => {
+exports.getAllRestaurantswithCat = async (req, res) => {
   try {
     const restaurants = await prismaConnection.restaurant.findMany({
       include: {
@@ -177,15 +190,16 @@ exports.getAllRestaurantsWithCategories = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+;
 
-// Retrieve categories by restaurant ID
+
+// In Restaurant.controller.js
 exports.getCategoriesByRestaurantId = async (req, res) => {
   const { id } = req.params;
-
   try {
     const categories = await prismaConnection.category.findMany({
       where: { restaurantId: Number(id) },
-      include: { menuItems: true }, // Include the items for each category
+      include: { menuItems: true }, // Ensure this includes the items
     });
     res.status(200).json(categories);
   } catch (error) {
@@ -196,20 +210,31 @@ exports.getCategoriesByRestaurantId = async (req, res) => {
 
 // Retrieve a restaurant by owner ID
 exports.getRestaurantByOwnerId = async (req, res) => {
-  const { ownerId } = req.query;
+  const { ownerId } = req.params;
+  console.log("Owner ID received:", ownerId); // Log the ownerId
 
   try {
-    const restaurants = await prismaConnection.restaurant.findMany({
-      where: { ownerId: Number(ownerId) },
-    });
-
-    if (!restaurants.length) {
-      return res.status(404).json({ message: "No restaurants found for this owner." });
+    // Convert ownerId to an integer
+    const ownerIdInt = parseInt(ownerId, 10);
+    if (isNaN(ownerIdInt)) {
+      return res.status(400).json({ message: "Invalid owner ID." });
     }
 
-    res.status(200).json(restaurants);
+    // Find all restaurants by ownerId
+    const restaurants = await prismaConnection.restaurant.findMany({
+      where: {
+        ownerId: ownerIdInt,
+      },
+      include: {
+        owner: true,
+        menuItems: true,
+      },
+    });
+
+    return res.status(200).json(restaurants);
   } catch (error) {
     console.error("Error fetching restaurants by owner ID:", error);
-    res.status(500).json({ message: "Internal server error" });
+    return res.status(500).json({ message: "Error fetching restaurants." });
   }
 };
+
