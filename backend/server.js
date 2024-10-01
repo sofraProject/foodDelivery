@@ -19,6 +19,8 @@ const cartRoutes = require("./routes/cart.route");
 const categoryRoutes = require("./routes/category.route");
 const restaurantRoutes = require("./routes/Restaurant.route");
 const LocationRoutes = require("./routes/Location.route");
+const orderItemRoutes = require("./routes/Orderitem.route")
+
 
 // Import utility functions
 const { connectToDatabase } = require("./prisma/prisma");
@@ -55,7 +57,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/carts", cartRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/locations", LocationRoutes);
-
+app.use("/api/orderitem  " ,  orderItemRoutes)
 // Create HTTP server
 const server = http.createServer(app);
 

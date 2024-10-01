@@ -1,66 +1,88 @@
 "use client";
+
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { useParams } from "next/navigation"; // Use this for accessing params in Next.js
 
-const serverDomain =
-  process.env.NEXT_PUBLIC_SERVER_DOMAINE || "http://localhost:3000"; // Provide a default value
+const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE || "http://localhost:3000";
 
 const MenuItemManagementPage = () => {
-  const [menuItems, setMenuItems] = useState<any[]>([]);
+  const { restaurantId } = useParams(); // Accessing restaurantId from params
+
+  const [menuItems, setMenuItems] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(null);
   const [newMenuItem, setNewMenuItem] = useState({ name: "", description: "", price: "", categoryId: "", available: true });
-  const [editingMenuItem, setEditingMenuItem] = useState<any | null>(null);
+  const [editingMenuItem, setEditingMenuItem] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
+  const [updateError, setUpdateError] = useState(null);
 
   useEffect(() => {
     const fetchMenuItems = async () => {
-      try {
-        const response = await axios.get(`${serverDomain}/api/menu-items`);
-        setMenuItems(response.data);
+      // Validate restaurantId
+      if (!restaurantId || isNaN(restaurantId)) {
+        setError("Invalid restaurant ID.");
         setLoading(false);
-      } catch (error) {
-        setError("Error fetching menu items.");
+        return;
+      }
+
+      try {
+        const response = await axios.get(`${serverDomain}/api/menu-items/restaurant/${restaurantId}`);
+        setMenuItems(response.data);
+      } catch (err) {
+        setError(err.response ? err.response.data : "Error fetching menu items.");
+      } finally {
         setLoading(false);
       }
     };
 
     fetchMenuItems();
-  }, []);
+  }, [restaurantId]);
 
-  const handleAddMenuItem = async () => {
+  const handleAddMenuItem = async (e) => {
+    e.preventDefault();
     try {
-      const response = await axios.post(`${serverDomain}/api/menu-items`, newMenuItem);
+      const response = await axios.post(`${serverDomain}/api/menu-items`, { ...newMenuItem, restaurantId });
       setMenuItems([...menuItems, response.data]);
       setNewMenuItem({ name: "", description: "", price: "", categoryId: "", available: true });
-    } catch (error) {
-      console.error("Error adding menu item", error);
+      setSuccessMessage("Menu item added successfully!");
+      setUpdateError(null);
+    } catch (err) {
+      setUpdateError("Error adding menu item. Please try again.");
+      console.error("Error adding menu item", err);
     }
   };
 
-  const handleEditMenuItem = (menuItem: any) => {
+  const handleEditMenuItem = (menuItem) => {
     setEditingMenuItem(menuItem);
     setNewMenuItem({ name: menuItem.name, description: menuItem.description, price: menuItem.price, categoryId: menuItem.categoryId, available: menuItem.available });
   };
 
-  const handleUpdateMenuItem = async () => {
+  const handleUpdateMenuItem = async (e) => {
+    e.preventDefault();
     if (!editingMenuItem) return;
 
     try {
-      const response = await axios.put(`${serverDomain}/api/menu-items/${editingMenuItem.id}`, newMenuItem);
+      const response = await axios.put(`${serverDomain}/api/menu-items/${editingMenuItem.id}`, { ...newMenuItem, restaurantId });
       setMenuItems(menuItems.map(item => (item.id === editingMenuItem.id ? response.data : item)));
       setNewMenuItem({ name: "", description: "", price: "", categoryId: "", available: true });
       setEditingMenuItem(null);
-    } catch (error) {
-      console.error("Error updating menu item", error);
+      setSuccessMessage("Menu item updated successfully!");
+      setUpdateError(null);
+    } catch (err) {
+      setUpdateError("Error updating menu item. Please try again.");
+      console.error("Error updating menu item", err);
     }
   };
 
-  const handleDeleteMenuItem = async (menuItemId: number) => {
+  const handleDeleteMenuItem = async (menuItemId) => {
     try {
       await axios.delete(`${serverDomain}/api/menu-items/${menuItemId}`);
       setMenuItems(menuItems.filter(item => item.id !== menuItemId));
-    } catch (error) {
-      console.error("Error deleting menu item", error);
+      setSuccessMessage("Menu item deleted successfully!");
+    } catch (err) {
+      setUpdateError("Error deleting menu item. Please try again.");
+      console.error("Error deleting menu item", err);
     }
   };
 
@@ -75,7 +97,7 @@ const MenuItemManagementPage = () => {
   if (error) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p className="text-red-500">{error}</p>
+        <p className="text-red-500">{error.message ? error.message : "Error fetching menu items."}</p>
       </div>
     );
   }
@@ -90,52 +112,57 @@ const MenuItemManagementPage = () => {
 
       <main className="flex flex-col flex-grow mx-auto max-w-7xl">
         <section className="p-6">
-          <h2 className="mb-6 text-3xl font-bold">Menu Item List</h2>
-
-          <div className="mb-6">
-            <h3 className="text-xl font-semibold">Add New Menu Item</h3>
+          {updateError && <p className="text-red-500">{updateError}</p>}
+          {successMessage && <p className="text-green-500">{successMessage}</p>}
+          
+          <h2 className="mb-6 text-3xl font-bold">Add New Menu Item</h2>
+          <form onSubmit={editingMenuItem ? handleUpdateMenuItem : handleAddMenuItem}>
             <input
               type="text"
-              placeholder="Name"
               value={newMenuItem.name}
               onChange={(e) => setNewMenuItem({ ...newMenuItem, name: e.target.value })}
-              className="block w-full p-2 mb-2 border rounded"
+              placeholder="Name"
+              className="mt-2 p-2 border rounded w-full"
+              required
             />
             <input
               type="text"
-              placeholder="Description"
               value={newMenuItem.description}
               onChange={(e) => setNewMenuItem({ ...newMenuItem, description: e.target.value })}
-              className="block w-full p-2 mb-2 border rounded"
+              placeholder="Description"
+              className="mt-2 p-2 border rounded w-full"
+              required
             />
             <input
               type="number"
-              placeholder="Price"
               value={newMenuItem.price}
               onChange={(e) => setNewMenuItem({ ...newMenuItem, price: e.target.value })}
-              className="block w-full p-2 mb-2 border rounded"
+              placeholder="Price"
+              className="mt-2 p-2 border rounded w-full"
+              required
             />
             <input
               type="text"
-              placeholder="Category ID"
               value={newMenuItem.categoryId}
               onChange={(e) => setNewMenuItem({ ...newMenuItem, categoryId: e.target.value })}
-              className="block w-full p-2 mb-2 border rounded"
+              placeholder="Category ID"
+              className="mt-2 p-2 border rounded w-full"
+              required
             />
-            <button
-              onClick={editingMenuItem ? handleUpdateMenuItem : handleAddMenuItem}
-              className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
-            >
-              {editingMenuItem ? "Update Menu Item" : "Add Menu Item"}
-            </button>
-          </div>
+            <div className="flex justify-end mt-4">
+              <button
+                type="submit"
+                className="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+              >
+                {editingMenuItem ? "Update Menu Item" : "Add Menu Item"}
+              </button>
+            </div>
+          </form>
 
+          <h2 className="mt-8 mb-6 text-3xl font-bold">Menu Item List</h2>
           <div className="space-y-4">
             {menuItems.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center p-4 bg-white rounded-lg shadow-md"
-              >
+              <div key={item.id} className="flex items-center p-4 bg-white rounded-lg shadow-md">
                 <div className="flex-grow">
                   <h3 className="text-lg font-semibold">{item.name}</h3>
                   <p className="text-sm text-gray-500">{item.description}</p>

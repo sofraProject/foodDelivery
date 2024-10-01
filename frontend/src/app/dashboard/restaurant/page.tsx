@@ -23,7 +23,7 @@ const dashboardCards = [
     title: "Manage Restaurant",
     description: "Edit and update restaurant details",
     icon: AiOutlineShop,
-    path: "./pages/dashboard/restaurant/detail/[ownerId]/page.tsx",
+    path: "./restaurant/detail/[ownerId]",
    
     color: "text-yellow-500",
   },
@@ -31,14 +31,14 @@ const dashboardCards = [
     title: "Sales",
     description: "View sales performance",
     icon: AiOutlineDollar,
-    path: "/sales",
-    color: "text-green-500",
+    path: "./restaurant/sales",
+    color: "text-green-500", 
   },
   {
     title: "Manage Menu",
     description: "Edit and update the restaurant menu",
     icon: AiOutlineMenu,
-    path: "./restaurant/menu",
+    path:"./restaurant/menu/[ownerId]",
     color: "text-blue-500",
   },
   {

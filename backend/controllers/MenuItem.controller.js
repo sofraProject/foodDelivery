@@ -235,11 +235,17 @@ exports.getUnavailableMenuItemsByUser = async (req, res) => {
 
 // Récupère les éléments de menu par restaurant
 exports.getMenuItemsByRestaurant = async (req, res) => {
-  const { id } = req.params;
+  const { id } = req.params; // Ensure this ID is being correctly captured
+
+  // Validate that the ID is a number
+  const restaurantId = parseInt(id);
+  if (isNaN(restaurantId)) {
+    return res.status(400).json({ message: "Invalid restaurant ID." });
+  }
 
   try {
     const menuItems = await prismaConnection.menuItem.findMany({
-      where: { restaurantId: parseInt(id) },
+      where: { restaurantId: restaurantId }, // Use the parsed ID
       include: {
         category: true, // Include the category for each menu item
         restaurant: true, // Include the restaurant for each menu item
@@ -247,14 +253,12 @@ exports.getMenuItemsByRestaurant = async (req, res) => {
     });
 
     if (!menuItems.length) {
-      return res
-        .status(404)
-        .json({ message: "No menu items found for this restaurant" });
+      return res.status(404).json({ message: "No menu items found for this restaurant." });
     }
 
     res.status(200).json(menuItems);
   } catch (error) {
     console.error("Error fetching menu items for restaurant:", error);
-    res.status(500).json({ message: "Internal server error" });
+    res.status(500).json({ message: "Internal server error." });
   }
 };
