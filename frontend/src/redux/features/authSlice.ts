@@ -1,11 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
-import {
-  LoginCredentials,
-  SignUpCredentials,
-  User,
-  UserResponse,
-} from "../../types/userTypes";
+import { LoginCredentials, User, UserResponse } from "../../types/userTypes";
 
 const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
 
@@ -20,6 +15,14 @@ const initialState: AuthState = {
   status: "idle",
   error: null,
 };
+// Update your types in userTypes.ts (or where the types are defined)
+interface SignUpCredentials {
+  name: string;
+  email: string;
+  password: string;
+  role: string;
+  profilePicture?: File | null; // Add profilePicture to the SignUpCredentials interface
+}
 
 // Logout action
 export const logoutUser = createAsyncThunk("auth/logoutUser", async () => {
@@ -46,13 +49,27 @@ export const loginUser = createAsyncThunk<UserResponse, LoginCredentials>(
 export const signUpUser = createAsyncThunk<UserResponse, SignUpCredentials>(
   "auth/signUpUser",
   async (credentials, { rejectWithValue }) => {
-    console.log(credentials,"credentials")
     try {
+      const formData = new FormData();
+      formData.append("name", credentials.name);
+      formData.append("email", credentials.email);
+      formData.append("password", credentials.password);
+      formData.append("role", credentials.role);
+
+      if (credentials.profilePicture) {
+        formData.append("profilePicture", credentials.profilePicture);
+      }
+
       const response = await axios.post<UserResponse>(
         `${serverDomain}/api/auth/signup`,
-        credentials
+        formData, // Send the FormData object to handle the file upload
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
       );
-      console.log("response.data",response.data);
+
       return response.data;
     } catch (error) {
       return rejectWithValue((error as Error).message);
@@ -181,21 +198,19 @@ const authSlice = createSlice({
       .addCase(updateUserLocation.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload as string;
-        
       })
-         // Fetch User
-    .addCase(fetchUser.pending, (state) => {
-      state.status = "loading";
-    })
-    .addCase(fetchUser.fulfilled, (state, action) => {
-      state.status = "succeeded";
-      state.user = action.payload.user; // Assuming the user data is returned
-    })
-    .addCase(fetchUser.rejected, (state, action) => {
-      state.status = "failed";
-      state.error = action.payload as string;
-    });
-      
+      // Fetch User
+      .addCase(fetchUser.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchUser.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.user = action.payload.user; // Assuming the user data is returned
+      })
+      .addCase(fetchUser.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload as string;
+      });
   },
 });
 

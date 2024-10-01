@@ -1,5 +1,5 @@
 const { PrismaClient } = require("@prisma/client");
-const {prismaConnection} = require('../prisma/prisma');
+const { prismaConnection } = require("../prisma/prisma");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
@@ -14,15 +14,19 @@ module.exports = {
   // Contrôleur pour l'inscription d'un utilisateur
   signUp: async (req, res) => {
     try {
-      const { email, password, role, name  } = req.body;
+      const { email, password, role, name } = req.body;
       console.log("Request body:", req.body);
       // Validation des champs requis
       if (!email || !password || !role || !name) {
-        return res.status(400).json({ message: "Email, password, role, and name are required" });
+        return res
+          .status(400)
+          .json({ message: "Email, password, role, and name are required" });
       }
 
       // Check for existing user
-      const existingUser = await prismaConnection.user.findUnique({ where: { email } });
+      const existingUser = await prismaConnection.user.findUnique({
+        where: { email },
+      });
       if (existingUser) {
         return res.status(400).json({ message: "Email already in use." });
       }
@@ -52,6 +56,7 @@ module.exports = {
           //     locationName: location.name,
           //   },
           // }, // Gère la relation avec l'entité Location
+          imagesUrl: req.file ? req.file.path : null, // Add image upload handling
           imageUrl: profilePicture,
         },
       });
@@ -64,8 +69,6 @@ module.exports = {
         { expiresIn: process.env.JWT_EXPIRES_IN || "1h" },
         { expiresIn: process.env.JWT_EXPIRES_IN || "1h" }
       );
-
-      
 
       res.status(201).json({
         message: "Account created successfully.",
@@ -108,7 +111,6 @@ module.exports = {
           id: user.id,
           email: user.email,
           role: user.role,
-          location: user.location,
           name: user.name,
           photoURL: user.imagesUrl,
         },
