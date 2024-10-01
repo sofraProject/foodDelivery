@@ -24,7 +24,6 @@ const dashboardCards = [
     description: "Edit and update restaurant details",
     icon: AiOutlineShop,
     path: "./restaurant/detail/[ownerId]",
-   
     color: "text-yellow-500",
   },
   {
@@ -38,7 +37,7 @@ const dashboardCards = [
     title: "Manage Menu",
     description: "Edit and update the restaurant menu",
     icon: AiOutlineMenu,
-    path:"./restaurant/menu/[ownerId]",
+    path: "./restaurant/menu/[ownerId]",
     color: "text-blue-500",
   },
   {
@@ -66,23 +65,17 @@ const dashboardCards = [
 
 const Dashboard = () => {
   const router = useRouter();
+  const ownerId = "someOwnerId"; // Replace with actual ownerId from your state/context
 
-  // Function to handle navigation
-  const navigateTo = (path: string) => {
-    const ownerId = "someOwnerId"; // Replace with actual ownerId from your state/context
+  const navigateTo = (path) => {
     const actualPath = path.replace("[ownerId]", ownerId);
     router.push(actualPath);
   };
-  
-
 
   return (
     <div className="min-h-screen py-10 mt-24 bg-gray-100">
       <div className="mx-auto max-w-7xl">
-        <h1 className="mb-6 text-4xl font-bold text-gray-900">
-          Restaurant Owner Dashboard
-        </h1>
-
+        <h1 className="mb-6 text-4xl font-bold text-gray-900">Restaurant Owner Dashboard</h1>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
           {dashboardCards.map((card, index) => (
             <div
@@ -93,9 +86,7 @@ const Dashboard = () => {
               <div className="flex items-center">
                 <card.icon className={`w-10 h-10 ${card.color} mr-4`} />
                 <div>
-                  <h2 className="text-2xl font-semibold text-gray-800">
-                    {card.title}
-                  </h2>
+                  <h2 className="text-2xl font-semibold text-gray-800">{card.title}</h2>
                   <p className="text-sm text-gray-500">{card.description}</p>
                 </div>
               </div>

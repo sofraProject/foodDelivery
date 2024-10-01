@@ -1,4 +1,3 @@
-
 "use client";
 
 import axios from "axios";
@@ -8,7 +7,7 @@ import { useParams } from "next/navigation";
 const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE || "http://localhost:3000";
 
 const FactureComponent = () => {
-  const { orderId } = useParams(); // Assuming orderId is passed in the URL
+  const { orderId } = useParams();
   const [orderItems, setOrderItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -19,7 +18,7 @@ const FactureComponent = () => {
         const response = await axios.get(`${serverDomain}/api/orders/order-items/order/${orderId}`);
         setOrderItems(response.data);
       } catch (err) {
-        setError("Error fetching order items.");
+        setError("Error fetching order items: " + err.message);
       } finally {
         setLoading(false);
       }
@@ -35,6 +34,8 @@ const FactureComponent = () => {
   if (error) {
     return <p className="text-red-500">{error}</p>;
   }
+
+  const totalAmount = orderItems.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2);
 
   return (
     <div className="p-6">
@@ -58,7 +59,7 @@ const FactureComponent = () => {
         </tbody>
       </table>
       <div className="mt-4">
-        <h2 className="text-xl font-bold">Total: ${orderItems.reduce((total, item) => total + item.price * item.quantity, 0).toFixed(2)}</h2>
+        <h2 className="text-xl font-bold">Total: ${totalAmount}</h2>
       </div>
     </div>
   );
