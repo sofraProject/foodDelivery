@@ -2,6 +2,7 @@
 import { useRouter } from "next/navigation";
 import React, { FormEvent, useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
+import axios from 'axios';
 import Button from "../../components/Form/Button";
 import TextField from "../../components/Form/TextField";
 import { useAuth } from "../../hooks/useAuth";
@@ -20,34 +21,30 @@ const AuthForm: React.FC = () => {
   const [role, setRole] = useState("customer");
   const [signupError, setSignupError] = useState<string | null>(null);
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
-  const [profilePictureBase64, setProfilePictureBase64] = useState<string | null>(null);
 
   useEffect(() => {
     setSignupError(null);
   }, [isSignUp, email, password, name]);
 
-  // Convert image file to base64 string
-  useEffect(() => {
-    if (profilePicture) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setProfilePictureBase64(reader.result as string);
-      };
-      reader.readAsDataURL(profilePicture);
-    }
-  }, [profilePicture]);
-
   const handleSignUpSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     try {
-      await dispatch(signUpUser({
-        name,
-        email,
-        password,
-        role,
-        profilePicture: profilePictureBase64, // Send base64 image
-      }));
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('email', email);
+      formData.append('password', password);
+      formData.append('role', role);
+      if (profilePicture) {
+        formData.append('profilePicture', profilePicture);
+      }
+
+      await axios.post(`${process.env.NEXT_PUBLIC_SERVER_DOMAINE}/api/auth/signup`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
       router.push("/joinus");
     } catch (error) {
       console.error("Error signing up:", error);

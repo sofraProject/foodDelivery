@@ -270,6 +270,7 @@ exports.deleteCustomer = async (req, res) => {
     res.status(500).json({ message: "Error deleting customer" });
   }
 }
+
 exports.updateProfilePicture = async (req, res) => {
   const userId = parseInt(req.params.id); // Ensure user ID is an integer
 
@@ -291,3 +292,4 @@ exports.updateProfilePicture = async (req, res) => {
       res.status(500).send("Error updating profile picture.");
   }
 };
+
