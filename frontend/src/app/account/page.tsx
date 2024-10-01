@@ -6,8 +6,10 @@ import YourProfile from "@/components/Account/YourProfile";
 import UpdateProfile from "@/components/Account/UpdateProfile";
 
 const Account = () => {
-    const [selectedComponent, setSelectedComponent] = useState<'profile' | 'update'>('profile'); // Define allowed values
+    // State to manage the currently selected component
+    const [selectedComponent, setSelectedComponent] = useState<'profile' | 'update'>('profile');
 
+    // Function to render the selected component
     const renderComponent = () => {
         switch (selectedComponent) {
             case 'profile':
@@ -21,8 +23,10 @@ const Account = () => {
 
     return (
         <div style={{ display: 'flex' }}>
+            {/* Sidebar for selecting components */}
             <Sidebar onSelect={setSelectedComponent} />
             <div style={{ padding: '20px', flex: 1 }}>
+                {/* Render the currently selected component */}
                 {renderComponent()}
             </div>
         </div>
