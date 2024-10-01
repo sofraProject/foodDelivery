@@ -205,21 +205,47 @@ module.exports = {
   deleteOrder: async (req, res) => {
     try {
       const orderId = parseInt(req.params.id);
-
+  
       // Check if the order exists before deleting
       const order = await prismaConnection.order.findUnique({
         where: { id: orderId },
+        include: {
+          orderItems: true, // Include order items
+          payments: true, // Include payments
+          delivery: true, // Include delivery details
+          notifications: true // Include notifications
+        },
       });
-
+  
       if (!order) {
         return res.status(404).json({ message: "Order not found" });
       }
-
+  
+      // Delete related order items
+      await prismaConnection.orderItem.deleteMany({
+        where: { orderId: orderId },
+      });
+  
+      // Delete related payments, if any
+      await prismaConnection.payment.deleteMany({
+        where: { orderId: orderId },
+      });
+  
+      // Delete related delivery details, if any
+      await prismaConnection.delivery.deleteMany({
+        where: { orderId: orderId },
+      });
+  
+      // Delete related notifications, if any
+      await prismaConnection.notification.deleteMany({
+        where: { orderId: orderId },
+      });
+  
       // Delete the order
       await prismaConnection.order.delete({
         where: { id: orderId },
       });
-
+  
       // Optionally, send a notification when the order is deleted
       await prismaConnection.notification.create({
         data: {
@@ -227,13 +253,11 @@ module.exports = {
           message: `Your order #${order.id} has been deleted.`,
         },
       });
-
+  
       res.status(204).send();
     } catch (error) {
       console.error("Error deleting order:", error);
-      res
-        .status(500)
-        .json({ message: "Error deleting order", error: error.message });
+      res.status(500).json({ message: "Error deleting order", error: error.message });
     }
   },
 
@@ -278,19 +302,24 @@ module.exports = {
     try {
       const orders = await prismaConnection.order.findMany({
         include: {
-          orderItems: {
-            include: {
-              menuItem: true, // Include menu item details
-            },
-          },
-          delivery: {
-            include: {
-              driver: { select: { name: true, email: true } },
-            },
-          },
-          payments: true,
-        },
-      });
+            orderItems: {
+                include: {
+                    menuItem: true
+                  },
+                },
+                delivery: {
+                  include: {
+                    driver: { select: { name: true, email: true } },
+                  },
+                },
+            payments: true,
+            customer: true,   // Assuming these exist in your model
+            restaurant: true,  // Assuming these exist in your model
+            driver: true,      // Assuming these exist in your model
+            notifications: true // Assuming these exist in your model
+        }
+    });
+    
 
       res.status(200).json(orders);
     } catch (error) {
@@ -480,6 +509,35 @@ module.exports = {
     } catch (error) {
       console.error("Error fetching confirmed orders:", error);
       res.status(500).json({ message: "Error fetching confirmed orders" });
+    }
+  },
+  getOrdersByUserId: async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      
+      // Fetch orders for the given userId
+      const orders = await prismaConnection.order.findMany({
+        where: { customerId: userId }, // Adjust this based on your schema
+        include: {
+          orderItems: {
+            include: {
+              menuItem: true,
+            },
+          },
+          payments: true,
+          restaurant: true,
+          // Include any other necessary relations
+        },
+      });
+  
+      if (!orders.length) {
+        return res.status(404).json({ message: "No orders found for this user" });
+      }
+  
+      res.status(200).json(orders);
+    } catch (error) {
+      console.error("Error fetching orders by user ID:", error);
+      res.status(500).json({ message: "Error fetching orders", error: error.message });
     }
   },
 
