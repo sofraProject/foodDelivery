@@ -9,7 +9,7 @@ router.post("/", restaurantController.createRestaurant);
 router.get("/category", restaurantController.getAllRestaurantswithCat);
 
 // Retrieve all restaurants
-router.get("/restaurants", restaurantController.getAllRestaurants);
+router.get("/", restaurantController.getAllRestaurants);
 
 // Retrieve a specific restaurant by ID
 router.get("/:id", restaurantController.getRestaurantById);

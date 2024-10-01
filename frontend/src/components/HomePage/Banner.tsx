@@ -49,12 +49,12 @@ const Banner: React.FC = () => {
 
   const handleSearch = useCallback(() => {
     setError("");
-    if (searchTerm.trim()) {
-      debouncedSearch(searchTerm);
+    if (searchTerm.trim() && user?.location) {
+      debouncedSearch(searchTerm, user.location);
     } else {
-      setError("Please enter a valid search term.");
+      setError("Please enter a valid search term or location.");
     }
-  }, [searchTerm, debouncedSearch]);
+  }, [searchTerm, debouncedSearch, user?.location]);
 
   return (
     <section className="relative flex items-center justify-center w-full mt-16 h-[32rem] bg-[#BFF38A]">
