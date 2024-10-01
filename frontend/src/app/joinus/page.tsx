@@ -7,6 +7,7 @@ import TextField from "../../components/Form/TextField";
 import { useAuth } from "../../hooks/useAuth";
 import { signUpUser } from "../../redux/features/authSlice";
 import { AppDispatch } from "../../redux/store";
+import axios from "axios";
 
 const AuthForm: React.FC = () => {
   const router = useRouter();
@@ -19,7 +20,7 @@ const AuthForm: React.FC = () => {
   const [name, setName] = useState("");
   const [role, setRole] = useState("CUSTOMER");
   const [signupError, setSignupError] = useState<string | null>(null);
-  const [profilePicture, setProfilePicture] = useState<File | null>(null);
+  const [imageUrl, setimageUrl] = useState<File | null>(null);
 
   useEffect(() => {
     setSignupError(null); // Reset error when form changes
@@ -28,14 +29,13 @@ const AuthForm: React.FC = () => {
   const handleSignUpSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-<<<<<<< HEAD
       const formData = new FormData();
       formData.append('name', name);
       formData.append('email', email);
       formData.append('password', password);
       formData.append('role', role);
-      if (profilePicture) {
-        formData.append('imageUrl', profilePicture);
+      if (imageUrl) {
+        formData.append('imageUrl', imageUrl);
       }
 
       await axios.post(`${process.env.NEXT_PUBLIC_SERVER_DOMAINE}/api/auth/signup`, formData, {
@@ -44,17 +44,6 @@ const AuthForm: React.FC = () => {
         },
       });
 
-=======
-      await dispatch(
-        signUpUser({
-          name,
-          email,
-          password,
-          role,
-          profilePicture,
-        })
-      );
->>>>>>> dc73b9339cf044674693a0c4179a6906a2c4e839
       router.push("/joinus");
     } catch (error) {
       console.error("Error signing up:", error);
@@ -138,7 +127,7 @@ const AuthForm: React.FC = () => {
                   type="file"
                   accept="image/*"
                   onChange={(e) =>
-                    setProfilePicture(e.target.files?.[0] || null)
+                    setimageUrl(e.target.files?.[0] || null)
                   }
                   className="p-2 text-gray-900 border border-gray-300 rounded-md bg-gray-50 focus:ring-primary focus:border-primary"
                 />

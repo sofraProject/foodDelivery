@@ -7,7 +7,7 @@ multer = require('multer');
 const upload = require('../middleware/multer')
 
 
-router.post("/signup",upload.single('profilePicture'), signUp);
+router.post("/signup",upload.single('imageUrl'), signUp);
 router.post("/signin", signIn);
 router.get("/me", authenticate, me);
 

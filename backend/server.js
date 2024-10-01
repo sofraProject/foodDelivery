@@ -7,7 +7,7 @@ const cookieParser = require("cookie-parser");
 const http = require("http");
 require("dotenv").config();
 const bodyParser = require('body-parser');
-
+const upload = require('./middleware/multer'); // Import multer middleware
 
 // Import routes
 const orderRoutes = require("./routes/Order.route");

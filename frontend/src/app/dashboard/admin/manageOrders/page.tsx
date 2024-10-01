@@ -128,7 +128,7 @@ const AdminManageOrdersPage = () => {
     <div className="min-h-screen mt-20 bg-gray-100">
       <header className="w-full bg-white">
         <div className="flex justify-between px-6 py-8 mx-auto max-w-7xl">
-          <h1 className="text-5xl font-bold text-gray-900">Manage Orders</h1>
+          <h1 className="text-5xl font-bold text-gray-900">Orders</h1>
         </div>
       </header>
 

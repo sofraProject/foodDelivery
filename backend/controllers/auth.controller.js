@@ -56,7 +56,7 @@ module.exports = {
           //     locationName: location.name,
           //   },
           // }, // Gère la relation avec l'entité Location
-          imagesUrl: req.file ? req.file.path : null, // Add image upload handling
+          // imagesUrl: req.file ? req.file.path : null, // Add image upload handling
           imageUrl: profilePicture,
         },
       });

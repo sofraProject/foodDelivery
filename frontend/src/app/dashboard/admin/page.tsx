@@ -3,13 +3,8 @@
 import { useRouter } from "next/navigation";
 import {
   AiOutlineShoppingCart,
-  AiOutlineDollar,
   AiOutlineShop,
-  AiOutlineMenu,
-  AiOutlineCalendar,
   AiOutlineUsergroupAdd,
-  AiOutlineStar,
-  AiOutlineUser,
 } from "react-icons/ai";
 
 const dashboardCards = [
