@@ -262,6 +262,20 @@ exports.updateUserLocation = async (req, res) => {
     }
   });
 
+// Delete a customer
+exports.deleteCustomer = async (req, res) => {
+  try {
+    const customerId = parseInt(req.params.id);
+    await prismaConnection.user.delete({
+      where: { id: customerId },
+    });
+    res.status(204).send();
+  } catch (error) {
+    console.error("Error deleting customer:", error);
+    res.status(500).json({ message: "Error deleting customer" });
+  }
+};
+
 exports.updateProfilePicture = async (req, res) => {
   const userId = parseInt(req.params.id); // Ensure user ID is an integer
 

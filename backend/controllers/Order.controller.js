@@ -211,11 +211,37 @@ module.exports = {
       // Check if the order exists before deleting
       const order = await prismaConnection.order.findUnique({
         where: { id: orderId },
+        include: {
+          orderItems: true, // Include order items
+          payments: true, // Include payments
+          delivery: true, // Include delivery details
+          notifications: true, // Include notifications
+        },
       });
 
       if (!order) {
         return res.status(404).json({ message: "Order not found" });
       }
+
+      // Delete related order items
+      await prismaConnection.orderItem.deleteMany({
+        where: { orderId: orderId },
+      });
+
+      // Delete related payments, if any
+      await prismaConnection.payment.deleteMany({
+        where: { orderId: orderId },
+      });
+
+      // Delete related delivery details, if any
+      await prismaConnection.delivery.deleteMany({
+        where: { orderId: orderId },
+      });
+
+      // Delete related notifications, if any
+      await prismaConnection.notification.deleteMany({
+        where: { orderId: orderId },
+      });
 
       // Delete the order
       await prismaConnection.order.delete({
@@ -282,7 +308,7 @@ module.exports = {
         include: {
           orderItems: {
             include: {
-              menuItem: true, // Include menu item details
+              menuItem: true,
             },
           },
         },
@@ -476,6 +502,39 @@ module.exports = {
     } catch (error) {
       console.error("Error fetching confirmed orders:", error);
       res.status(500).json({ message: "Error fetching confirmed orders" });
+    }
+  },
+  getOrdersByUserId: async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+
+      // Fetch orders for the given userId
+      const orders = await prismaConnection.order.findMany({
+        where: { customerId: userId }, // Adjust this based on your schema
+        include: {
+          orderItems: {
+            include: {
+              menuItem: true,
+            },
+          },
+          payments: true,
+          restaurant: true,
+          // Include any other necessary relations
+        },
+      });
+
+      if (!orders.length) {
+        return res
+          .status(404)
+          .json({ message: "No orders found for this user" });
+      }
+
+      res.status(200).json(orders);
+    } catch (error) {
+      console.error("Error fetching orders by user ID:", error);
+      res
+        .status(500)
+        .json({ message: "Error fetching orders", error: error.message });
     }
   },
 
