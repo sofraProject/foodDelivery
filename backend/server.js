@@ -8,6 +8,7 @@ const http = require("http");
 require("dotenv").config();
 const bodyParser = require('body-parser');
 
+
 // Import routes
 const orderRoutes = require("./routes/Order.route");
 const menuItemRoutes = require("./routes/MenuItem.route");
@@ -44,8 +45,8 @@ app.use('/uploads', express.static('uploads'));
 helmet({
   crossOriginResourcePolicy: false,
 })
-app.use(bodyParser.json({ limit: '100mb' })); // Vous pouvez ajuster la limite selon vos besoins
-app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }))
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // Define API routes
 app.use("/api/orders", orderRoutes);

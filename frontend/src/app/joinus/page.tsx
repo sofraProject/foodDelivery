@@ -36,7 +36,7 @@ const AuthForm: React.FC = () => {
       formData.append('password', password);
       formData.append('role', role);
       if (profilePicture) {
-        formData.append('profilePicture', profilePicture);
+        formData.append('imageUrl', profilePicture);
       }
 
       await axios.post(`${process.env.NEXT_PUBLIC_SERVER_DOMAINE}/api/auth/signup`, formData, {
