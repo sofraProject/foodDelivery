@@ -86,8 +86,8 @@
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import React, { useEffect, useRef } from "react";
-import IconDriver from "./Delivery.png";
-import IconMe from "./Me.png";
+import IconDriver from "../../../assets/Delivery.png";
+import IconMe from "../../../assets/Me.png";
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_TOKEN || "";
 
 type Props = {

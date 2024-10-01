@@ -6,7 +6,7 @@ const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const http = require("http");
 require("dotenv").config();
-const bodyParser = require('body-parser');
+const bodyParser = require("body-parser");
 
 // Import routes
 const orderRoutes = require("./routes/Order.route");
@@ -31,21 +31,15 @@ const app = express();
 const PORT = process.env.SERVER_PORT || 3000;
 
 // Middleware configuration
-app.use(cors({
-  origin: 'http://localhost:3000',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+app.use(cors());
 app.use(helmet());
 app.use(express.json());
 app.use(cookieParser());
 app.use(morgan("dev"));
-app.use('/uploads', express.static('uploads'));
+app.use("/uploads", express.static("uploads"));
 helmet({
   crossOriginResourcePolicy: false,
-})
-app.use(bodyParser.json({ limit: '100mb' })); // Vous pouvez ajuster la limite selon vos besoins
-app.use(bodyParser.urlencoded({ limit: '100mb', extended: true }))
+});
 
 // Define API routes
 app.use("/api/orders", orderRoutes);

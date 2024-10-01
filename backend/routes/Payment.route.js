@@ -8,4 +8,5 @@ router.post(
   authenticate,
   paymentController.generatePayment
 );
+router.put("/update-payment-method", paymentController.updatePaymentMethod);
 module.exports = router;
