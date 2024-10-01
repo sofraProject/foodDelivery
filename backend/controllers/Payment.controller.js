@@ -1,6 +1,6 @@
 const axios = require("axios");
 require("dotenv").config();
-
+const { prismaConnection } = require("../prisma/prisma");
 module.exports = {
   generatePayment: async (req, res) => {
     try {
@@ -29,6 +29,44 @@ module.exports = {
     } catch (error) {
       console.log(error);
       res.status(500).json({ error: "Failed to generate payment" });
+    }
+  },
+  // Contrôleur pour mettre à jour la méthode de paiement
+  updatePaymentMethod: async (req, res) => {
+    const { orderId, paymentMethod } = req.body;
+
+    try {
+      // Vérifier si la commande existe
+      const order = await prismaConnection.order.findUnique({
+        where: { id: parseInt(orderId) },
+      });
+
+      if (!order) {
+        return res.status(404).json({ message: "Order not found" });
+      }
+
+      // Mettre à jour la méthode de paiement pour tous les paiements associés à l'orderId
+      const updatedPayments = await prismaConnection.payment.updateMany({
+        where: { orderId: parseInt(orderId) },
+        data: {
+          paymentMethod: paymentMethod,
+          status: "PAID",
+        },
+      });
+
+      if (updatedPayments.count === 0) {
+        return res
+          .status(404)
+          .json({ message: "No payments found for the given order ID" });
+      }
+
+      res.status(200).json({
+        message: "Payment method updated successfully for all related payments",
+        updatedPayments,
+      });
+    } catch (error) {
+      console.error("Error updating payment:", error);
+      res.status(500).json({ error: "Error updating payment" });
     }
   },
 };
