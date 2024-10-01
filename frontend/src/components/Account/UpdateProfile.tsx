@@ -61,79 +61,79 @@ const UpdateProfile = () => {
 
     if (!userData) return <div>Loading...</div>;
 
-    return (
-        <div className="flex items-start justify-start min-h-screen bg-gradient-to-r from-primary to-neutral p-4">
-            <div className="w-full max-w-md mt-24">
-                <h2 className="text-2xl font-bold mb-4 text-left">Update Profile</h2>
-    
-                <div className="flex justify-between mb-4">
-                    <span className="block text-lg font-semibold">Name: {name}</span>
-                    <span className="text-blue-600 cursor-pointer ml-auto" onClick={() => setIsEditingName(true)}>Edit</span>
-                </div>
-    
-                <div className="flex justify-between mb-4">
-                    <span className="block text-lg font-semibold">Email: {email}</span>
-                    <span className="text-blue-600 cursor-pointer ml-auto" onClick={() => setIsEditingEmail(true)}>Edit</span>
-                </div>
-    
-                <div className="flex justify-between mb-4">
-                    <span className="block text-lg font-semibold">Change Password:</span>
-                    <span className="text-blue-600 cursor-pointer ml-auto" onClick={() => setIsEditingPassword(true)}>Edit</span>
-                </div>
-    
-                {isEditingName && (
-                    <Modal title="Edit your name" onClose={() => setIsEditingName(false)} onSave={handleUpdateName}>
-                        <input
-                            type="text"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            className="block w-full p-2 border border-gray-300 rounded-md"
-                        />
-                    </Modal>
-                )}
-    
-                {isEditingEmail && (
-                    <Modal title="Edit your email" onClose={() => setIsEditingEmail(false)} onSave={handleUpdateEmail}>
-                        <input
-                            type="email"
-                            value={email}
-                            onChange={(e) => setEmail(e.target.value)}
-                            className="block w-full p-2 border border-gray-300 rounded-md"
-                        />
-                    </Modal>
-                )}
-    
-                {isEditingPassword && (
-                    <Modal title="Change your password" onClose={() => setIsEditingPassword(false)} onSave={handleUpdatePassword}>
-                        <input
-                            type="password"
-                            placeholder="Enter new password"
-                            value={newPassword}
-                            onChange={(e) => setNewPassword(e.target.value)}
-                            className="block w-full p-2 border border-gray-300 rounded-md"
-                        />
-                    </Modal>
-                )}
-    
-                <h2 className="text-xl font-bold mt-6 mb-4 text-left">Update Profile Picture</h2>
-                <form className="space-y-4">
-                    <div>
-                        <Image
-                            src={`${serverDomain}/${userData.imageUrl}`}
-                            alt="Profile"
-                            width={160}
-                            height={160}
-                            className="rounded-full border-4 border-accent shadow-lg"
-                        />
-                    </div>
-                    <button type="submit" className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">
-                        Update Picture
-                    </button>
-                </form>
+  return (
+    <div className="flex items-start justify-start min-h-screen bg-gradient-to-r from-[#BFF38A] to-[#F2F2F2] p-4">
+        <div className="w-full max-w-md mt-24">
+            <h2 className="text-2xl font-bold mb-6 text-left text-[#101827]">Update Profile</h2>
+
+            <div className="flex justify-between mb-4">
+                <span className="block text-lg font-semibold text-[#101827]">{name}</span>
+                <span className="text-[#34C759] cursor-pointer ml-auto" onClick={() => setIsEditingName(true)}>Edit</span>
             </div>
+
+            <div className="flex justify-between mb-4">
+                <span className="block text-lg font-semibold text-[#101827]">{email}</span>
+                <span className="text-[#34C759] cursor-pointer ml-auto" onClick={() => setIsEditingEmail(true)}>Edit</span>
+            </div>
+
+            <div className="flex justify-between mb-4">
+                <span className="block text-lg font-semibold text-[#101827]">Change Password:</span>
+                <span className="text-[#34C759] cursor-pointer ml-auto" onClick={() => setIsEditingPassword(true)}>Edit</span>
+            </div>
+
+            {isEditingName && (
+                <Modal title="Edit your name" onClose={() => setIsEditingName(false)} onSave={handleUpdateName}>
+                    <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
+                        className="block w-full p-2 border border-[#e0ffbc] rounded-md"
+                    />
+                </Modal>
+            )}
+
+            {isEditingEmail && (
+                <Modal title="Edit your email" onClose={() => setIsEditingEmail(false)} onSave={handleUpdateEmail}>
+                    <input
+                        type="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="block w-full p-2 border border-[#e0ffbc] rounded-md"
+                    />
+                </Modal>
+            )}
+
+            {isEditingPassword && (
+                <Modal title="Change your password" onClose={() => setIsEditingPassword(false)} onSave={handleUpdatePassword}>
+                    <input
+                        type="password"
+                        placeholder="Enter new password"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        className="block w-full p-2 border border-[#e0ffbc] rounded-md"
+                    />
+                </Modal>
+            )}
+
+            <h2 className="text-xl font-bold mt-6 mb-4 text-left text-[#101827]">Update Profile Picture</h2>
+            <form className="space-y-4">
+                <div>
+                    <Image
+                        src={`${serverDomain}/${userData.imageUrl}`}
+                        alt="Profile"
+                        width={160}
+                        height={160}
+                        className="rounded-full border-4 border-[#34C759] shadow-lg"
+                    />
+                </div>
+                <button type="submit" className="mt-4 px-4 py-2 bg-[#34C759] text-white rounded-md hover:bg-[#2b9c43]">
+                    Update Picture
+                </button>
+            </form>
         </div>
-    );
-    
+    </div>
+);
+
     
 };
 
