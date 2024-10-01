@@ -13,6 +13,7 @@ interface AuthState {
   user: User | null;
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;
+  
 }
 
 const initialState: AuthState = {
@@ -47,9 +48,29 @@ export const signUpUser = createAsyncThunk<UserResponse, SignUpCredentials>(
   "auth/signUpUser",
   async (credentials, { rejectWithValue }) => {
     try {
-      const response = await axios.post<UserResponse>(
-        `${serverDomain}/api/auth/signup`,
-        credentials
+      const response = await axios.put(
+        `${serverDomain}/api/users/location`, 
+        { location }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue((error as Error).message);
+    }
+  }
+);
+
+// Update user action
+export const updateUser = createAsyncThunk<UserResponse, Partial<User>>(
+  "auth/updateUser",
+  async (userData, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as { auth: AuthState };
+      const userId = state.auth.user?.id;
+      if (!userId) throw new Error("User not authenticated");
+
+      const response = await axios.patch<UserResponse>(
+        `${serverDomain}/api/users/${userId}`,
+        userData
       );
       return response.data;
     } catch (error) {
@@ -73,6 +94,23 @@ export const updateUserLocation = createAsyncThunk<
       const response = await axios.patch<UserResponse>(
         `${serverDomain}/api/users/${userId}/location`,
         { longitude, latitude }
+      );
+      return response.data;
+    } catch (error) {
+      return rejectWithValue((error as Error).message); // Gère l'erreur
+    }
+  }
+);
+export const fetchUser = createAsyncThunk<UserResponse, void>(
+  "auth/fetchUser",
+  async (_, { getState, rejectWithValue }) => {
+    try {
+      const state = getState() as { auth: AuthState };
+      const userId = state.auth.user?.id;
+      if (!userId) throw new Error("User not authenticated");
+
+      const response = await axios.get<UserResponse>(
+        `${serverDomain}/api/users/${userId}`
       );
       return response.data;
     } catch (error) {
@@ -115,6 +153,20 @@ const authSlice = createSlice({
       .addCase(logoutUser.fulfilled, (state) => {
         state.user = null;
       })
+      // Update user
+      .addCase(updateUser.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        if (state.user) {
+          state.user = { ...state.user, ...action.payload.user }; // Merge updated user data
+        }
+      })
+      .addCase(updateUser.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.payload as string;
+      })
       // Update user location
       .addCase(updateUserLocation.pending, (state) => {
         state.status = "loading";
@@ -128,7 +180,21 @@ const authSlice = createSlice({
       .addCase(updateUserLocation.rejected, (state, action) => {
         state.status = "failed";
         state.error = action.payload as string;
-      });
+        
+      })
+         // Fetch User
+    .addCase(fetchUser.pending, (state) => {
+      state.status = "loading";
+    })
+    .addCase(fetchUser.fulfilled, (state, action) => {
+      state.status = "succeeded";
+      state.user = action.payload.user; // Assuming the user data is returned
+    })
+    .addCase(fetchUser.rejected, (state, action) => {
+      state.status = "failed";
+      state.error = action.payload as string;
+    });
+      
   },
 });
 

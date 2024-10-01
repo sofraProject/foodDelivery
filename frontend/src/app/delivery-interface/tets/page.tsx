@@ -83,7 +83,7 @@ const DeliveryInterface: React.FC = () => {
   const updateOrderStatus = async (newStatus: string) => {
     try {
       await axios.post(
-        "http://localhost:3000/api/orders/delivery/update-status",
+        "http://localhost:/api/orders/delivery/update-status",
         {
           orderId,
           status: newStatus,

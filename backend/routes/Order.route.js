@@ -1,41 +1,46 @@
 const express = require("express");
 const router = express.Router();
-const OrderController = require("../controllers/Order.controller"); // Assurez-vous que ce chemin est correct
+const OrderController = require("../controllers/Order.controller"); // Ensure this path is correct
 
-// Créer une nouvelle commande
+
+// Create a new order
 router.post("/", OrderController.createOrder);
 
-// Obtenir toutes les commandes (Admin seulement)
+// Get all orders (Admin only)
 router.get("/", OrderController.getAllOrders);
 
-// Obtenir les commandes avec le statut CONFIRMED
+// Get orders by status
 router.get("/status/confirmed", OrderController.getConfirmedOrders);
 
-// Obtenir une commande par ID
+// Get an order by ID
 router.get("/:id", OrderController.getOrderById);
 
-// Mettre à jour une commande par ID (peut inclure la mise à jour du statut)
+// Get orders by user ID
+router.get("/byUser/:userId", OrderController.getOrdersByUserId);
+
+// Update an order status by ID (may include status update)
 router.put("/:id", OrderController.updateOrderStatus);
 
-// Supprimer une commande par ID
+// Delete an order by ID
 router.delete("/:id", OrderController.deleteOrder);
 
-// Obtenir les données du tableau de bord de l'utilisateur
+// User dashboard data
 router.get("/dashboard/user", OrderController.getDashboardData);
 
-// Route pour paiement réussi
+// Payment success route
 router.put("/:id/success", OrderController.updateOrderPaymentSuccess);
 
-// Route pour paiement échoué
+// Payment failure route
 router.put("/:id/failure", OrderController.updateOrderPaymentFailure);
 
-// Route pour confirmer la commande
+// Confirm an order
 router.put("/:id/confirm", OrderController.confirmOrder);
 
-// Route pour ready la commande
+// Mark an order as ready
 router.put("/:id/ready", OrderController.updateOrderToReady);
 
-// Route pour assigner uniquement un chauffeur à une commande (sans changement de statut)
+// Assign a driver to an order (without changing status)
 router.put("/:id/assign-driver", OrderController.assignDriver);
 
 module.exports = router;
+

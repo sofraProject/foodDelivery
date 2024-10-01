@@ -24,6 +24,7 @@ const ManageOrderPage = () => {
   const [order, setOrder] = useState<OrderData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [updating, setUpdating] = useState(false); // State to handle the updating process
   const router = useRouter();
   const params = useParams();
   const orderId = params.orderId; // Ensure we retrieve the order ID correctly
@@ -59,6 +60,26 @@ const ManageOrderPage = () => {
       fetchOrderAndRestaurantDetails();
     }
   }, [orderId]);
+
+  // Function to update the order status to "On Route"
+  const markAsOnRoute = async () => {
+    try {
+      setUpdating(true);
+      // Send PUT request to update the order status
+      await axios.put(`${serverDomain}/api/orders/${orderId}/assign-driver`, {
+        driverId: 1,
+      });
+
+      // Update the local order status
+      setOrder((prevOrder) =>
+        prevOrder ? { ...prevOrder, status: "On Route" } : prevOrder
+      );
+      setUpdating(false);
+    } catch (error) {
+      console.error("Error updating the order status:", error);
+      setUpdating(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -106,10 +127,13 @@ const ManageOrderPage = () => {
 
           <div className="max-w-5xl mx-auto mt-6">
             <button
-              onClick={() => console.log("Mark as on route")} // Add the logic here
-              className="w-full px-6 py-2 text-white bg-green-600 rounded-lg hover:bg-green-700"
+              onClick={markAsOnRoute}
+              disabled={updating} // Disable the button if updating
+              className={`w-full px-6 py-2 text-white bg-green-600 rounded-lg hover:bg-green-700 ${
+                updating ? "opacity-50 cursor-not-allowed" : ""
+              }`}
             >
-              Mark as On Route
+              {updating ? "Updating..." : "Mark as On Route"}
             </button>
           </div>
         </section>

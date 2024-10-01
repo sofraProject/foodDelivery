@@ -93,7 +93,7 @@ const Foods: React.FC = () => {
   const fetchMenuItems = async (id: number) => {
     try {
       const response = await axios.get(
-        `${serverDomain}/api/menu-items/cat/${id}`
+        `${serverDomain}/api/menu-items/category/${id}`
       );
       const formattedData = response.data.map((item: MenuItem) => ({
         ...item,

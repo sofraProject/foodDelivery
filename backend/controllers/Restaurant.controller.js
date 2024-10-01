@@ -204,57 +204,42 @@ exports.getAllRestaurantswithCat = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+;
 
-// Retrieve restaurants by search term and proximity
-exports.getNearbyRestaurants = async (req, res) => {
-  const { q: searchTerm, lat, long } = req.query;
 
-  if (!lat || !long) {
-    return res
-      .status(400)
-      .json({ message: "User location (latitude and longitude) is required." });
-  }
-
-  const userLat = parseFloat(lat);
-  const userLong = parseFloat(long);
-
+// In Restaurant.controller.js
+exports.getCategoriesByRestaurantId = async (req, res) => {
+  const { id } = req.params;
   try {
-    // Find restaurants based on the search term
-    const restaurants = await prismaConnection.restaurant.findMany({
-      where: {
-        OR: [
-          { name: { contains: searchTerm, mode: "insensitive" } },
-          { description: { contains: searchTerm, mode: "insensitive" } },
-        ],
-      },
-      include: {
-        Location: true, // Include location data for each restaurant
-      },
+    const categories = await prismaConnection.category.findMany({
+      where: { restaurantId: Number(id) },
+      include: { menuItems: true }, // Ensure this includes the items
     });
-
-    // Calculate Euclidean distance for each restaurant and filter by proximity
-    const nearbyRestaurants = restaurants
-      .map((restaurant) => {
-        if (restaurant.Location.length > 0) {
-          const { lat: restaurantLat, long: restaurantLong } =
-            restaurant.Location[0];
-          const distance = Math.sqrt(
-            Math.pow(restaurantLat - userLat, 2) +
-              Math.pow(restaurantLong - userLong, 2)
-          );
-          return { ...restaurant, distance };
-        }
-        return null;
-      })
-      .filter((restaurant) => restaurant !== null) // Exclude restaurants without location data
-      .sort((a, b) => a.distance - b.distance); // Sort by nearest first
-
-    return res.status(200).json(nearbyRestaurants);
+    res.status(200).json(categories);
   } catch (error) {
-    console.error("Error fetching nearby restaurants:", error);
-    return res.status(500).json({
-      message: "An error occurred while searching for nearby restaurants.",
-      error: error.message,
+    console.error("Error fetching categories:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Retrieve a restaurant by owner ID
+exports.getRestaurantByOwnerId = async (req, res) => {
+  try {
+    const { ownerId } = req.params;
+    const id = Number(ownerId);
+    const restaurant = await prismaConnection.restaurant.findUnique({
+      where: { id },
     });
+
+    if (!restaurant) {
+      return res.status(404).json({ message: "Restaurant not found" });
+    }
+
+    res.status(200).json(restaurant);
+  } catch (error) {
+    console.error("Error fetching restaurant by owner ID:", error);
+    res
+      .status(500)
+      .json({ message: "An error occurred while fetching the restaurant" });
   }
 };

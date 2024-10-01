@@ -207,21 +207,47 @@ module.exports = {
   deleteOrder: async (req, res) => {
     try {
       const orderId = parseInt(req.params.id);
-
+  
       // Check if the order exists before deleting
       const order = await prismaConnection.order.findUnique({
         where: { id: orderId },
+        include: {
+          orderItems: true, // Include order items
+          payments: true, // Include payments
+          delivery: true, // Include delivery details
+          notifications: true // Include notifications
+        },
       });
-
+  
       if (!order) {
         return res.status(404).json({ message: "Order not found" });
       }
-
+  
+      // Delete related order items
+      await prismaConnection.orderItem.deleteMany({
+        where: { orderId: orderId },
+      });
+  
+      // Delete related payments, if any
+      await prismaConnection.payment.deleteMany({
+        where: { orderId: orderId },
+      });
+  
+      // Delete related delivery details, if any
+      await prismaConnection.delivery.deleteMany({
+        where: { orderId: orderId },
+      });
+  
+      // Delete related notifications, if any
+      await prismaConnection.notification.deleteMany({
+        where: { orderId: orderId },
+      });
+  
       // Delete the order
       await prismaConnection.order.delete({
         where: { id: orderId },
       });
-
+  
       // Optionally, send a notification when the order is deleted
       await prismaConnection.notification.create({
         data: {
@@ -229,13 +255,11 @@ module.exports = {
           message: `Your order #${order.id} has been deleted.`,
         },
       });
-
+  
       res.status(204).send();
     } catch (error) {
       console.error("Error deleting order:", error);
-      res
-        .status(500)
-        .json({ message: "Error deleting order", error: error.message });
+      res.status(500).json({ message: "Error deleting order", error: error.message });
     }
   },
 
@@ -280,19 +304,19 @@ module.exports = {
     try {
       const orders = await prismaConnection.order.findMany({
         include: {
-          orderItems: {
-            include: {
-              menuItem: true, // Include menu item details
+            orderItems: {
+                include: {
+                    menuItem: true
+                }
             },
-          },
-          delivery: {
-            include: {
-              driver: { select: { name: true, email: true } },
-            },
-          },
-          payments: true,
-        },
-      });
+            payments: true,
+            customer: true,   // Assuming these exist in your model
+            restaurant: true,  // Assuming these exist in your model
+            driver: true,      // Assuming these exist in your model
+            notifications: true // Assuming these exist in your model
+        }
+    });
+    
 
       res.status(200).json(orders);
     } catch (error) {
@@ -484,4 +508,165 @@ module.exports = {
       res.status(500).json({ message: "Error fetching confirmed orders" });
     }
   },
+  getOrdersByUserId: async (req, res) => {
+    try {
+      const userId = parseInt(req.params.userId);
+      
+      // Fetch orders for the given userId
+      const orders = await prismaConnection.order.findMany({
+        where: { customerId: userId }, // Adjust this based on your schema
+        include: {
+          orderItems: {
+            include: {
+              menuItem: true,
+            },
+          },
+          payments: true,
+          restaurant: true,
+          // Include any other necessary relations
+        },
+      });
+  
+      if (!orders.length) {
+        return res.status(404).json({ message: "No orders found for this user" });
+      }
+  
+      res.status(200).json(orders);
+    } catch (error) {
+      console.error("Error fetching orders by user ID:", error);
+      res.status(500).json({ message: "Error fetching orders", error: error.message });
+    }
+  },
+
+// Inside your Order.controller.js
+
+// Cancel an order
+cancelOrder: async (req, res) => {
+  try {
+    const orderId = parseInt(req.params.id);
+
+    // Check if the order exists
+    const order = await prismaConnection.order.findUnique({
+      where: { id: orderId },
+    });
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    // Update the order status to "CANCELED"
+    const updatedOrder = await prismaConnection.order.update({
+      where: { id: orderId },
+      data: { status: "CANCELED" },
+    });
+
+    // Optionally, send a notification when the order is canceled
+    await prismaConnection.notification.create({
+      data: {
+        userId: updatedOrder.customerId,
+        orderId: updatedOrder.id,
+        message: `Your order #${updatedOrder.id} has been canceled.`,
+      },
+    });
+
+    return res.status(200).json({
+      message: "Order successfully canceled",
+      order: updatedOrder,
+    });
+  } catch (error) {
+    console.error("Error canceling order:", error);
+    return res
+      .status(500)
+      .json({ message: "Error canceling order", error: error.message });
+  }
+},
+
+
+};
+
+
+
+
+
+
+// Create a new Order
+exports.createOrder = async (req, res) => {
+  const { total_amount, user_id, orderItems } = req.body; // Ensure you get these from the request body
+
+  // Validate required fields
+  if (!total_amount || !user_id || !orderItems) {
+    return res.status(400).json({ error: "Missing required fields" });
+  }
+
+  try {
+    const newOrder = await prismaConnection.order.create({
+      data: {
+        total_amount: parseFloat(total_amount), // Use parseFloat to convert to a number
+        user_id: parseInt(user_id), // Ensure user_id is an integer
+        orderItems: {
+          create: orderItems, // Assuming orderItems is an array of items
+        },
+        // You can add other fields as necessary
+      },
+    });
+    res.status(201).json(newOrder);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to create order" });
+  }
+};
+
+// Get all Orders
+exports.getAllOrders = async (req, res) => {
+  const orders = await prismaConnection.order.findMany();
+  res.status(200).json(orders);
+};
+
+// Get an Order by ID
+exports.getOrderById = async (req, res) => {
+  const order = await prismaConnection.order.findUnique({ where: { id: parseInt(req.params.id) } });
+  res.status(200).json(order);
+};
+
+// Update an Order
+exports.updateOrder = async (req, res) => {
+  await prismaConnection.order.update({
+    where: { id: parseInt(req.params.id) },
+    data: req.body,
+  });
+  res.status(204).send();
+};
+
+// Delete an Order
+exports.deleteOrder = async (req, res) => {
+  await prismaConnection.order.delete({ where: { id: parseInt(req.params.id) } });
+  res.status(204).send();
+};
+
+// Accept Order
+exports.acceptOrder = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const order = await prismaConnection.order.update({
+      where: { id: parseInt(id) },
+      data: { status: 'confirmed' },
+    });
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to accept order" });
+  }
+};
+
+// Cancel Order
+exports.cancelOrder = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const order = await prismaConnection.order.update({
+      where: { id: parseInt(id) },
+      data: { status: 'canceled' },
+    });
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to cancel order" });
+  }
 };

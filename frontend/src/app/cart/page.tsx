@@ -1,16 +1,16 @@
 "use client";
-import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { useRouter } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
-import { AiOutlineArrowLeft } from "react-icons/ai";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import { AiOutlineArrowLeft } from "react-icons/ai";
+import { useDispatch, useSelector } from "react-redux";
 import swal from "sweetalert";
+import { handlePayment } from "../../api/payment";
 import preview from "../../assets/preview.svg";
 import Button from "../../components/Form/Button";
 import { removeFromCart, updateQuantity } from "../../redux/features/cartSlice";
 import { AppDispatch, RootState } from "../../redux/store";
-import { handlePayment } from "../../api/payment";
 
 const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
 const deliveryFee = 5; // Fixed delivery fee per restaurant
@@ -19,7 +19,8 @@ const Cart: React.FC = () => {
   const cartItems = useSelector((state: RootState) => state.cart.items);
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
-  const token = localStorage.getItem("token") || "";
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") || "" : "";
 
   // Tracking loading status and errors for each restaurant by their ID
   const [loadingStatus, setLoadingStatus] = useState<{
@@ -34,6 +35,38 @@ const Cart: React.FC = () => {
     (total, item) => total + Number(item.price) * Number(item.quantity),
     0
   );
+
+  // Redirect to /joinus if not logged in
+  useEffect(() => {
+    if (!token) {
+      swal({
+        title: "Please log in",
+        text: "You need to log in to access your cart.",
+        icon: "warning",
+        buttons: {
+          cancel: {
+            text: "Cancel",
+            visible: true,
+            value: null,
+            className:
+              "bg-dark text-primary rounded-xl px-6 py-4 hover:bg-primary  hover:bg-dark",
+            closeModal: true,
+          },
+          confirm: {
+            text: "Go to Login",
+            value: true,
+            visible: true,
+            className: "bg-primary text-dark rounded-xl px-6 py-4 ",
+            closeModal: true,
+          },
+        },
+      }).then((willRedirect) => {
+        if (willRedirect) {
+          router.push("/joinus");
+        }
+      });
+    }
+  }, [token, router]);
 
   useEffect(() => {
     if (cartItems.length > 0) {
@@ -81,31 +114,24 @@ const Cart: React.FC = () => {
   }, {});
 
   const handlePlaceOrder = async (restaurantId: number) => {
-    // Mettez à jour l'état de chargement pour l'ID du restaurant en cours
     setLoadingStatus((prev) => ({ ...prev, [restaurantId]: true }));
-    // Réinitialisez les erreurs pour le restaurant en cours
     setOrderError((prev) => ({ ...prev, [restaurantId]: null }));
 
-    // Obtenez les articles et le prix total pour ce restaurant spécifique
     const itemsForRestaurant = groupedItems[restaurantId].items;
     const priceForRestaurant = groupedItems[restaurantId].totalPrice;
 
     try {
-      // Appelez la fonction `handlePayment` en passant les informations nécessaires
       const paymentResult = await handlePayment(
-        itemsForRestaurant, // Les articles pour ce restaurant
-        priceForRestaurant + deliveryFee, // Le prix total, y compris les frais de livraison
-        token, // Le token de l'utilisateur
-        restaurantId, // L'ID du restaurant
-        "flouci" // La méthode de paiement (ici "flouci")
+        itemsForRestaurant,
+        priceForRestaurant + deliveryFee,
+        token,
+        restaurantId,
+        "flouci"
       );
 
-      // Vérifiez le succès du paiement
       if (paymentResult.success) {
-        // Affichez une alerte de succès et redirigez l'utilisateur vers la page de paiement
         swal("Order placed!", "Redirecting to payment...", "success");
       } else {
-        // Mettez à jour l'état d'erreur si le paiement échoue
         setOrderError((prev) => ({
           ...prev,
           [restaurantId]:
@@ -113,14 +139,12 @@ const Cart: React.FC = () => {
         }));
       }
     } catch (error) {
-      // Gérez les erreurs lors du traitement de la commande
       setOrderError((prev) => ({
         ...prev,
         [restaurantId]:
           "An error occurred during the order process. Please try again.",
       }));
     } finally {
-      // Réinitialisez l'état de chargement une fois le processus terminé
       setLoadingStatus((prev) => ({ ...prev, [restaurantId]: false }));
     }
   };
