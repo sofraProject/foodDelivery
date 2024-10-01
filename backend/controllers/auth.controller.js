@@ -55,7 +55,10 @@ module.exports = {
       const token = jwt.sign(
         { id: newUser.id, role: newUser.role },
         process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN || "1h" }      );
+        { expiresIn: process.env.JWT_EXPIRES_IN || "1h" }
+      );
+
+      
 
       res.status(201).json({
         message: "Account created successfully.",

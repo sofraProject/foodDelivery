@@ -9,7 +9,7 @@
     "prisma": "rimraf prisma/migrations && npx prisma migrate dev dev init",
     "seed": "node seeds/seedsAll.js"
   },
-  "author": "",
+  "ayuthor": "",
   "license": "ISC",
   "devDependencies": {
     "morgan": "^1.10.0",

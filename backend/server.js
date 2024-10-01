@@ -11,7 +11,7 @@ require("dotenv").config();
 const orderRoutes = require("./routes/Order.route");
 const menuItemRoutes = require("./routes/MenuItem.route");
 const deliveryRoutes = require("./routes/Delivery.route");
-const driverRoutes = require("./routes/Delivery.route");
+const driverRoutes = require("./routes/Driver.route");
 const paymentRoutes = require("./routes/Payment.route");
 const userRoutes = require("./routes/User.route");
 const authRoutes = require("./routes/auth.route");
