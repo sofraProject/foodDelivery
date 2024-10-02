@@ -1,7 +1,5 @@
-"use client";
-
-import { debounce } from "lodash";
-import React, { useCallback, useEffect, useState } from "react";
+import axios from "axios";
+import React, { useState } from "react";
 import {
   FaBacon,
   FaCheese,
@@ -12,57 +10,32 @@ import {
   FaIceCream,
   FaPizzaSlice,
   FaSearch,
-  FaSpinner,
-} from "react-icons/fa"; // Icônes de fast-food
-import { useDispatch, useSelector } from "react-redux";
-import { searchProductsAndRestaurants } from "../../redux/features/searchSlice";
-import { AppDispatch, RootState } from "../../redux/store";
-import LocationPrompt from "../LocationPrompt";
-
+} from "react-icons/fa";
+const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
 const Banner: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [showSearch, setShowSearch] = useState<boolean>(false);
-  const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string>("");
-  const user = useSelector((state: RootState) => state.users.user);
-  const dispatch = useDispatch<AppDispatch>();
-
-  useEffect(() => {
-    if (user && user.location) {
-      setShowSearch(true);
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+ 
+  const handleSearch = async () => {
+    if (!searchTerm.trim()) {
+      console.log("Please enter a valid search term.");
+      return;
     }
-  }, [user]);
 
-  const debouncedSearch = useCallback(
-    debounce((searchTerm: string) => {
-      if (searchTerm.trim()) {
-        setIsLoading(true);
-        dispatch(searchProductsAndRestaurants(searchTerm)).finally(() => {
-          setIsLoading(false);
-        });
-      } else {
-        setError("Please enter a valid search term.");
-      }
-    }, 500),
-    []
-  );
-
-  const handleSearch = useCallback(() => {
-    setError("");
-    if (searchTerm.trim()) {
-      debouncedSearch(searchTerm);
-    } else {
-      setError("Please enter a valid search term.");
+    try {
+      const response = await axios.get(`${serverDomain}/restaurant/search`, {
+        params: { searchTerm },
+      });
+      setSearchResults(response.data);
+    } catch (error) {
+      console.error("Error fetching search results:", error);
     }
-  }, [searchTerm, debouncedSearch]);
+  };
 
   return (
     <section className="relative flex items-center justify-center w-full mt-16 h-[32rem] bg-[#BFF38A]">
-      {" "}
-      {/* Fond en couleur primaire */}
-      <div className="absolute inset-0 bg-[#BFF38A]"></div>{" "}
-      {/* Couleur primaire #BFF38A */}
-      {/* Icônes de fast-food avec animations lentes et couleur noire */}
+      <div className="absolute inset-0 bg-[#BFF38A]"></div>
+
       <FaPizzaSlice className="absolute top-10 left-4 text-black/50 text-7xl animate-slow-spin" />
       <FaHamburger className="absolute top-16 right-6 text-black/50 text-8xl animate-slow-bounce" />
       <FaIceCream className="absolute bottom-6 left-8 text-black/50 text-7xl animate-slow-ping" />
@@ -71,6 +44,7 @@ const Banner: React.FC = () => {
       <FaFish className="absolute text-6xl top-1/4 left-20 text-black/50 animate-slow-bounce" />
       <FaBacon className="absolute text-5xl top-1/3 right-24 text-black/50 animate-slow-spin" />
       <FaCheese className="absolute top-1/2 right-1/4 text-black/50 text-7xl animate-slow-ping" />
+
       <div className="container relative z-10 px-4 mx-auto text-center">
         <h1 className="mb-6 text-4xl font-extrabold text-black md:text-5xl lg:text-6xl drop-shadow-lg">
           Your Fast Food Feast Awaits!
@@ -78,34 +52,43 @@ const Banner: React.FC = () => {
         <p className="mb-8 text-xl text-black md:text-2xl drop-shadow-md">
           Discover the best fast food in town 🍔🍕🌭
         </p>
+
         <div className="max-w-xl mx-auto">
-          {showSearch ? (
-            <div className="flex items-center p-2 transition-transform bg-white rounded-full shadow-md transform-gpu hover:scale-105">
-              <input
-                type="text"
-                className="flex-grow px-6 py-3 transition duration-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
-                placeholder="What are you craving today?"
-                value={searchTerm}
-                aria-label="Search for food or restaurants"
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyPress={(e) => e.key === "Enter" && handleSearch()}
-              />
-              <button
-                className="p-3 transition duration-300 rounded-full shadow-md text-primary bg-dark hover:bg-primary-dark focus:outline-none"
-                onClick={handleSearch}
-                aria-label="Search"
-              >
-                {isLoading ? (
-                  <FaSpinner className="text-xl animate-spin" />
-                ) : (
-                  <FaSearch className="text-xl text-primary" />
-                )}
-              </button>
-            </div>
-          ) : (
-            <LocationPrompt onLocationSet={() => setShowSearch(true)} />
+          <a
+            href="/saveLocation"
+            className="px-6 py-3 text-lg font-bold text-white bg-dark rounded-full hover:bg-primary-dark focus:outline-none"
+          >
+            Search for food or restaurants
+          </a>
+
+          <div className="flex items-center mt-6">
+            <input
+              type="text"
+              className="flex-grow px-6 py-3 text-lg transition duration-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
+              placeholder="What are you craving today?"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              aria-label="Search for food or restaurants"
+            />
+            <button
+              className="p-3 ml-2 transition duration-300 rounded-full shadow-md text-primary bg-dark hover:bg-primary-dark focus:outline-none"
+              onClick={handleSearch}
+              aria-label="Search"
+            >
+              <FaSearch className="text-xl text-primary" />
+            </button>
+          </div>
+
+          {/* Render search results */}
+          {searchResults.length > 0 && (
+            <ul className="mt-4 text-left">
+              {searchResults.map((restaurant) => (
+                <li key={restaurant.id} className="p-2 bg-white border-b">
+                  {restaurant.name}
+                </li>
+              ))}
+            </ul>
           )}
-          {error && <p className="mt-4 text-red-500">{error}</p>}
         </div>
       </div>
     </section>

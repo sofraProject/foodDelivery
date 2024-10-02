@@ -55,7 +55,7 @@ const RestaurantPage: React.FC = () => {
 
         // Fetch restaurant by name
         const restaurantRes = await axios.get(
-          `${serverDomain}/api/restaurants/name/${restaurantName}`
+          `${serverDomain}/api/restaurant/name/${restaurantName}`
         );
         setRestaurant(restaurantRes.data);
 

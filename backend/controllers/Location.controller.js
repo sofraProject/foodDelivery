@@ -128,3 +128,52 @@ exports.getLocationsByUserId = async (req, res) => {
     res.status(500).json({ message: "Error retrieving locations." });
   }
 };
+
+// exports.getNearestRestaurant = async (req, res) => {
+//   try {
+//     const { lat, long } = req.query;
+
+//     if (!lat || !long) {
+//       return res
+//         .status(400)
+//         .json({ message: "User latitude and longitude are required." });
+//     }
+
+//     const userLat = parseFloat(lat);
+//     const userLong = parseFloat(long);
+
+//     // Fetch all restaurant locations
+//     const restaurantLocations = await prismaConnection.location.findMany({
+//       where: { restaurantId: { not: null } }, // Ensure we are only fetching restaurant locations
+//       include: {
+//         restaurant: true, // Include restaurant details
+//       },
+//     });
+
+//     if (restaurantLocations.length === 0) {
+//       return res
+//         .status(404)
+//         .json({ message: "No restaurant locations found." });
+//     }
+
+//     // Calculate the Euclidean distance for each restaurant location
+//     const nearestRestaurant = restaurantLocations
+//       .map((location) => {
+//         const distance = Math.sqrt(
+//           Math.pow(location.lat - userLat, 2) +
+//             Math.pow(location.long - userLong, 2)
+//         );
+//         return { ...location, distance };
+//       })
+//       .sort((a, b) => a.distance - b.distance)[0]; // Sort by distance and get the nearest one
+
+//     if (!nearestRestaurant) {
+//       return res.status(404).json({ message: "No nearby restaurant found." });
+//     }
+
+//     res.status(200).json(nearestRestaurant);
+//   } catch (error) {
+//     console.error("Error retrieving nearest restaurant:", error);
+//     res.status(500).json({ message: "Internal server error." });
+//   }
+// };
