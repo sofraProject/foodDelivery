@@ -1,11 +1,11 @@
 const { prismaConnection } = require("../prisma/prisma");
 
-// Crée une nouvelle localisation
+// Create a new location
 exports.createLocation = async (req, res) => {
   try {
-    console.log(req.body);
     const { lat, long, locationName, userId, restaurantId } = req.body;
-
+    
+    // Create location in the database
     const location = await prismaConnection.location.create({
       data: {
         lat,
@@ -16,18 +16,17 @@ exports.createLocation = async (req, res) => {
       },
     });
 
-    res.status(201).json(location);
+    res.status(201).json(location); // Respond with the created location
   } catch (error) {
-    console.error("Erreur lors de la création de la localisation:", error);
-    res
-      .status(500)
-      .json({ message: "Erreur lors de la création de la localisation." });
+    console.error("Error creating location:", error);
+    res.status(500).json({ message: "Error creating location." });
   }
 };
 
-// Récupère toutes les localisations
+// Retrieve all locations
 exports.getAllLocations = async (req, res) => {
   try {
+    // Fetch all locations with user and restaurant details
     const locations = await prismaConnection.location.findMany({
       include: {
         user: true,
@@ -35,20 +34,19 @@ exports.getAllLocations = async (req, res) => {
       },
     });
 
-    res.status(200).json(locations);
+    res.status(200).json(locations); // Respond with the list of locations
   } catch (error) {
-    console.error("Erreur lors de la récupération des localisations:", error);
-    res
-      .status(500)
-      .json({ message: "Erreur lors de la récupération des localisations." });
+    console.error("Error retrieving locations:", error);
+    res.status(500).json({ message: "Error retrieving locations." });
   }
 };
 
-// Récupère une localisation par son ID
+// Retrieve a location by its ID
 exports.getLocationById = async (req, res) => {
   try {
     const { id } = req.params;
 
+    // Find the location by ID
     const location = await prismaConnection.location.findUnique({
       where: { id: parseInt(id) },
       include: {
@@ -58,24 +56,23 @@ exports.getLocationById = async (req, res) => {
     });
 
     if (!location) {
-      return res.status(404).json({ message: "Localisation non trouvée." });
+      return res.status(404).json({ message: "Location not found." });
     }
 
-    res.status(200).json(location);
+    res.status(200).json(location); // Respond with the found location
   } catch (error) {
-    console.error("Erreur lors de la récupération de la localisation:", error);
-    res
-      .status(500)
-      .json({ message: "Erreur lors de la récupération de la localisation." });
+    console.error("Error retrieving location:", error);
+    res.status(500).json({ message: "Error retrieving location." });
   }
 };
 
-// Met à jour une localisation par son ID
+// Update a location by its ID
 exports.updateLocation = async (req, res) => {
   try {
     const { id } = req.params;
     const { lat, long, locationName, userId, restaurantId } = req.body;
 
+    // Update the location in the database
     const location = await prismaConnection.location.update({
       where: { id: parseInt(id) },
       data: {
@@ -87,56 +84,48 @@ exports.updateLocation = async (req, res) => {
       },
     });
 
-    res.status(200).json(location);
+    res.status(200).json(location); // Respond with the updated location
   } catch (error) {
-    console.error("Erreur lors de la mise à jour de la localisation:", error);
-    res
-      .status(500)
-      .json({ message: "Erreur lors de la mise à jour de la localisation." });
+    console.error("Error updating location:", error);
+    res.status(500).json({ message: "Error updating location." });
   }
 };
 
-// Supprime une localisation par son ID
+// Delete a location by its ID
 exports.deleteLocation = async (req, res) => {
   try {
     const { id } = req.params;
 
+    // Delete the location from the database
     await prismaConnection.location.delete({
       where: { id: parseInt(id) },
     });
 
-    res.status(204).send();
+    res.status(204).send(); // Respond with no content status
   } catch (error) {
-    console.error("Erreur lors de la suppression de la localisation:", error);
-    res
-      .status(500)
-      .json({ message: "Erreur lors de la suppression de la localisation." });
+    console.error("Error deleting location:", error);
+    res.status(500).json({ message: "Error deleting location." });
   }
 };
 
-// Récupérer toutes les localisations par userId
+// Retrieve all locations by userId
 exports.getLocationsByUserId = async (req, res) => {
   try {
     const { userId } = req.params;
+
+    // Fetch locations for the specified user
     const locations = await prismaConnection.location.findMany({
       where: { userId: parseInt(userId) },
     });
 
     if (locations.length === 0) {
-      return res
-        .status(404)
-        .json({ message: "Aucune localisation trouvée pour cet utilisateur." });
+      return res.status(404).json({ message: "No locations found for this user." });
     }
 
-    res.status(200).json(locations);
+    res.status(200).json(locations); // Respond with the user's locations
   } catch (error) {
-    console.error(
-      "Erreur lors de la récupération des localisations par userId:",
-      error
-    );
-    res
-      .status(500)
-      .json({ message: "Erreur lors de la récupération des localisations." });
+    console.error("Error retrieving locations by userId:", error);
+    res.status(500).json({ message: "Error retrieving locations." });
   }
 };
 

@@ -67,18 +67,24 @@ exports.getAllRestaurants = async (req, res) => {
 
 // Retrieve a restaurant by ID
 exports.getRestaurantById = async (req, res) => {
-  const { id } = req.params;
+  const { id } = req.params; // Extract id from request parameters
+  console.log("ID received:", id); // Log the received ID for debugging
+
+  if (!id) {
+    return res.status(400).json({ message: "Restaurant ID is required." });
+  }
+
   try {
     const restaurant = await prismaConnection.restaurant.findUnique({
-      where: { id: parseInt(id) },
+      where: { id: parseInt(id) }, // Ensure the ID is converted to an integer
       include: {
-        owner: true, // Include owner information
-        menuItems: true, // Include related menu items
+        owner: true,
+        menuItems: true,
       },
     });
 
     if (!restaurant) {
-      return res.status(404).json({ message: "Restaurant not found" });
+      return res.status(404).json({ message: "Restaurant not found." });
     }
 
     res.status(200).json(restaurant);
@@ -87,6 +93,7 @@ exports.getRestaurantById = async (req, res) => {
     res.status(500).json({ message: "Internal server error" });
   }
 };
+
 
 // Update a restaurant
 exports.updateRestaurant = async (req, res) => {
@@ -224,22 +231,31 @@ exports.getCategoriesByRestaurantId = async (req, res) => {
 
 // Retrieve a restaurant by owner ID
 exports.getRestaurantByOwnerId = async (req, res) => {
-  try {
-    const { ownerId } = req.params;
-    const id = Number(ownerId);
-    const restaurant = await prismaConnection.restaurant.findUnique({
-      where: { id },
-    });
+  const { ownerId } = req.params;
+  console.log("Owner ID received:", ownerId); // Log the ownerId
 
-    if (!restaurant) {
-      return res.status(404).json({ message: "Restaurant not found" });
+  try {
+    // Convert ownerId to an integer
+    const ownerIdInt = parseInt(ownerId, 10);
+    if (isNaN(ownerIdInt)) {
+      return res.status(400).json({ message: "Invalid owner ID." });
     }
 
-    res.status(200).json(restaurant);
+    // Find all restaurants by ownerId
+    const restaurants = await prismaConnection.restaurant.findMany({
+      where: {
+        ownerId: ownerIdInt,
+      },
+      include: {
+        owner: true,
+        menuItems: true,
+      },
+    });
+
+    return res.status(200).json(restaurants);
   } catch (error) {
-    console.error("Error fetching restaurant by owner ID:", error);
-    res
-      .status(500)
-      .json({ message: "An error occurred while fetching the restaurant" });
+    console.error("Error fetching restaurants by owner ID:", error);
+    return res.status(500).json({ message: "Error fetching restaurants." });
   }
 };
+
