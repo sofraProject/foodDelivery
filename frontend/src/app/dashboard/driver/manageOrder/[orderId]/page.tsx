@@ -1,4 +1,5 @@
 "use client";
+import useSocket from "@/hooks/useSocket"; // Import your custom hook
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -14,8 +15,8 @@ type OrderData = {
   restaurantId: number;
   totalPrice: number;
   status: string;
-  items?: Array<{ name: string; quantity: number; price: number }>; // Typing for items in the order
-  restaurant?: { name: string }; // Typing for the restaurant details
+  items?: Array<{ name: string; quantity: number; price: number }>;
+  restaurant?: { name: string };
 };
 
 const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE; // Fetch from environment
@@ -27,7 +28,14 @@ const ManageOrderPage = () => {
   const [updating, setUpdating] = useState(false); // State to handle the updating process
   const router = useRouter();
   const params = useParams();
-  const orderId = params.orderId; // Ensure we retrieve the order ID correctly
+
+  // Ensure we retrieve the order ID correctly and convert to a number
+  const orderId = Array.isArray(params.orderId)
+    ? parseInt(params.orderId[0], 10)
+    : parseInt(params.orderId, 10);
+
+  // Initialize the socket connection using the custom useSocket hook
+  const socket = useSocket(`${serverDomain}`);
 
   // Combined function to fetch order and restaurant details
   const fetchOrderAndRestaurantDetails = async () => {
@@ -59,20 +67,36 @@ const ManageOrderPage = () => {
     if (orderId) {
       fetchOrderAndRestaurantDetails();
     }
-  }, [orderId]);
 
-  // Function to update the order status to "On Route"
-  const markAsOnRoute = async () => {
+    // Ensure the socket connection exists
+    if (socket) {
+      // Subscribe to the "orderStatusUpdated" event
+      socket.on("orderStatusUpdated", (updatedOrder: OrderData) => {
+        if (updatedOrder.orderId === orderId) {
+          // Now comparing as numbers
+          setOrder(updatedOrder);
+        }
+      });
+
+      // Cleanup socket connection on unmount
+      return () => {
+        socket.off("orderStatusUpdated"); // Remove the listener when the component unmounts
+      };
+    }
+  }, [orderId, socket]);
+
+  // Function to update the order status
+  const updateOrderStatus = async (newStatus: string) => {
     try {
       setUpdating(true);
       // Send PUT request to update the order status
-      await axios.put(`${serverDomain}/api/orders/${orderId}/assign-driver`, {
-        driverId: 1,
+      await axios.put(`${serverDomain}/api/orders/${orderId}/update-status`, {
+        status: newStatus,
       });
 
       // Update the local order status
       setOrder((prevOrder) =>
-        prevOrder ? { ...prevOrder, status: "On Route" } : prevOrder
+        prevOrder ? { ...prevOrder, status: newStatus } : prevOrder
       );
       setUpdating(false);
     } catch (error) {
@@ -127,13 +151,49 @@ const ManageOrderPage = () => {
 
           <div className="max-w-5xl mx-auto mt-6">
             <button
-              onClick={markAsOnRoute}
-              disabled={updating} // Disable the button if updating
+              onClick={() => updateOrderStatus("EXPEDITED")}
+              disabled={updating}
               className={`w-full px-6 py-2 text-white bg-green-600 rounded-lg hover:bg-green-700 ${
                 updating ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
-              {updating ? "Updating..." : "Mark as On Route"}
+              {updating ? "Updating..." : "Mark as Expedited"}
+            </button>
+            <button
+              onClick={() => updateOrderStatus("TORESTO")}
+              disabled={updating}
+              className={`w-full px-6 py-2 mt-4 text-white bg-blue-600 rounded-lg hover:bg-blue-700 ${
+                updating ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            >
+              {updating ? "Updating..." : "Mark as To Restaurant"}
+            </button>
+            <button
+              onClick={() => updateOrderStatus("TOCUSTOMER")}
+              disabled={updating}
+              className={`w-full px-6 py-2 mt-4 text-white bg-yellow-600 rounded-lg hover:bg-yellow-700 ${
+                updating ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            >
+              {updating ? "Updating..." : "Mark as To Customer"}
+            </button>
+            <button
+              onClick={() => updateOrderStatus("DELIVERED")}
+              disabled={updating}
+              className={`w-full px-6 py-2 mt-4 text-white bg-purple-600 rounded-lg hover:bg-purple-700 ${
+                updating ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            >
+              {updating ? "Updating..." : "Mark as Delivered"}
+            </button>
+            <button
+              onClick={() => updateOrderStatus("UNAVAILABLE")}
+              disabled={updating}
+              className={`w-full px-6 py-2 mt-4 text-white bg-red-600 rounded-lg hover:bg-red-700 ${
+                updating ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            >
+              {updating ? "Updating..." : "Mark as Unavailable"}
             </button>
           </div>
         </section>

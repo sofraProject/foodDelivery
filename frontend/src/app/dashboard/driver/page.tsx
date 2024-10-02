@@ -3,12 +3,12 @@
 import { useRouter } from "next/navigation";
 import {
   AiOutlineCar,
-  AiOutlineDollar,
-  AiOutlineUser,
-  AiOutlineUnorderedList,
-  AiOutlineClockCircle,
   AiOutlineCheckCircle,
+  AiOutlineClockCircle,
+  AiOutlineDollar,
   AiOutlineMessage,
+  AiOutlineUnorderedList,
+  AiOutlineUser,
 } from "react-icons/ai";
 
 const dashboardCards = [
@@ -75,7 +75,7 @@ const Dashboard = () => {
     <div className="min-h-screen py-10 mt-24 bg-gray-100">
       <div className="mx-auto max-w-7xl">
         <h1 className="mb-6 text-4xl font-bold text-gray-900">
-          Restaurant Owner Dashboard
+          Driver Dashboard
         </h1>
 
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">

@@ -12,8 +12,7 @@ import io from "socket.io-client";
 import swal from "sweetalert";
 
 // Environment variable for server domain
-const serverDomain =
-  process.env.NEXT_PUBLIC_SERVER_DOMAINE || "http://localhost:3000";
+const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE || "";
 
 const ConfirmedOrdersPage = () => {
   // State management for orders, loading, error, and notifications

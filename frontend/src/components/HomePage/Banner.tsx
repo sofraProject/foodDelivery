@@ -44,7 +44,7 @@ const Banner: React.FC = () => {
         setError("Please enter a valid search term.");
       }
     }, 500),
-    []
+    [dispatch]
   );
 
   const handleSearch = useCallback(() => {
@@ -73,10 +73,10 @@ const Banner: React.FC = () => {
       <FaCheese className="absolute top-1/2 right-1/4 text-black/50 text-7xl animate-slow-ping" />
       <div className="container relative z-10 px-4 mx-auto text-center">
         <h1 className="mb-6 text-4xl font-extrabold text-black md:text-5xl lg:text-6xl drop-shadow-lg">
-          Your Fast Food Feast Awaits!
+          Satisfy Your Cravings in Minutes!
         </h1>
         <p className="mb-8 text-xl text-black md:text-2xl drop-shadow-md">
-          Discover the best fast food in town 🍔🍕🌭
+          Find your favorite meals and fast food delights now 🍔🍕🌭
         </p>
         <div className="max-w-xl mx-auto">
           {showSearch ? (
@@ -84,7 +84,7 @@ const Banner: React.FC = () => {
               <input
                 type="text"
                 className="flex-grow px-6 py-3 transition duration-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
-                placeholder="What are you craving today?"
+                placeholder="What would you love to eat today?"
                 value={searchTerm}
                 aria-label="Search for food or restaurants"
                 onChange={(e) => setSearchTerm(e.target.value)}

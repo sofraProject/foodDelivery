@@ -26,8 +26,8 @@ export const HomePage: React.FC = () => {
           <Foods />
           <Category />
           <HowItWorks />
-          <RestaurantList />
-          <Testimonials />
+          {/* <RestaurantList />
+          <Testimonials /> */}
         </>
       )}
     </div>

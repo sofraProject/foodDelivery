@@ -101,7 +101,7 @@ const runSeeder = async () => {
       description: "Traditionnal food ",
       ownerId: 6,
       imageUrl:
-        "https://scontent.ftun20-1.fna.fbcdn.net/v/t1.6435-9/119115007_3233614170027063_479538850313669955_n.png?_nc_cat=103&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=zw4lLhQ63wIQ7kNvgEuZBgd&_nc_ht=scontent.ftun20-1.fna&_nc_gid=ASQawR52V15uUy0DYRvavKp&oh=00_AYAIDYo4m20R1pjLmjunyvg0TiPEEiRuwCp42MqNI5Nacg&oe=67208669",
+        "https://scontent.ftun10-2.fna.fbcdn.net/v/t1.6435-9/119115007_3233614170027063_479538850313669955_n.png?_nc_cat=103&ccb=1-7&_nc_sid=1d70fc&_nc_ohc=hsmP8KIsd5YQ7kNvgE1_QHb&_nc_ht=scontent.ftun10-2.fna&_nc_gid=AZRezGSDbmP4v86OeM4g6wa&oh=00_AYDrVO37T8lbhqEz1WzSNV-uWHSjo3X3m853iXo7VDD3AA&oe=672442A9",
     },
     {
       name: "Bombay Restaurant",
@@ -193,21 +193,24 @@ const runSeeder = async () => {
       price: 8.5,
       categoryId: 1, // Tacos
       restaurantId: 1, // Tacos Chaneb
-      imageUrl: "https://example.com/tacos-poulet.jpg",
+      imageUrl:
+        "https://img.cuisineaz.com/1024x576/2019/04/17/i146583-tacos-poulet-curry.jpeg",
     },
     {
       name: "Tacos Viande Hachée",
       price: 9.0,
       categoryId: 1, // Tacos
       restaurantId: 1, // Tacos Chaneb
-      imageUrl: "https://example.com/tacos-viande-hachee.jpg",
+      imageUrl:
+        "https://www.all-clad.fr/wp-content/uploads/2022/09/335-fr-TObqZchlyw.jpg",
     },
     {
       name: "Burger Fromage",
       price: 11.5,
       categoryId: 2, // Burgers
       restaurantId: 1, // Tacos Chaneb
-      imageUrl: "https://example.com/burger-fromage.jpg",
+      imageUrl:
+        "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRdp20o9NY1dVAsKfKqNUZs9XAIk5A0_ndo0A&s",
     },
 
     // Pizza Popolare
@@ -216,21 +219,24 @@ const runSeeder = async () => {
       price: 13.0,
       categoryId: 3, // Pizza
       restaurantId: 2, // Pizza Popolare
-      imageUrl: "https://example.com/pizza-quatre-fromages.jpg",
+      imageUrl:
+        "https://www.galbani.fr/wp-content/uploads/2017/07/Pizza-4-Fromages-800x600.jpg",
     },
     {
       name: "Pizza Pepperoni",
       price: 14.0,
       categoryId: 3, // Pizza
       restaurantId: 2, // Pizza Popolare
-      imageUrl: "https://example.com/pizza-pepperoni.jpg",
+      imageUrl:
+        "https://www.simplyrecipes.com/thmb/KE6iMblr3R2Db6oE8HdyVsFSj2A=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/__opt__aboutcom__coeus__resources__content_migration__simply_recipes__uploads__2019__09__easy-pepperoni-pizza-lead-3-1024x682-583b275444104ef189d693a64df625da.jpg",
     },
     {
       name: "Pizza Végétarienne",
       price: 12.0,
       categoryId: 3, // Pizza
       restaurantId: 2, // Pizza Popolare
-      imageUrl: "https://example.com/pizza-vegetarienne.jpg",
+      imageUrl:
+        "https://i0.wp.com/pizzabelga.com/wp-content/uploads/2018/12/alice.jpg",
     },
 
     // Am Hbib Kafteji
@@ -239,21 +245,24 @@ const runSeeder = async () => {
       price: 7.0,
       categoryId: 5, // Kafteji
       restaurantId: 3, // Am Hbib Kafteji
-      imageUrl: "https://example.com/kafteji-traditionnel.jpg",
+      imageUrl:
+        "https://www.tunisienumerique.com/wp-content/uploads/2023/07/kafteji-1200x1200.jpg",
     },
     {
       name: "Ojja Merguez",
       price: 9.0,
       categoryId: 4, // Tunisian
       restaurantId: 3, // Am Hbib Kafteji
-      imageUrl: "https://example.com/ojja-merguez.jpg",
+      imageUrl:
+        "https://www.francoislambert.one/cdn/shop/articles/ojja.webp?v=1718131116",
     },
     {
       name: "Brik à l'Oeuf",
       price: 4.5,
       categoryId: 4, // Tunisian
       restaurantId: 3, // Am Hbib Kafteji
-      imageUrl: "https://example.com/brik-a-loeuf.jpg",
+      imageUrl:
+        "https://zwitafoods.com/cdn/shop/articles/Brik_4_1024x1024.png?v=1679956471",
     },
 
     // Bombay Restaurant
@@ -262,21 +271,24 @@ const runSeeder = async () => {
       price: 10.0,
       categoryId: 6, // Indian
       restaurantId: 4, // Bombay Restaurant
-      imageUrl: "https://example.com/poulet-tikka.jpg",
+      imageUrl:
+        "https://www.letajmahal-beziers.fr/wp-content/uploads/2022/09/poulet-tikka.jpg.webp",
     },
     {
       name: "Shawarma Poulet",
       price: 7.5,
       categoryId: 7, // Shawarma
       restaurantId: 4, // Bombay Restaurant
-      imageUrl: "https://example.com/shawarma-poulet.jpg",
+      imageUrl:
+        "https://img.passeportsante.net/1200x675/2022-11-15/shutterstock-1909114753.webp",
     },
     {
       name: "Shawarma Viande",
       price: 8.0,
       categoryId: 7, // Shawarma
       restaurantId: 4, // Bombay Restaurant
-      imageUrl: "https://example.com/shawarma-viande.jpg",
+      imageUrl:
+        "https://i.ytimg.com/vi/f0W3XZJH5hc/hq720.jpg?sqp=-oaymwEhCK4FEIIDSFryq4qpAxMIARUAAAAAGAElAADIQj0AgKJD&rs=AOn4CLBo-MeV08g6fGvHrQJB1Q8zDfHHCA",
     },
 
     // Baguette & Baguette
@@ -285,28 +297,32 @@ const runSeeder = async () => {
       price: 6.5,
       categoryId: 8, // Sandwiches
       restaurantId: 5, // Baguette & Baguette
-      imageUrl: "https://example.com/sandwich-poulet.jpg",
+      imageUrl:
+        "https://www.marie-hot.com/wp-content/uploads/sandwich-r%C3%A9duit.jpg",
     },
     {
       name: "Sandwich Thon",
       price: 5.5,
       categoryId: 8, // Sandwiches
       restaurantId: 5, // Baguette & Baguette
-      imageUrl: "https://example.com/sandwich-thon.jpg",
+      imageUrl:
+        "https://images.openfoodfacts.org/images/products/376/027/025/0143/front_fr.10.full.jpg",
     },
     {
       name: "Poulet Grillé",
       price: 9.0,
       categoryId: 9, // Chicken
       restaurantId: 5, // Baguette & Baguette
-      imageUrl: "https://example.com/poulet-grille.jpg",
+      imageUrl:
+        "https://images.radio-canada.ca/v1/alimentation/recette/4x3/2881-sandwichs-poulet-asiatique.jpg",
     },
     {
       name: "Chicken Nuggets",
       price: 7.5,
       categoryId: 9, // Chicken
       restaurantId: 5, // Baguette & Baguette
-      imageUrl: "https://example.com/chicken-nuggets.jpg",
+      imageUrl:
+        "https://www.allrecipes.com/thmb/DOhcP7hAGP_ams-a-M8A-16TeK4=/1500x0/filters:no_upscale():max_bytes(150000):strip_icc()/AR-161469-the-best-ever-chicken-nuggets-DDMFS-4x3-e0f5af0ce26241d888967904f66962c7.jpg",
     },
   ]);
 
