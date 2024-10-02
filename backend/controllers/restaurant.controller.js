@@ -142,20 +142,17 @@ exports.getMenuItemsByRestaurant = async (req, res) => {
 
 // Retrieve a restaurant by its name
 exports.getRestaurantByName = async (req, res) => {
-  const { searchTerm } = req.query;
   const { restaurantName } = req.params;
 
   try {
-    const restaurants = await prismaConnection.restaurant.findMany({
+    const restaurant = await prismaConnection.restaurant.findUnique({
       where: {
-        name: {
-          contains: searchTerm,
-        },
+        name: restaurantName,
       },
     });
 
-    if (restaurants.length === 0) {
-      return res.status(404).json({ message: "No restaurants found" });
+    if (!restaurant) {
+      return res.status(404).json({ message: "Restaurant not found." });
     }
 
     res.status(200).json(restaurant);
@@ -169,15 +166,14 @@ exports.getRestaurantByName = async (req, res) => {
 
 exports.searchRestaurants = async (req, res) => {
   const { searchTerm } = req.query;
-  const { restaurantName } = req.params;
+
   try {
     // Search restaurants by name (case-insensitive)
     const restaurants = await prisma.restaurant.findMany({
       where: {
         name: {
           contains: searchTerm,
-          mode: "insensitive",
-          restoName, // Makes the search case-insensitive
+          mode: "insensitive", // Makes the search case-insensitive
         },
       },
     });

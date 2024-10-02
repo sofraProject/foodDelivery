@@ -11,23 +11,25 @@ exports.searchProductsAndRestaurants = async (req, res) => {
 
     // Check if query parameter is provided
     if (!q) {
-      return res.status(400).json({ message: "Query parameter 'q' is required." });
+      return res
+        .status(400)
+        .json({ message: "Query parameter 'q' is required." });
     }
 
     // Search for restaurants
     const restaurants = await prismaConnection.user.findMany({
       where: {
-        role: "restaurant_owner",
+        role: "RESTAURANT_OWNER",
         name: {
-          contains: q,  // Use `contains` for case-insensitive search
+          contains: q, // Use `contains` for case-insensitive search
         },
       },
       select: {
         id: true,
         name: true,
         email: true,
-        imagesUrl: true,
-        location: true,
+        imageUrl: true,
+        // location: true,
       },
     });
 
@@ -35,7 +37,7 @@ exports.searchProductsAndRestaurants = async (req, res) => {
     const menuItems = await prismaConnection.menuItem.findMany({
       where: {
         name: {
-          contains: q,  // Use `contains` for case-insensitive search
+          contains: q, // Use `contains` for case-insensitive search
         },
       },
       include: {
@@ -44,11 +46,15 @@ exports.searchProductsAndRestaurants = async (req, res) => {
     });
 
     // Filter menu items to only include those from restaurant owners
-    const filteredMenuItems = menuItems.filter(item => item.user.role === "restaurant_owner");
+    const filteredMenuItems = menuItems.filter(
+      (item) => item.user.role === "restaurant_owner"
+    );
 
     res.json({ restaurants, filteredMenuItems });
   } catch (error) {
     console.error("Search error:", error);
-    res.status(500).json({ message: "Error performing search", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error performing search", error: error.message });
   }
 };

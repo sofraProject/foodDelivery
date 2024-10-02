@@ -21,6 +21,7 @@ const categoryRoutes = require("./routes/category.route");
 const restaurantRoutes = require("./routes/Restaurant.route");
 const LocationRoutes = require("./routes/Location.route");
 const adminRoutes = require("./routes/admin.route");
+const searchRoute = require("./routes/Search.route");
 
 // Import utility functions
 const { connectToDatabase } = require("./prisma/prisma");
@@ -61,6 +62,7 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/locations", LocationRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/restaurant", restaurantRoutes);
+app.use("/api/searching", searchRoute);
 // Create HTTP server
 const server = http.createServer(app);
 

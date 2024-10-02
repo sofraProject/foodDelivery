@@ -21,8 +21,9 @@ router.delete("/:id", RestaurantController.deleteRestaurant);
 router.get("/menu-items/:id", RestaurantController.getMenuItemsByRestaurant);
 
 // Retrieve a specific restaurant by Name
-router.get("/name/:restaurantName", RestaurantController.getRestaurantByName); // New Route
+router.get("/:restaurantName", RestaurantController.getRestaurantByName); // New Route
 
 // Define the search route
-router.get("/:restoName", RestaurantController.searchRestaurants);
+router.get("/search", RestaurantController.searchRestaurants);
+
 module.exports = router;
