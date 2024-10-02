@@ -23,7 +23,7 @@ const Banner: React.FC = () => {
     }
 
     try {
-      const response = await axios.get(`${serverDomain}/api/restaurants/search`, {
+      const response = await axios.get(`${serverDomain}/restaurant/search`, {
         params: { searchTerm },
       });
       setSearchResults(response.data);

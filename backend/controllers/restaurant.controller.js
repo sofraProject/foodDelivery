@@ -142,17 +142,20 @@ exports.getMenuItemsByRestaurant = async (req, res) => {
 
 // Retrieve a restaurant by its name
 exports.getRestaurantByName = async (req, res) => {
+  const { searchTerm } = req.query;
   const { restaurantName } = req.params;
 
   try {
-    const restaurant = await prismaConnection.restaurant.findFirst({
+    const restaurants = await prismaConnection.restaurant.findMany({
       where: {
-        name: restaurantName,
+        name: {
+          contains: searchTerm,
+        },
       },
     });
 
-    if (!restaurant) {
-      return res.status(404).json({ message: "Restaurant not found." });
+    if (restaurants.length === 0) {
+      return res.status(404).json({ message: "No restaurants found" });
     }
 
     res.status(200).json(restaurant);
@@ -161,5 +164,31 @@ exports.getRestaurantByName = async (req, res) => {
     res
       .status(500)
       .json({ message: "Internal server error", error: error.message });
+  }
+};
+
+exports.searchRestaurants = async (req, res) => {
+  const { searchTerm } = req.query;
+  const { restaurantName } = req.params;
+  try {
+    // Search restaurants by name (case-insensitive)
+    const restaurants = await prisma.restaurant.findMany({
+      where: {
+        name: {
+          contains: searchTerm,
+          mode: "insensitive",
+          restoName, // Makes the search case-insensitive
+        },
+      },
+    });
+
+    if (restaurants.length === 0) {
+      return res.status(404).json({ message: "No restaurants found" });
+    }
+
+    res.status(200).json(restaurants);
+  } catch (error) {
+    console.error("Error fetching search results:", error);
+    res.status(500).json({ message: "Error fetching search results" });
   }
 };
