@@ -20,4 +20,7 @@ router.delete("/:id", locationController.deleteLocation);
 // Récupérer toutes les localisations pour un utilisateur spécifique par userId
 router.get("/user/:userId", locationController.getLocationsByUserId);
 
+// get nearest restaurant location
+router.get("/nearest-restaurant", locationController.getNearestRestaurant);
+
 module.exports = router;

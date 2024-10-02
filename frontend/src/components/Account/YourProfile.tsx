@@ -6,45 +6,49 @@ import { useAuth } from '../../hooks/useAuth';
 const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
 
 const YourProfile = () => {
-    const { isAuthenticated, decodedUser } = useAuth();
-    const [userData, setUserData] = useState<any>(null);
+    const { isAuthenticated, decodedUser } = useAuth(); // Get authentication state
+    const [userData, setUserData] = useState<any>(null); // State for user data
 
     useEffect(() => {
         const fetchUserData = async () => {
+            // Fetch user data if authenticated
             if (isAuthenticated && decodedUser?.id) {
                 try {
                     const response = await axios.get(`${serverDomain}/api/users/${decodedUser.id}`);
-                    setUserData(response.data);
+                    setUserData(response.data); // Set user data from API response
                 } catch (error) {
-                    console.error("Error retrieving user data", error);
+                    console.error("Error retrieving user data", error); // Log any error
                 }
             }
         };
-        fetchUserData();
+        fetchUserData(); // Call fetch function
     }, [isAuthenticated, decodedUser]);
 
+    // Loading state
     if (!userData) {
         return <div className="mt-20 text-center">Loading...</div>;
     }
 
-    // Replace backslashes with forward slashes
+    // Prepare image URL, using a default if necessary
     const imageUrl = (userData.imageUrl ? userData.imageUrl.replace(/\\/g, '/') : 'uploads/default-avatar.jpg');
 
     return (
-        <div className="flex justify-center items-center h-screen bg-gray-100">
-            <div className="bg-white rounded-lg shadow-lg p-6 text-center w-80">
-                <Image
-                    src={`${serverDomain}/${imageUrl}`}
-                    alt="Profile"
-                    width={96}
-                    height={96}
-                    className="rounded-full border-4 border-blue-500 mx-auto mb-4"
-                />
-                <h2 className="text-xl font-bold mb-1">{userData.name}</h2>
-                <p className="text-sm text-gray-600 mb-1">{userData.email}</p>
-                <p className="text-md text-blue-500 mb-2">{userData.role}</p>
-                <p className="text-xs text-gray-500">
-                    {`Member since: ${new Date(userData.createdAt).toLocaleDateString()}`}
+        <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-primary to-neutral p-4">
+            <div className="bg-secondary rounded-lg shadow-2xl p-8 flex flex-col items-center w-full h-auto max-w-md mx-auto transition-transform transform hover:scale-105">
+                <div className="relative mb-4 z-10">
+                    <Image
+                        src={`${serverDomain}/${imageUrl}`} // Use prepared image URL
+                        alt="Profile"
+                        width={160}
+                        height={160}
+                        className="rounded-full border-4 border-accent shadow-lg transform transition-transform duration-300 hover:scale-110"
+                    />
+                </div>
+                <h2 className="text-dark text-3xl font-bold mb-1 z-10">{userData.name}</h2>
+                <p className="text-lightText text-sm mb-1 z-10">{userData.email}</p>
+                <p className="text-success text-md font-medium mb-4 z-10">{userData.role}</p>
+                <p className="text-lightText text-xs z-10 text-center">
+                    {`Member since: ${new Date(userData.createdAt).toLocaleDateString()}`} // Format creation date
                 </p>
             </div>
         </div>

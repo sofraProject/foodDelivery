@@ -20,7 +20,9 @@ const cartRoutes = require("./routes/cart.route");
 const categoryRoutes = require("./routes/category.route");
 const restaurantRoutes = require("./routes/Restaurant.route");
 const LocationRoutes = require("./routes/Location.route");
+const orderItemRoutes = require("./routes/Orderitem.route")
 const adminRoutes = require("./routes/admin.route");
+const searchRoute = require("./routes/Search.route");
 
 // Import utility functions
 const { connectToDatabase } = require("./prisma/prisma");
@@ -31,6 +33,13 @@ const app = express();
 const PORT = process.env.SERVER_PORT || 3000;
 
 // Middleware configuration
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 app.use(cors());
 app.use(helmet());
 app.use(express.json());
@@ -48,13 +57,14 @@ app.use("/api/delivery", deliveryRoutes);
 app.use("/api/driver", driverRoutes);
 app.use("/api/payment", paymentRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/restaurants", restaurantRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/carts", cartRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/locations", LocationRoutes);
+app.use("/api/orderitem  " ,  orderItemRoutes)
 app.use("/api/admin", adminRoutes);
-
+app.use("/api/restaurant", restaurantRoutes);
+app.use("/api/searching", searchRoute);
 // Create HTTP server
 const server = http.createServer(app);
 

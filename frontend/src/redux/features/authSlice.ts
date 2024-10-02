@@ -14,6 +14,7 @@ const initialState: AuthState = {
   user: null,
   status: "idle",
   error: null,
+
 };
 // Update your types in userTypes.ts (or where the types are defined)
 interface SignUpCredentials {

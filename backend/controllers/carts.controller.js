@@ -1,16 +1,16 @@
 const { prismaConnection } = require("../prisma/prisma");
 
+// Retrieve all carts
 exports.getAllCarts = async (req, res) => {
   try {
     const carts = await prismaConnection.cart.findMany();
     res.status(200).json(carts);
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Error retrieving carts", error: error.message });
+    res.status(500).json({ message: "Error retrieving carts", error: error.message });
   }
 };
 
+// Retrieve a cart by customer ID
 exports.getCartById = async (req, res) => {
   try {
     const carts = await prismaConnection.cart.findMany({
@@ -30,9 +30,9 @@ exports.getCartById = async (req, res) => {
     });
 
     if (carts.length > 0) {
-      const cartsWithNumberPrice = carts.map((cart) => ({
+      const cartsWithNumberPrice = carts.map(cart => ({
         ...cart,
-        menuItem: cart.menuItem.map((item) => ({
+        menuItem: cart.menuItem.map(item => ({
           ...item,
           price: parseFloat(item.price),
         })),
@@ -43,42 +43,39 @@ exports.getCartById = async (req, res) => {
     }
   } catch (error) {
     console.error("Error retrieving cart:", error);
-    res
-      .status(500)
-      .json({ message: "Error retrieving cart", error: error.message });
+    res.status(500).json({ message: "Error retrieving cart", error: error.message });
   }
 };
 
+// Create a new cart or update existing one
 exports.createCart = async (req, res) => {
   try {
-    const { id } = req.user; // ID du client
-    const { restaurant_owner_id, menu_item_id, quantity } = req.body; // Correction: menu_item_id
-    console.log(req.body);
+    const { id } = req.user; // Customer ID
+    const { restaurant_owner_id, menu_item_id, quantity } = req.body;
+
     if (!menu_item_id) {
       return res.status(400).json({ message: "menu_item_id is required" });
     }
 
-    // Vérifier si l'utilisateur est un client valide
+    // Validate customer
     const customer = await prismaConnection.user.findUnique({ where: { id } });
     if (!customer || customer.role !== "customer") {
       return res.status(400).json({ message: "Invalid customer ID" });
     }
 
-    // Vérifier si le propriétaire du restaurant est valide
-    const restaurantOwner = await prismaConnection.user.findUnique({
-      where: { id: restaurant_owner_id },
-    });
+    // Validate restaurant owner
+    const restaurantOwner = await prismaConnection.user.findUnique({ where: { id: restaurant_owner_id } });
     if (!restaurantOwner || restaurantOwner.role !== "restaurant_owner") {
       return res.status(400).json({ message: "Invalid restaurant owner ID" });
     }
 
-    // Vérifier si l'article de menu existe déjà dans le panier du client
+    // Check if the menu item already exists in the customer's cart
     const existingCartItem = await prismaConnection.cart.findUnique({
       where: {
         customer_id_restaurant_owner_id_menu_item_id: {
           customer_id: id,
           restaurant_owner_id,
-          menu_item_id, // Correction: assurer que menu_item_id est bien utilisé ici
+          menu_item_id,
         },
       },
       include: {
@@ -93,19 +90,18 @@ exports.createCart = async (req, res) => {
       },
     });
 
-    // Si l'article existe déjà dans le panier, mettre à jour la quantité
+    // Update quantity if the item exists
     if (existingCartItem) {
       const updatedCartItem = await prismaConnection.cart.update({
         where: {
           customer_id_restaurant_owner_id_menu_item_id: {
-            // Utiliser la clé composée
             customer_id: id,
             restaurant_owner_id,
             menu_item_id,
           },
         },
         data: {
-          quantity: existingCartItem.quantity + quantity, // Augmenter la quantité
+          quantity: existingCartItem.quantity + quantity,
         },
         include: {
           menuItem: {
@@ -121,12 +117,12 @@ exports.createCart = async (req, res) => {
       return res.status(200).json(updatedCartItem);
     }
 
-    // Sinon, créer un nouvel article dans le panier
+    // Create a new cart item
     const newCart = await prismaConnection.cart.create({
       data: {
         customer_id: id,
         restaurant_owner_id,
-        menu_item_id, // Utiliser le nom correct
+        menu_item_id,
         quantity,
       },
       include: {
@@ -143,12 +139,11 @@ exports.createCart = async (req, res) => {
     return res.status(201).json(newCart);
   } catch (error) {
     console.error("Error creating cart:", error);
-    return res
-      .status(500)
-      .json({ message: "Error creating cart", error: error.message });
+    return res.status(500).json({ message: "Error creating cart", error: error.message });
   }
 };
 
+// Update a cart item
 exports.updateCart = async (req, res) => {
   try {
     const updatedCart = await prismaConnection.cart.update({
@@ -168,26 +163,24 @@ exports.updateCart = async (req, res) => {
     res.status(200).json(updatedCart);
   } catch (error) {
     console.error("Error updating cart:", error);
-    res
-      .status(500)
-      .json({ message: "Error updating cart", error: error.message });
+    res.status(500).json({ message: "Error updating cart", error: error.message });
   }
 };
 
+// Delete a cart item
 exports.deleteCart = async (req, res) => {
   try {
-    const deleted = await prismaConnection.cart.delete({
+    await prismaConnection.cart.delete({
       where: { menuitems_id: req.params.id },
     });
     res.status(204).json({ message: "Cart deleted" });
   } catch (error) {
     console.error("Error deleting cart:", error);
-    res
-      .status(500)
-      .json({ message: "Error deleting cart", error: error.message });
+    res.status(500).json({ message: "Error deleting cart", error: error.message });
   }
 };
 
+// Retrieve carts by customer ID
 exports.getCartByCustomerId = async (req, res) => {
   try {
     const carts = await prismaConnection.cart.findMany({
@@ -207,6 +200,7 @@ exports.getCartByCustomerId = async (req, res) => {
   }
 };
 
+// Retrieve carts by menu item ID
 exports.getCartByMenuItemId = async (req, res) => {
   try {
     const carts = await prismaConnection.cart.findMany({
@@ -226,6 +220,7 @@ exports.getCartByMenuItemId = async (req, res) => {
   }
 };
 
+// Retrieve carts by restaurant owner ID
 exports.getCartByRestaurantOwnerId = async (req, res) => {
   try {
     const carts = await prismaConnection.cart.findMany({
@@ -234,9 +229,7 @@ exports.getCartByRestaurantOwnerId = async (req, res) => {
     if (carts.length > 0) {
       res.status(200).json(carts);
     } else {
-      res
-        .status(404)
-        .json({ message: "No carts found for this restaurant owner" });
+      res.status(404).json({ message: "No carts found for this restaurant owner" });
     }
   } catch (error) {
     console.error("Error retrieving carts by restaurant owner:", error);
@@ -247,6 +240,7 @@ exports.getCartByRestaurantOwnerId = async (req, res) => {
   }
 };
 
+// Clear the cart for the logged-in user
 exports.clearCart = async (req, res) => {
   const { id } = req.user;
   try {
@@ -256,8 +250,6 @@ exports.clearCart = async (req, res) => {
     res.status(200).json({ message: "Cart cleared successfully" });
   } catch (error) {
     console.error("Error clearing cart:", error);
-    res
-      .status(500)
-      .json({ message: "Error clearing cart", error: error.message });
+    res.status(500).json({ message: "Error clearing cart", error: error.message });
   }
 };

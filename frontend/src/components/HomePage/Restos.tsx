@@ -8,7 +8,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaSearch } from "react-icons/fa";
 
 interface Restaurant {
   id: number;
@@ -73,6 +73,8 @@ const MenuItemCard: React.FC<{ item: MenuItem; onClick: () => void }> = ({
 
 const Foods: React.FC = () => {
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+  const [filteredRestaurants, setFilteredRestaurants] = useState<Restaurant[]>([]);
+  const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedRestaurant, setSelectedRestaurant] = useState<number | null>(
     null
   );
@@ -83,8 +85,9 @@ const Foods: React.FC = () => {
   // Fetch restaurants
   const fetchRestaurants = async () => {
     try {
-      const response = await axios.get(`${serverDomain}/api/restaurants`);
+      const response = await axios.get(`${serverDomain}/api/restaurant`);
       setRestaurants(response.data);
+      setFilteredRestaurants(response.data); // Initially, all restaurants are shown
     } catch (error) {
       console.error("Error fetching restaurants:", error);
     }
@@ -113,7 +116,23 @@ const Foods: React.FC = () => {
     fetchRestaurants();
   }, []);
 
-  // Handle click on restaurant card
+// Handle search
+const handleSearch = async () => {
+  if (!searchTerm.trim()) {
+    setFilteredRestaurants(restaurants); // Reset to all restaurants if no search term
+    return;
+  }
+
+  try {
+    // Use searchTerm directly to fetch the restaurant by name
+    const response = await axios.get(`${serverDomain}/api/restaurant/name/${searchTerm}`);
+    setFilteredRestaurants([response.data]); // Response is a single restaurant, so wrap it in an array
+  } catch (error) {
+    console.error("Error fetching search results:", error);
+  }
+};
+
+
   const handleRestaurantClick = useCallback(
     (restaurantName: string) => {
       router.push(`/Restaurant/${restaurantName}`);
@@ -141,15 +160,15 @@ const Foods: React.FC = () => {
 
   const restaurantList = useMemo(
     () =>
-      restaurants.map((restaurant) => (
+      filteredRestaurants.map((restaurant) => (
         <RestaurantCard
           key={restaurant.id}
           restaurant={restaurant}
           selected={selectedRestaurant === restaurant.id}
-          onClick={() => handleRestaurantClick(restaurant.name)} // Pass restaurant name
+          onClick={() => handleRestaurantClick(restaurant.name)}
         />
       )),
-    [restaurants, selectedRestaurant, handleRestaurantClick]
+    [filteredRestaurants, selectedRestaurant, handleRestaurantClick]
   );
 
   const menuItemList = useMemo(
@@ -169,6 +188,27 @@ const Foods: React.FC = () => {
       <h2 className="mb-8 text-3xl font-bold text-gray-800">
         Explore Our Restaurants
       </h2>
+
+      {/* Search bar */}
+      <div className="flex items-center mb-6">
+        <input
+          type="text"
+          className="flex-grow px-6 py-3 text-lg transition duration-300 rounded-full focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
+          placeholder="Search for restaurants..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          aria-label="Search for restaurants"
+        />
+        <button
+          className="p-3 ml-2 transition duration-300 rounded-full shadow-md text-primary bg-dark hover:bg-primary-dark focus:outline-none"
+          onClick={handleSearch}
+          aria-label="Search"
+        >
+          <FaSearch className="text-xl text-primary" />
+        </button>
+      </div>
+
+      {/* Restaurant list */}
       <div className="relative">
         <button
           onClick={() => scroll("left")}

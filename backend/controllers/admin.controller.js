@@ -1,7 +1,10 @@
 const { prismaConnection } = require("../prisma/prisma");
 const bcrypt = require("bcrypt");
 
-// Récupère tous les utilisateurs (pour l'admin)
+// Controller to manage users, restaurants, orders, drivers, and statistics
+
+
+// Retrieve all users (for admin)
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await prismaConnection.user.findMany();
@@ -12,11 +15,12 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
-// Récupère tous les restaurants (pour l'admin)
+
+// Retrieve all restaurants (for admin)
 exports.getAllRestaurants = async (req, res) => {
   try {
     const restaurants = await prismaConnection.restaurant.findMany({
-      include: { owner: true, category: true }
+      include: { owner: true, category: true },
     });
     res.status(200).json(restaurants);
   } catch (error) {
@@ -25,7 +29,8 @@ exports.getAllRestaurants = async (req, res) => {
   }
 };
 
-// Récupère toutes les commandes (pour l'admin)
+
+// Retrieve all orders (for admin)
 exports.getAllOrders = async (req, res) => {
   try {
     const orders = await prismaConnection.order.findMany({
@@ -34,9 +39,9 @@ exports.getAllOrders = async (req, res) => {
         restaurant: true,
         driver: true,
         orderItems: {
-          include: { menuItem: true }
-        }
-      }
+          include: { menuItem: true },
+        },
+      },
     });
     res.status(200).json(orders);
   } catch (error) {
@@ -44,7 +49,9 @@ exports.getAllOrders = async (req, res) => {
     res.status(500).json({ error: "Failed to fetch orders." });
   }
 };
-// Met à jour le statut d'une commande (pour l'admin)
+
+
+// Update the status of an order (for admin)
 exports.updateOrderStatus = async (req, res) => {
   const { id } = req.params;
   const { status } = req.body;
@@ -65,8 +72,7 @@ exports.updateOrderStatus = async (req, res) => {
   }
 };
 
-
-// Crée un nouveau restaurant (pour l'admin)
+// Create a new restaurant (for admin)
 exports.createRestaurant = async (req, res) => {
   const { name, description, ownerId, categoryId } = req.body;
 
@@ -90,7 +96,7 @@ exports.createRestaurant = async (req, res) => {
   }
 };
 
-// Met à jour un restaurant (pour l'admin)
+// Update a restaurant (for admin)
 exports.updateRestaurant = async (req, res) => {
   const { id } = req.params;
   const { name, description, ownerId, categoryId } = req.body;
@@ -112,7 +118,7 @@ exports.updateRestaurant = async (req, res) => {
   }
 };
 
-// Supprime un restaurant (pour l'admin)
+// Delete a restaurant (for admin)
 exports.deleteRestaurant = async (req, res) => {
   const { id } = req.params;
   try {
@@ -126,7 +132,7 @@ exports.deleteRestaurant = async (req, res) => {
   }
 };
 
-// Récupère tous les chauffeurs (pour l'admin)
+// Retrieve all drivers (for admin)
 exports.getAllDrivers = async (req, res) => {
   try {
     const drivers = await prismaConnection.user.findMany({
@@ -139,7 +145,7 @@ exports.getAllDrivers = async (req, res) => {
   }
 };
 
-// Crée un nouveau chauffeur (pour l'admin)
+// Create a new driver (for admin)
 exports.createDriver = async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -164,7 +170,7 @@ exports.createDriver = async (req, res) => {
   }
 };
 
-// Met à jour un chauffeur (pour l'admin)
+// Update a driver (for admin)
 exports.updateDriver = async (req, res) => {
   const { id } = req.params;
   const { name, email, password } = req.body;
@@ -186,7 +192,7 @@ exports.updateDriver = async (req, res) => {
   }
 };
 
-// Supprime un chauffeur (pour l'admin)
+// Delete a driver (for admin)
 exports.deleteDriver = async (req, res) => {
   const { id } = req.params;
   try {
@@ -200,7 +206,7 @@ exports.deleteDriver = async (req, res) => {
   }
 };
 
-// Statistiques générales (pour l'admin)
+// Retrieve general statistics (for admin)
 exports.getStatistics = async (req, res) => {
   try {
     const userCount = await prismaConnection.user.count();

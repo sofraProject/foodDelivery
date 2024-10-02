@@ -18,6 +18,7 @@ export const HomePage: React.FC = () => {
 
   return (
     <div className="bg-gray-50">
+   
       <Banner />
       {hasSearchResults ? (
         <SearchResults />

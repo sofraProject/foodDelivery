@@ -1,5 +1,6 @@
 const { prismaConnection } = require("../prisma/prisma");
 
+// Retrieve all categories
 exports.getAllCategories = async (req, res) => {
   try {
     const categories = await prismaConnection.category.findMany();
@@ -9,6 +10,7 @@ exports.getAllCategories = async (req, res) => {
   }
 };
 
+// Retrieve a category by its ID
 exports.getCategoryById = async (req, res) => {
   const { id } = req.params;
   try {
@@ -23,6 +25,7 @@ exports.getCategoryById = async (req, res) => {
   }
 };
 
+// Retrieve a category by its name
 exports.getCategoryByName = async (req, res) => {
   const { name } = req.params;
   try {
@@ -37,6 +40,7 @@ exports.getCategoryByName = async (req, res) => {
   }
 };
 
+// Create a new category
 exports.createCategory = async (req, res) => {
   const { name, imageUrl } = req.body;
   try {
@@ -49,6 +53,7 @@ exports.createCategory = async (req, res) => {
   }
 };
 
+// Update an existing category
 exports.updateCategory = async (req, res) => {
   const { id } = req.params;
   const { name, imageUrl } = req.body;
@@ -67,18 +72,19 @@ exports.updateCategory = async (req, res) => {
   }
 };
 
+// Delete a category
 exports.deleteCategory = async (req, res) => {
-    const { id } = req.params;
-    try {
-      const deletedCategory = await prismaConnection.category.delete({
-        where: { id: Number(id) },
-      });
-      res.status(200).json({ message: "Category deleted successfully" });
-    } catch (error) {
-      if (error.code === 'P2025') {
-        res.status(404).json({ message: "Category not found" });
-      } else {
-        res.status(500).json({ error: error.message });
-      }
+  const { id } = req.params;
+  try {
+    await prismaConnection.category.delete({
+      where: { id: Number(id) },
+    });
+    res.status(200).json({ message: "Category deleted successfully" });
+  } catch (error) {
+    if (error.code === 'P2025') {
+      res.status(404).json({ message: "Category not found" });
+    } else {
+      res.status(500).json({ error: error.message });
     }
-  };
+  }
+};

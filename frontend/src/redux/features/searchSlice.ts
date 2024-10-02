@@ -5,12 +5,11 @@ const serverDomain = process.env.NEXT_PUBLIC_SERVER_DOMAINE;
 
 export const searchProductsAndRestaurants = createAsyncThunk(
   "search/productsAndRestaurants",
-  async (searchTerm: string, { rejectWithValue }) => {
+  async ({ searchTerm, lat, long }: { searchTerm: string; lat: number; long: number }, { rejectWithValue }) => {
     try {
       const response = await axios.get(
-        `${serverDomain}/api/search?q=${encodeURIComponent(searchTerm)}`
+        `${serverDomain}/api/search?q=${encodeURIComponent(searchTerm)}&lat=${lat}&long=${long}`
       );
-      console.log(response.data, "ya hafaaaaaaaaaa");
       return response.data;
     } catch (error) {
       if (axios.isAxiosError(error) && error.response) {
